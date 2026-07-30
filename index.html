@@ -369,6 +369,10 @@ table.mtxtab td.num{font-variant-numeric:tabular-nums}
 table.mtxtab tbody td.mtxcell{cursor:pointer}
 table.mtxtab tbody td.mtxcell:hover{background:var(--brand-l);font-weight:700}
 table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px #f59e0b;font-weight:800}
+table.mtxtab .mtxhd{cursor:pointer}
+table.mtxtab .mtxhd:hover{background:var(--brand-l)}
+table.mtxtab .mtxoff{opacity:.35;filter:grayscale(1)}
+table.mtxtab .mtxhd.mtxoff{text-decoration:line-through}
 .mxright{display:flex;flex-direction:column;gap:22px;min-width:0}
 .mxlegend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;font-size:13px;color:var(--muted)}
 .mxlegend span{display:inline-flex;align-items:center;gap:7px}
@@ -1426,16 +1430,21 @@ function renderSal(){
 const MTXROWS=[-5,0,5,10,15,20];
 const MTXCOLS=[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}];
 let mxSel=0, mxUnit='clinic', mxRi=1, mxCi=0; // implicit: 0% spital × 3 ani (coef 1)
+const mxRowOff=new Set(), mxColOff=new Set(); // rânduri / coloane ascunse (estompate + excluse din grafic)
 const mxCoefAt=(ri,ci)=>1+(MTXROWS[ri]+MTXCOLS[ci].p)/100;
 const fcoef=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:3});
 function renderMtx(){
   const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
-  let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map(c=>`<th class="num">${c.l}</th>`).join('')+'</tr>';
-  h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map(c=>`<th class="num mtxpct">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
+  const coff=ci=>mxColOff.has(ci), roff=ri=>mxRowOff.has(ri);
+  let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${c.l}</th>`).join('')+'</tr>';
+  h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxpct mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
   MTXROWS.forEach((r,ri)=>{
     h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${MTXROWS.length}">Tip de spital</th>`:'');
-    h+=`<td class="num mtxpct"><b>${r>0?'+':''}${r}%</b></td>`;
-    h+=MTXCOLS.map((c,ci)=>`<td class="num mtxcell${ri===mxRi&&ci===mxCi?' sel':''}" data-ri="${ri}" data-ci="${ci}" title="Aplică coeficientul ${fcoef(mxCoefAt(ri,ci))}">${fcoef(mxCoefAt(ri,ci))}</td>`).join('')+'</tr>';
+    h+=`<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: ascunde / afișează rândul"><b>${r>0?'+':''}${r}%</b></td>`;
+    h+=MTXCOLS.map((c,ci)=>{
+      const off=roff(ri)||coff(ci);
+      return `<td class="num mtxcell${ri===mxRi&&ci===mxCi?' sel':''}${off?' mtxoff':''}" data-ri="${ri}" data-ci="${ci}" title="Aplică coeficientul ${fcoef(mxCoefAt(ri,ci))}">${fcoef(mxCoefAt(ri,ci))}</td>`;
+    }).join('')+'</tr>';
   });
   $('mtxtab').innerHTML=h+'</tbody>';
 }
@@ -1503,6 +1512,7 @@ function renderMx(){
 function renderMxChart(r,sh,cp){
   const pts=[];
   MTXROWS.forEach((rw,ri)=>MTXCOLS.forEach((cl,ci)=>{
+    if(mxRowOff.has(ri)||mxColOff.has(ci)) return; // rând / coloană ascunsă
     pts.push({ri,ci,coef:mxCoefAt(ri,ci),tot:mxTotNou(r,sh,mxCoefAt(ri,ci)-1).tot});
   }));
   pts.forEach(p=>p.diff=p.tot-cp.P);
@@ -1549,6 +1559,12 @@ function mxInit(){
   ['mx_ore','mx_svechi','mx_snou','mx_orenoapte','mx_oresdsl','mx_tarifsdsl','mx_hranav','mx_indemnv','mx_ppct'].forEach(id=>$(id).addEventListener('input',renderMx));
   $('mx_reset').addEventListener('click',()=>{mxApplyDefaults();renderMtx();renderMx();});
   $('mtxtab').addEventListener('click',e=>{
+    const hd=e.target.closest('[data-coloff],[data-rowoff]');
+    if(hd){
+      if(hd.dataset.coloff!=null){const ci=+hd.dataset.coloff; mxColOff.has(ci)?mxColOff.delete(ci):mxColOff.add(ci);}
+      else{const ri=+hd.dataset.rowoff; mxRowOff.has(ri)?mxRowOff.delete(ri):mxRowOff.add(ri);}
+      renderMtx(); renderMx(); return;
+    }
     const td=e.target.closest('td.mtxcell'); if(!td) return;
     mxRi=+td.dataset.ri; mxCi=+td.dataset.ci; renderMtx(); renderMx();
   });
