@@ -990,7 +990,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
         <div class="fwrap">
           <table class="saltab mtxtab" id="mtxtab"></table>
         </div>
-        <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri, −5% … +20%) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane, 0% … +10%). <b>Click pe o celulă</b> pentru a aplica coeficientul salariului de bază din proiect în comparația de mai jos.</div>
+        <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri, −3% … +12%) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane, 0% … +10%). <b>Click pe o celulă</b> pentru a aplica coeficientul salariului de bază din proiect în comparația de mai jos.</div>
       </div>
     </section>
     <section class="card">
@@ -1427,7 +1427,7 @@ function renderSal(){
 }
 
 // ===== Matrice ajustări (tip de spital × specialitate) + comparație prezent/nou =====
-const MTXROWS=[-5,0,5,10,15,20];
+const MTXROWS=[-3,0,3,6,9,12];
 const MTXCOLS=[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}];
 let mxSel=0, mxUnit='clinic', mxRi=1, mxCi=0; // implicit: 0% spital × 3 ani (coef 1)
 const mxRowOff=new Set(), mxColOff=new Set(); // rânduri / coloane ascunse (estompate + excluse din grafic)
