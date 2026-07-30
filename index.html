@@ -374,6 +374,8 @@ table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px 
 .mxlegend span{display:inline-flex;align-items:center;gap:7px}
 .mxlegend .lg-dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff}
 .mxlegend .lg-diamond{width:10px;height:10px;background:#0f172a;display:inline-block;transform:rotate(45deg)}
+#mx_tip{position:absolute;display:none;background:#0f172a;color:#fff;font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:9px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:5;max-width:250px;white-space:nowrap}
+#mx_chart circle{cursor:pointer}
 .c3rm{position:absolute;top:4px;right:5px;appearance:none;border:none;background:rgba(255,255,255,.25);color:#fff;width:18px;height:18px;line-height:16px;border-radius:50%;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .c3rm:hover{background:rgba(255,255,255,.5)}
 table.c3tab td.c3warncell{background:#fdeaee}
@@ -988,6 +990,22 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       </div>
     </section>
     <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — toate celulele matricei</h2>
+      <div class="body">
+        <div id="mx_chartwrap" style="position:relative">
+          <div id="mx_chart"></div>
+          <div id="mx_tip"></div>
+        </div>
+        <div class="mxlegend">
+          <span><i class="lg-diamond"></i>Calcul prezent</span>
+          <span><i class="lg-dot" style="background:#0c7a43"></i>Proiect — peste prezent</span>
+          <span><i class="lg-dot" style="background:#c81e3c"></i>Proiect — sub prezent</span>
+          <span><i class="lg-dot" style="background:#94a3b8;box-shadow:0 0 0 2.5px #f59e0b"></i>Celula selectată</span>
+        </div>
+        <div class="note">Fiecare punct = un <b>calcul proiect</b> pentru o celulă din matrice (30 de combinații); zona roșiatică de sub linia zero marchează totalurile <b>sub prezent</b>. Ține cursorul pe un punct pentru detalii.</div>
+      </div>
+    </section>
+    <section class="card">
       <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație — prezent vs. nou <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="mx_coeflbl"></span></h2>
       <div class="body">
         <p class="selfn" id="mx_meta"></p>
@@ -1011,19 +1029,6 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
           </table>
         </div>
         <div class="note">Cazul 2 folosește salariul de bază din <b>proiect</b> înmulțit cu <b>coeficientul selectat în matrice</b>; restul parametrilor sunt cei din panoul „Parametri comuni”.</div>
-      </div>
-    </section>
-    <section class="card">
-      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — toate celulele matricei</h2>
-      <div class="body">
-        <div id="mx_chart"></div>
-        <div class="mxlegend">
-          <span><i class="lg-diamond"></i>Calcul prezent</span>
-          <span><i class="lg-dot" style="background:#0c7a43"></i>Proiect — peste prezent</span>
-          <span><i class="lg-dot" style="background:#c81e3c"></i>Proiect — sub prezent</span>
-          <span><i class="lg-dot" style="background:#94a3b8;box-shadow:0 0 0 2.5px #f59e0b"></i>Celula selectată</span>
-        </div>
-        <div class="note">Fiecare punct = un <b>calcul proiect</b> pentru o celulă din matrice (30 de combinații); zona roșiatică de sub linia zero marchează totalurile <b>sub prezent</b>. Ține cursorul pe un punct pentru detalii.</div>
       </div>
     </section>
   </div>
@@ -1519,11 +1524,10 @@ function renderMxChart(r,sh,cp){
   pts.forEach(p=>{
     const selp=p.ri===mxRi&&p.ci===mxCi;
     const col=p.diff>=0?'#0c7a43':'#c81e3c';
-    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="${selp?8:5.5}" fill="${col}" stroke="${selp?'#f59e0b':'#fff'}" stroke-width="${selp?3:2}">`+
-       `<title>${MTXROWS[p.ri]>0?'+':''}${MTXROWS[p.ri]}% spital · ${MTXCOLS[p.ci].l} (coef. ${fcoef(p.coef)})\nTotal: ${lei(p.tot)} lei · Dif.: ${p.diff>=0?'+':''}${lei(p.diff)} lei</title></circle>`;
+    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="${selp?8:5.5}" fill="${col}" stroke="${selp?'#f59e0b':'#fff'}" stroke-width="${selp?3:2}" data-ri="${p.ri}" data-ci="${p.ci}" data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}" data-dpct="${cp.P?pct(p.tot/cp.P-1):''}" data-coef="${fcoef(p.coef)}"/>`;
   });
   // punctul prezent — romb închis la culoare pe linia zero
-  s+=`<path d="M ${X(cp.P)} ${Y(0)-8} l 8 8 l -8 8 l -8 -8 Z" fill="#0f172a" stroke="#fff" stroke-width="2"><title>Calcul prezent\nTotal: ${lei(cp.P)} lei</title></path>`;
+  s+=`<path d="M ${X(cp.P)} ${Y(0)-8} l 8 8 l -8 8 l -8 -8 Z" fill="#0f172a" stroke="#fff" stroke-width="2" data-prez="1" data-tot="${lei(cp.P)}"/>`;
   // axele
   s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
   s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență proiect − prezent (lei)</text>`;
@@ -1548,6 +1552,29 @@ function mxInit(){
     const td=e.target.closest('td.mtxcell'); if(!td) return;
     mxRi=+td.dataset.ri; mxCi=+td.dataset.ci; renderMtx(); renderMx();
   });
+  // tooltip pe punctele graficului
+  const tip=$('mx_tip'), wrap=$('mx_chartwrap');
+  wrap.addEventListener('mousemove',e=>{
+    const el=e.target.closest('circle[data-tot],path[data-prez]');
+    if(!el){tip.style.display='none';return;}
+    if(el.dataset.prez){
+      tip.innerHTML=`<b>◆ Calcul prezent</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
+    }else{
+      const ri=+el.dataset.ri, ci=+el.dataset.ci, rp=MTXROWS[ri], cpp=MTXCOLS[ci];
+      tip.innerHTML=`Tip spital: <b>${rp>0?'+':''}${rp}%</b><br>`+
+        `Specialitate: <b>${cpp.l}</b> (+${cpp.p.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})}%)<br>`+
+        `Coeficient: <b>${el.dataset.coef}</b><br>`+
+        `Total: <b>${el.dataset.tot} lei</b><br>`+
+        `Diferență: <b>${el.dataset.diff} lei</b>${el.dataset.dpct?' ('+el.dataset.dpct+')':''}`;
+    }
+    tip.style.display='block';
+    const r=wrap.getBoundingClientRect();
+    let x=e.clientX-r.left+14, y=e.clientY-r.top+12;
+    if(x+tip.offsetWidth>r.width-4) x=e.clientX-r.left-tip.offsetWidth-14;
+    if(y+tip.offsetHeight>r.height-4) y=e.clientY-r.top-tip.offsetHeight-12;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  });
+  wrap.addEventListener('mouseleave',()=>{tip.style.display='none';});
   renderMtx(); renderMx();
 }
 
