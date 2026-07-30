@@ -366,7 +366,14 @@ table.mtxtab th.mtxcorner{background:#fff;border-bottom:1px solid var(--line)}
 table.mtxtab th.mtxside{background:var(--prez-bg);text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);width:110px;vertical-align:middle}
 table.mtxtab .mtxpct{color:var(--brand-d);font-weight:700}
 table.mtxtab td.num{font-variant-numeric:tabular-nums}
-table.mtxtab tbody td:not(.mtxpct):hover{background:var(--brand-l);font-weight:700}
+table.mtxtab tbody td.mtxcell{cursor:pointer}
+table.mtxtab tbody td.mtxcell:hover{background:var(--brand-l);font-weight:700}
+table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px #f59e0b;font-weight:800}
+.mxright{display:flex;flex-direction:column;gap:22px;min-width:0}
+.mxlegend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;font-size:13px;color:var(--muted)}
+.mxlegend span{display:inline-flex;align-items:center;gap:7px}
+.mxlegend .lg-dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff}
+.mxlegend .lg-diamond{width:10px;height:10px;background:#0f172a;display:inline-block;transform:rotate(45deg)}
 .c3rm{position:absolute;top:4px;right:5px;appearance:none;border:none;background:rgba(255,255,255,.25);color:#fff;width:18px;height:18px;line-height:16px;border-radius:50%;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .c3rm:hover{background:rgba(255,255,255,.5)}
 table.c3tab td.c3warncell{background:#fdeaee}
@@ -902,16 +909,124 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   </section>
 </div>
 
-<div id="mtxview" style="display:none">
-  <section class="card">
-    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Matrice ajustări <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500">· tip de spital × specialitate</span></h2>
+<div class="grid cmp3view" id="mtxview" style="display:none">
+  <section class="card c3params">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
     <div class="body">
-      <div class="fwrap">
-        <table class="saltab mtxtab" id="mtxtab"></table>
+      <div class="pgroup"><div class="pgroup-title">Tip unitate</div>
+        <div class="seg" id="mx_unit">
+          <button type="button" data-u="clinic" class="active">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="sju">SAJ · ATI</button>
+        </div>
       </div>
-      <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri, −5% … +20%) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane, 0% … +10%). Se aplică salariului de bază din proiect.</div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="mx_fnsel"></select></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="mx_grad_lbl">5</b></span><span class="gradcoef" id="mx_grad_coef">coef. 1×</span></div>
+        <input type="range" id="mx_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="mx_ore" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor condiții deosebite</div>
+        <div class="params two">
+          <div class="field"><label>Actual <span class="u">(%)</span></label><input type="number" id="mx_svechi" step="1"></div>
+          <div class="field"><label>Nou <span class="u">(%)</span></label><input type="number" id="mx_snou" step="1"></div>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor tură / noapte</div>
+        <div class="seg" id="mx_mode">
+          <button type="button" data-v="Tura">Tură</button>
+          <button type="button" data-v="Noapte">Noapte</button>
+          <button type="button" data-v="Nimic">Nimic</button>
+        </div>
+        <div class="field" id="mx_wrap_orenoapte" style="margin-top:11px"><label>Ore de noapte / lună</label><input type="number" id="mx_orenoapte" step="1"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor SDSL</div>
+        <div class="params two">
+          <div class="field"><label>Ore SDSL / lună</label><input type="number" id="mx_oresdsl" step="1"></div>
+          <div class="field"><label>Tarif SDSL <span class="u">(%)</span></label><input type="number" id="mx_tarifsdsl" step="1"></div>
+        </div>
+      </div>
+      <div class="pgrow">
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație de hrană</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="mx_hrana"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="mx_hranav" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație OUG 63/2023</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="mx_indemn"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="mx_indemnv" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Plată pe performanță <span class="u">(% din salariul de bază nou)</span></div>
+          <div class="switchrow">
+            <button type="button" class="switch" id="mx_pp"><span class="knob"></span><span class="stxt">Nu</span></button>
+            <input type="number" id="mx_ppct" class="vinput" step="1" value="15"><span class="unit">%</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="mx_reset">↺ Resetează parametrii</button></div>
     </div>
   </section>
+  <div class="mxright">
+    <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Matrice ajustări <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500">· tip de spital × specialitate · alege o celulă</span></h2>
+      <div class="body">
+        <div class="fwrap">
+          <table class="saltab mtxtab" id="mtxtab"></table>
+        </div>
+        <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri, −5% … +20%) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane, 0% … +10%). <b>Click pe o celulă</b> pentru a aplica coeficientul salariului de bază din proiect în comparația de mai jos.</div>
+      </div>
+    </section>
+    <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație — prezent vs. nou <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="mx_coeflbl"></span></h2>
+      <div class="body">
+        <p class="selfn" id="mx_meta"></p>
+        <div class="fwrap">
+          <table class="c3tab mxtab">
+            <thead><tr><th class="c3lbl"></th>
+              <th>Cazul 1<span class="c3sub">Prezent</span></th>
+              <th>Cazul 2<span class="c3sub" id="mx_c2sub">Nou 2026</span></th></tr></thead>
+            <tbody>
+              <tr class="c3sec"><td colspan="3">Componente</td></tr>
+              <tr><td class="c3lbl">Salariu de bază</td><td id="mx_sb0"></td><td id="mx_sb1"></td></tr>
+              <tr><td class="c3lbl">Spor condiții deosebite</td><td id="mx_sc0"></td><td id="mx_sc1"></td></tr>
+              <tr><td class="c3lbl">Spor tură / noapte</td><td id="mx_st0"></td><td id="mx_st1"></td></tr>
+              <tr><td class="c3lbl">Spor SDSL</td><td id="mx_ss0"></td><td id="mx_ss1"></td></tr>
+              <tr><td class="c3lbl">Indemnizație de hrană</td><td id="mx_ih0"></td><td id="mx_ih1"></td></tr>
+              <tr><td class="c3lbl">Indemnizație OUG 63/2023</td><td id="mx_io0"></td><td id="mx_io1"></td></tr>
+              <tr><td class="c3lbl">Plată pe performanță</td><td class="c3na">—</td><td id="mx_pp1"></td></tr>
+              <tr class="c3total"><td class="c3lbl">TOTAL brut / lună</td><td id="mx_tn0"></td><td id="mx_tn1"></td></tr>
+              <tr><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="mx_df1"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Cazul 2 folosește salariul de bază din <b>proiect</b> înmulțit cu <b>coeficientul selectat în matrice</b>; restul parametrilor sunt cei din panoul „Parametri comuni”.</div>
+      </div>
+    </section>
+    <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — toate celulele matricei</h2>
+      <div class="body">
+        <div id="mx_chart"></div>
+        <div class="mxlegend">
+          <span><i class="lg-diamond"></i>Calcul prezent</span>
+          <span><i class="lg-dot" style="background:#0c7a43"></i>Proiect — peste prezent</span>
+          <span><i class="lg-dot" style="background:#c81e3c"></i>Proiect — sub prezent</span>
+          <span><i class="lg-dot" style="background:#94a3b8;box-shadow:0 0 0 2.5px #f59e0b"></i>Celula selectată</span>
+        </div>
+        <div class="note">Fiecare punct = un <b>calcul proiect</b> pentru o celulă din matrice (30 de combinații); zona roșiatică de sub linia zero marchează totalurile <b>sub prezent</b>. Ține cursorul pe un punct pentru detalii.</div>
+      </div>
+    </section>
+  </div>
 </div>
 
 <div class="prog-top" id="progtop" style="display:none">
@@ -1203,6 +1318,7 @@ function showView(ds){
   const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp', isMtx=ds==='mtx';
   const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp&&!isMtx;
   $('mtxview').style.display=isMtx?'':'none';
+  if(isMtx) renderMx();
   $('salview').style.display=isSal?'':'none';
   if(isSal) renderSal();
   $('gcmpview').style.display=isGcmp?'':'none';
@@ -1301,20 +1417,138 @@ function renderSal(){
   $('salcount').textContent='· '+rows.length+' funcții · '+C3_UNITLBL[salUnit];
 }
 
-// ===== Matrice ajustări (tip de spital × specialitate) =====
+// ===== Matrice ajustări (tip de spital × specialitate) + comparație prezent/nou =====
+const MTXROWS=[-5,0,5,10,15,20];
+const MTXCOLS=[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}];
+let mxSel=0, mxUnit='clinic', mxRi=1, mxCi=0; // implicit: 0% spital × 3 ani (coef 1)
+const mxCoefAt=(ri,ci)=>1+(MTXROWS[ri]+MTXCOLS[ci].p)/100;
+const fcoef=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:3});
 function renderMtx(){
-  const rows=[-5,0,5,10,15,20];
-  const cols=[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}];
-  const fc=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:3});
   const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
-  let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+cols.map(c=>`<th class="num">${c.l}</th>`).join('')+'</tr>';
-  h+='<tr><th class="mtxcorner" colspan="2"></th>'+cols.map(c=>`<th class="num mtxpct">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
-  rows.forEach((r,ri)=>{
-    h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${rows.length}">Tip de spital</th>`:'');
+  let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map(c=>`<th class="num">${c.l}</th>`).join('')+'</tr>';
+  h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map(c=>`<th class="num mtxpct">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
+  MTXROWS.forEach((r,ri)=>{
+    h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${MTXROWS.length}">Tip de spital</th>`:'');
     h+=`<td class="num mtxpct"><b>${r>0?'+':''}${r}%</b></td>`;
-    h+=cols.map(c=>`<td class="num">${fc(1+(r+c.p)/100)}</td>`).join('')+'</tr>';
+    h+=MTXCOLS.map((c,ci)=>`<td class="num mtxcell${ri===mxRi&&ci===mxCi?' sel':''}" data-ri="${ri}" data-ci="${ci}" title="Aplică coeficientul ${fcoef(mxCoefAt(ri,ci))}">${fcoef(mxCoefAt(ri,ci))}</td>`).join('')+'</tr>';
   });
   $('mtxtab').innerHTML=h+'</tbody>';
+}
+function mxMode(){return document.querySelector('#mx_mode button.active')?.dataset.v||'Nimic';}
+function mxSetMode(m){document.querySelectorAll('#mx_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));$('mx_wrap_orenoapte').style.display=(m==='Noapte')?'':'none';}
+function mxUpdateGrad(){const v=+$('mx_grad').value;$('mx_grad_lbl').textContent=v;$('mx_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('mx_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function mxShared(){return {
+  ore:+$('mx_ore').value||1, grad:+$('mx_grad').value,
+  svechi:(+$('mx_svechi').value||0)/100, snou:(+$('mx_snou').value||0)/100,
+  noapte:mxMode()==='Noapte'?'Da':'Nu', orenoapte:+$('mx_orenoapte').value||0,
+  tura:mxMode()==='Tura'?'Da':'Nu', oresdsl:+$('mx_oresdsl').value||0,
+  tarifsdsl:(+$('mx_tarifsdsl').value||0)/100,
+  hrana:c3Sw('mx_hrana'), hranav:+$('mx_hranav').value||0,
+  indemn:c3Sw('mx_indemn'), indemnv:+$('mx_indemnv').value||0
+};}
+function mxApplyDefaults(){
+  $('mx_ore').value=168; $('mx_grad').value=5; mxUpdateGrad();
+  $('mx_svechi').value=85; $('mx_snou').value=20;
+  mxSetMode('Tura'); $('mx_orenoapte').value=0;
+  $('mx_oresdsl').value=48; $('mx_tarifsdsl').value=30;
+  c3SetSw('mx_hrana',true); $('mx_hranav').value=347;
+  c3SetSw('mx_indemn',true); $('mx_indemnv').value=800;
+  c3SetSw('mx_pp',false); $('mx_ppct').value=15;
+  mxUnit='clinic'; document.querySelectorAll('#mx_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
+  mxRi=1; mxCi=0;
+}
+function mxTotNou(r,sh,adj){
+  const c=calc(r,{...sh, adjust:adj, indemnAll: sh.indemn==='Da'});
+  const ppv=c3Sw('mx_pp')==='Da'?(+$('mx_ppct').value||0)/100*c.I:0;
+  return {c, ppv, tot:c.I+c.R+c.T+c.V+ppv};
+}
+function renderMx(){
+  const sh=mxShared(); const meta=DS.clinic.rows[mxSel], r=DS[mxUnit].rows[mxSel];
+  const coef=mxCoefAt(mxRi,mxCi);
+  $('mx_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[mxUnit]} · matrice: ${MTXROWS[mxRi]>0?'+':''}${MTXROWS[mxRi]}% spital + ${MTXCOLS[mxCi].p}% ${MTXCOLS[mxCi].l}`;
+  $('mx_coeflbl').textContent='· coef. selectat '+fcoef(coef);
+  $('mx_c2sub').textContent='Nou 2026 · coef. '+fcoef(coef);
+  const cp=calc(r,{...sh, adjust:0, indemnAll: sh.indemn==='Da'});
+  $('mx_sb0').textContent=lei(cp.J); $('mx_sc0').textContent=lei(cp.M);
+  $('mx_st0').textContent=lei(cp.N); $('mx_ss0').textContent=lei(cp.O);
+  $('mx_ih0').textContent=cp.hrana?lei(cp.hrana):'0'; $('mx_io0').textContent=cp.indemn?lei(cp.indemn):'0';
+  $('mx_tn0').textContent=lei(cp.P);
+  const mxv=(id,val,base,elim)=>{const d=val-base,cls=d>1e-9?'pos':(d<-1e-9?'neg':'');
+    const top=elim?'<span class="elim">— eliminat</span>':lei(val);
+    let dl='';
+    if(!elim && !(base===0&&val===0)){
+      dl=`<span class="c3d ${cls}">${d>=0?'+':''}${lei(d)}</span>`;
+      if(base) dl+=`<span class="c3d ${cls}">${pct(val/base-1)}</span>`;
+    }
+    $(id).innerHTML=top+dl;};
+  const {c, ppv, tot}=mxTotNou(r,sh,coef-1);
+  mxv('mx_sb1',c.I,cp.J); mxv('mx_sc1',c.R,cp.M);
+  mxv('mx_st1',c.T,cp.N); mxv('mx_ss1',c.V,cp.O);
+  mxv('mx_ih1',0,cp.hrana,true); mxv('mx_io1',0,cp.indemn,true);
+  $('mx_pp1').textContent=c3Sw('mx_pp')==='Da'?lei(ppv):'—';
+  $('mx_tn1').textContent=lei(tot);
+  const d=tot-cp.P, dc=$('mx_df1');
+  dc.classList.add('c3diff'); dc.classList.remove('pos','neg'); dc.classList.add(d>=0?'pos':'neg');
+  dc.innerHTML=`${d>=0?'+':''}${lei(d)}<span class="dp">${cp.P?pct(tot/cp.P-1):''}</span>`;
+  const warn=tot<cp.P;
+  ['sb1','sc1','st1','ss1','ih1','io1','pp1','tn1','df1'].forEach(k=>$('mx_'+k).classList.toggle('c3warncell',warn));
+  renderMxChart(r,sh,cp);
+}
+// grafic: x = total brut / lună, y = diferență (proiect − prezent); un punct pe celulă
+function renderMxChart(r,sh,cp){
+  const pts=[];
+  MTXROWS.forEach((rw,ri)=>MTXCOLS.forEach((cl,ci)=>{
+    pts.push({ri,ci,coef:mxCoefAt(ri,ci),tot:mxTotNou(r,sh,mxCoefAt(ri,ci)-1).tot});
+  }));
+  pts.forEach(p=>p.diff=p.tot-cp.P);
+  const xs=[cp.P,...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
+  const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
+  const xpad=(xmax-xmin)*0.07||1000, ypad=(ymaxR-yminR)*0.1||500;
+  const x0=xmin-xpad, x1=xmax+xpad, y0=yminR-ypad, y1=ymaxR+ypad;
+  const W=760,H=400,ML=86,MR=16,MT=14,MB=44;
+  const X=v=>ML+(v-x0)/(x1-x0)*(W-ML-MR), Y=v=>MT+(y1-v)/(y1-y0)*(H-MT-MB);
+  const ticks=(a,b,n)=>{const s=(b-a)/n;const m=Math.pow(10,Math.floor(Math.log10(s)));const st=Math.ceil(s/m)*m;const t=[];for(let v=Math.ceil(a/st)*st;v<=b;v+=st)t.push(v);return t;};
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font:12px system-ui">`;
+  // zona negativă (sub prezent) evidențiată
+  if(y0<0) s+=`<rect x="${ML}" y="${Y(Math.min(0,y1))}" width="${W-ML-MR}" height="${Y(y0)-Y(Math.min(0,y1))}" fill="#e11d48" opacity="0.06"/>`;
+  ticks(y0,y1,6).forEach(v=>{s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e2e8f0" stroke-width="1"/><text x="${ML-8}" y="${Y(v)+4}" text-anchor="end" fill="#64748b">${v>0?'+':''}${lei(v)}</text>`;});
+  ticks(x0,x1,6).forEach(v=>{s+=`<text x="${X(v)}" y="${H-MB+18}" text-anchor="middle" fill="#64748b">${lei(v)}</text>`;});
+  // linia zero
+  if(0>=y0&&0<=y1) s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(0)}" y2="${Y(0)}" stroke="#0f172a" stroke-width="1.5"/><text x="${W-MR-4}" y="${Y(0)-6}" text-anchor="end" fill="#0f172a" font-weight="600">prezent (dif. 0)</text>`;
+  // punctele proiect — verde peste prezent, roșu sub prezent
+  pts.forEach(p=>{
+    const selp=p.ri===mxRi&&p.ci===mxCi;
+    const col=p.diff>=0?'#0c7a43':'#c81e3c';
+    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="${selp?8:5.5}" fill="${col}" stroke="${selp?'#f59e0b':'#fff'}" stroke-width="${selp?3:2}">`+
+       `<title>${MTXROWS[p.ri]>0?'+':''}${MTXROWS[p.ri]}% spital · ${MTXCOLS[p.ci].l} (coef. ${fcoef(p.coef)})\nTotal: ${lei(p.tot)} lei · Dif.: ${p.diff>=0?'+':''}${lei(p.diff)} lei</title></circle>`;
+  });
+  // punctul prezent — romb închis la culoare pe linia zero
+  s+=`<path d="M ${X(cp.P)} ${Y(0)-8} l 8 8 l -8 8 l -8 -8 Z" fill="#0f172a" stroke="#fff" stroke-width="2"><title>Calcul prezent\nTotal: ${lei(cp.P)} lei</title></path>`;
+  // axele
+  s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
+  s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență proiect − prezent (lei)</text>`;
+  s+=`</svg>`;
+  $('mx_chart').innerHTML=s;
+}
+function mxInit(){
+  $('mx_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('mx_fnsel').value=0;
+  mxApplyDefaults();
+  $('mx_fnsel').addEventListener('change',e=>{mxSel=+e.target.value;renderMx();});
+  document.querySelectorAll('#mx_unit button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#mx_unit button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); mxUnit=b.dataset.u; renderMx();
+  }));
+  document.querySelectorAll('#mx_mode button').forEach(b=>b.addEventListener('click',()=>{mxSetMode(b.dataset.v);renderMx();}));
+  $('mx_grad').addEventListener('input',()=>{mxUpdateGrad();renderMx();});
+  ['mx_hrana','mx_indemn','mx_pp'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderMx();}));
+  ['mx_ore','mx_svechi','mx_snou','mx_orenoapte','mx_oresdsl','mx_tarifsdsl','mx_hranav','mx_indemnv','mx_ppct'].forEach(id=>$(id).addEventListener('input',renderMx));
+  $('mx_reset').addEventListener('click',()=>{mxApplyDefaults();renderMtx();renderMx();});
+  $('mtxtab').addEventListener('click',e=>{
+    const td=e.target.closest('td.mtxcell'); if(!td) return;
+    mxRi=+td.dataset.ri; mxCi=+td.dataset.ci; renderMtx(); renderMx();
+  });
+  renderMtx(); renderMx();
 }
 
 // ===== Comparație 3 cazuri =====
@@ -1889,7 +2123,7 @@ g4Init();
 pfInit();
 loadDS();
 $('sal_search').addEventListener('input',renderSal);
-renderMtx();
+mxInit();
 document.querySelectorAll('#sal_unit button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#sal_unit button').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); salUnit=b.dataset.u; renderSal();
