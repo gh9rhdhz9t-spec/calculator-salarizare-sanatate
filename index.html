@@ -342,6 +342,12 @@ table.c3tab.on4 .cc4{display:table-cell}
 table.c3tab.on5 .cc5{display:table-cell}
 .cmp3view.noparams{grid-template-columns:1fr}
 .cmp3view.noparams .c3params{display:none}
+/* tarife noi gărzi — casetă evidențiată deasupra tabelului */
+.g4newrates{border:1.5px solid #f59e0b;background:#fff7ed;border-radius:12px;padding:12px 14px 13px;margin-bottom:14px;box-shadow:0 1px 4px rgba(245,158,11,.15)}
+.g4newrates .pgroup-title{color:#b45309}
+.g4newrates .pgroup-title::before{background:#f59e0b}
+.g4newrates .g4nr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px 14px}
+.g4newrates input:focus{border-color:#f59e0b;box-shadow:0 0 0 3px #fde9c8}
 /* tab Salarii de bază */
 table.saltab{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
 table.saltab th,table.saltab td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
@@ -801,15 +807,6 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="pgroup"><div class="pgroup-title">Durata gărzii <span class="u">(ore)</span></div><input type="number" id="g4_dur" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă zi lucrătoare <span class="u">(%, prezent)</span></div><input type="number" id="g4_gz" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă weekend / sărbători <span class="u">(%, prezent)</span></div><input type="number" id="g4_gw" step="1"></div>
-      <div class="pgroup"><div class="pgroup-title">Tarif nou pe tip de gardă <span class="u">(% din tariful orar nou)</span>
-        </div>
-        <div class="params">
-          <div class="field"><label>Gardă în urgență <span class="u">(%)</span></label><input type="number" id="g4_pu" step="1"></div>
-          <div class="field"><label>Gardă de monitorizare <span class="u">(%)</span></label><input type="number" id="g4_pm" step="1"></div>
-          <div class="field"><label>Gardă la domiciliu <span class="u">(%)</span></label><input type="number" id="g4_pd" step="1"></div>
-        </div>
-      </div>
-      <div class="pgroup"><div class="pgroup-title">Spor nou weekend / sărbători <span class="u">(%)</span></div><input type="number" id="g4_pwe" step="1"></div>
       <div style="margin-top:14px;text-align:right"><button class="btn" id="g4_reset">↺ Resetează parametrii</button></div>
     </div>
   </section>
@@ -817,6 +814,15 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație gărzi<button class="printbtn" id="g4_add" title="Adaugă un caz nou (max. 5)">+ Adaugă caz</button><button class="printbtn" id="g4_toggleparams" title="Arată / ascunde panoul Parametri comuni">⚙ Ascunde parametrii</button></h2>
     <div class="body">
       <p class="selfn" id="g4_meta"></p>
+      <div class="g4newrates">
+        <div class="pgroup-title">Tarife noi pe tip de gardă <span class="u">(% din tariful orar nou)</span></div>
+        <div class="g4nr">
+          <div class="field"><label>Gardă în urgență <span class="u">(%)</span></label><input type="number" id="g4_pu" step="1"></div>
+          <div class="field"><label>Gardă de monitorizare <span class="u">(%)</span></label><input type="number" id="g4_pm" step="1"></div>
+          <div class="field"><label>Gardă la domiciliu <span class="u">(%)</span></label><input type="number" id="g4_pd" step="1"></div>
+          <div class="field"><label>Spor weekend / sărbători <span class="u">(%)</span></label><input type="number" id="g4_pwe" step="1"></div>
+        </div>
+      </div>
       <div class="fwrap">
         <table class="c3tab g4tab">
           <thead><tr><th class="c3lbl"></th>
