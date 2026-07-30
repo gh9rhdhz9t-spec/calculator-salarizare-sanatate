@@ -987,10 +987,14 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <section class="card">
       <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Matrice ajustări <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500">· tip de spital × specialitate · alege o celulă</span></h2>
       <div class="body">
+        <div class="seg" id="mx_var" style="max-width:420px;margin-bottom:12px">
+          <button type="button" data-v="v1" class="active" title="Rânduri −3% … +12% · coloane 0% … +10%">Varianta 1</button>
+          <button type="button" data-v="v2" title="Rânduri −10% … +10% · coloane 0% … +5%">Varianta 2</button>
+        </div>
         <div class="fwrap">
           <table class="saltab mtxtab" id="mtxtab"></table>
         </div>
-        <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri, −3% … +12%) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane, 0% … +10%). <b>Click pe o celulă</b> pentru a aplica coeficientul salariului de bază din proiect în comparația de mai jos.</div>
+        <div class="note">Coeficientul din fiecare celulă = <b>1 + ajustarea pe tip de spital</b> (rânduri) <b>+ ajustarea pe specialitate / durata rezidențiatului</b> (coloane). <b>Click pe o celulă</b> pentru a aplica coeficientul salariului de bază din proiect în comparația de mai jos; click pe anteturi pentru a ascunde rânduri / coloane.</div>
       </div>
     </section>
     <section class="card">
@@ -1427,14 +1431,23 @@ function renderSal(){
 }
 
 // ===== Matrice ajustări (tip de spital × specialitate) + comparație prezent/nou =====
-const MTXROWS=[-3,0,3,6,9,12];
-const MTXCOLS=[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}];
+const MTXVAR={
+  v1:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
+  v2:{rows:[-10,-5,0,5,8,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]}
+};
+let MTXROWS=MTXVAR.v1.rows, MTXCOLS=MTXVAR.v1.cols;
+function mxSetVariant(v){
+  MTXROWS=MTXVAR[v].rows; MTXCOLS=MTXVAR[v].cols;
+  mxRi=Math.max(0,MTXROWS.indexOf(0)); mxCi=0;
+  mxRowOff.clear(); mxColOff.clear();
+  document.querySelectorAll('#mx_var button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+}
 let mxSel=0, mxUnit='clinic', mxRi=1, mxCi=0; // implicit: 0% spital × 3 ani (coef 1)
 const mxRowOff=new Set(), mxColOff=new Set(); // rânduri / coloane ascunse (estompate + excluse din grafic)
 const mxCoefAt=(ri,ci)=>1+(MTXROWS[ri]+MTXCOLS[ci].p)/100;
 const fcoef=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:3});
 function renderMtx(){
-  const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+  const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:2})+'%';
   const coff=ci=>mxColOff.has(ci), roff=ri=>mxRowOff.has(ri);
   let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${c.l}</th>`).join('')+'</tr>';
   h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxpct mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
@@ -1568,6 +1581,9 @@ function mxInit(){
     const td=e.target.closest('td.mtxcell'); if(!td) return;
     mxRi=+td.dataset.ri; mxCi=+td.dataset.ci; renderMtx(); renderMx();
   });
+  document.querySelectorAll('#mx_var button').forEach(b=>b.addEventListener('click',()=>{
+    mxSetVariant(b.dataset.v); renderMtx(); renderMx();
+  }));
   // tooltip pe punctele graficului
   const tip=$('mx_tip'), wrap=$('mx_chartwrap');
   wrap.addEventListener('mousemove',e=>{
