@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator salarizare — Sănătate (Anexa II)</title>
+<style>
+:root{
+  --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+  --brand:#e2001a; --brand-d:#b4001a; --brand-l:#fdeaec;
+  --pos:#15803d; --pos-bg:#dcfce7; --neg:#b91c1c; --neg-bg:#fee2e2;
+  --prez:#475569; --prez-bg:#f1f5f9; --nou:#e2001a; --nou-bg:#fdeaec;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#f8fafc,#eef2f6);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px 60px}
+header.top{background:linear-gradient(120deg,var(--brand-d),var(--brand));color:#fff;padding:22px 0 0;margin-bottom:0;
+  box-shadow:0 6px 24px rgba(226,0,26,.25)}
+header.top .wrap{padding-top:0;padding-bottom:0}
+.logo{display:block;height:54px;width:auto;max-width:100%;margin-bottom:14px}
+header.top h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.2px}
+header.top p{margin:6px 0 0;font-size:14.5px;opacity:.9;max-width:840px}
+.badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+  padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;margin-bottom:8px;letter-spacing:.3px}
+/* tabs */
+.tabs{display:flex;gap:4px;margin-top:16px;flex-wrap:wrap}
+.tab{appearance:none;border:none;background:rgba(255,255,255,.12);color:#eafaf7;font:inherit;font-size:15px;font-weight:600;
+  padding:11px 20px;border-radius:12px 12px 0 0;cursor:pointer;transition:.15s;position:relative;top:1px;
+  border:1px solid transparent;border-bottom:none}
+.tab:hover{background:rgba(255,255,255,.22)}
+.tab.active{background:linear-gradient(180deg,#f8fafc,#eef2f6);color:var(--brand-d)}
+.tab .sm{display:block;font-size:12px;font-weight:500;opacity:.75;margin-top:1px}
+.tab.active .sm{opacity:.65}
+.wrap.main{padding-top:22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+.presetcard{margin-bottom:18px}
+.presetcard .body{padding:14px 16px}
+.preselabel{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:10px}
+.presetbar{display:flex;flex-wrap:wrap;gap:9px}
+.preset{font:inherit;font-size:13.5px;font-weight:600;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);
+  background:#fff;color:var(--ink);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px}
+.preset:hover{border-color:var(--brand);color:var(--brand-d)}
+.preset .ps{font-size:11px;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--prez-bg);color:var(--muted)}
+.preset.active{background:var(--brand);border-color:var(--brand);color:#fff}
+.preset.active .ps{background:rgba(255,255,255,.25);color:#fff}
+.sporpresets{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.sppreset{font:inherit;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:999px;border:1.5px solid var(--line);
+  background:#fff;color:var(--ink);cursor:pointer;transition:.15s;font-variant-numeric:tabular-nums}
+.sppreset:hover{border-color:var(--brand);color:var(--brand-d)}
+.sppreset.active{background:var(--brand);border-color:var(--brand);color:#fff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.card h2{margin:0;font-size:15px;font-weight:700;padding:13px 16px;background:var(--prez-bg);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;letter-spacing:.2px}
+.card h2 .ico{width:18px;height:18px;flex:0 0 auto;color:var(--brand)}
+.card .body{padding:16px}
+.params{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+@media(max-width:520px){.params{grid-template-columns:1fr}}
+.pgroup{border:1px solid var(--line);border-radius:11px;padding:12px 13px 13px;margin-bottom:14px;background:#fbfdfe}
+.pgroup-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--brand-d);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:8px}
+.pgroup-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand);flex:0 0 auto}
+#grp_adjust{border-color:#f6d69a;background:#fffbf2}
+#grp_adjust .pgroup-title{color:#b45309}
+#grp_adjust .pgroup-title::before{background:#f59e0b}
+.grouprow{display:flex;gap:12px;align-items:flex-start}
+.grouprow .field{flex:0 0 150px}
+.grouprow .ghint{flex:1;font-size:12.5px;color:var(--muted);line-height:1.5;padding-top:2px}
+.pgrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.pgrow{grid-template-columns:1fr}}
+.switchrow{display:flex;align-items:center;gap:10px}
+.switch{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:999px;
+  padding:4px 13px 4px 5px;cursor:pointer;font:inherit;font-size:14px;font-weight:700;color:var(--muted);transition:.15s;flex:0 0 auto}
+.switch .knob{width:34px;height:20px;border-radius:999px;background:#cbd5e1;position:relative;transition:.15s;flex:0 0 auto}
+.switch .knob::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.switch.on{border-color:var(--brand);color:var(--brand-d)}
+.switch.on .knob{background:var(--brand)}
+.switch.on .knob::after{transform:translateX(14px)}
+.switch:focus-visible{outline:none;box-shadow:0 0 0 3px var(--brand-l)}
+.vinput{width:92px}
+.unit{font-size:13px;color:var(--muted)}
+.switchrow:has(.switch:not(.on)) .vinput{opacity:.5}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;width:100%}
+.seg button{flex:1;appearance:none;border:none;background:#fff;font:inherit;font-size:14.5px;font-weight:700;color:var(--muted);
+  padding:9px 10px;cursor:pointer;transition:.15s;border-right:1.5px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:var(--brand-l)}
+.seg button.active{background:var(--brand);color:#fff}
+.sliderhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;font-size:14.5px;font-weight:600;color:var(--ink)}
+.sliderhead b{color:var(--brand-d);font-size:16px}
+.gradcoef{font-size:13px;font-weight:600;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:999px;outline:none;
+  background:var(--line);cursor:pointer;padding:0;border:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--brand);border:3px solid #fff;box-shadow:0 1px 4px rgba(226,0,26,.45);cursor:pointer;margin-top:0}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--brand);border:3px solid #fff;
+  box-shadow:0 1px 4px rgba(226,0,26,.45);cursor:pointer}
+input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--brand-l)}
+.ticks{display:flex;justify-content:space-between;margin-top:6px;padding:0 2px;font-size:12px;font-weight:600;color:var(--muted)}
+.chk{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--brand);cursor:pointer;flex:0 0 auto}
+.chk:has(input:disabled){cursor:default;opacity:.75}
+.chk input:disabled{cursor:default}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field.hl input{border-color:#f59e0b;background:#fffbeb}
+label{font-size:13px;font-weight:600;color:var(--muted)}
+label .u{font-weight:500;opacity:.75}
+input,select{font:inherit;font-size:15px;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);width:100%}
+input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+input[type=number]{-moz-appearance:textfield}
+.inline{display:flex;gap:8px}
+.inline>*{flex:1}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 14px}
+.btn{font:inherit;font-size:13.5px;font-weight:600;padding:7px 13px;border-radius:9px;border:1.5px solid var(--line);
+  background:#fff;color:var(--ink);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.selfn{font-size:14px;color:var(--muted);margin:0 0 4px}
+.selfn b{color:var(--ink)}
+.totrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 4px}
+.tot{border-radius:12px;padding:13px 14px;text-align:center;border:1px solid var(--line)}
+.tot.prez{background:var(--prez-bg)}
+.tot.nou{background:var(--nou-bg);border-color:#f3c6cb}
+.tot .lbl{font-size:12.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.tot.nou .lbl{color:var(--brand-d)}
+.tot .val{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+.tot .val small{font-size:14px;font-weight:600;opacity:.7}
+.diffbar{margin-top:12px;border-radius:12px;padding:12px 14px;text-align:center;font-weight:700;font-size:16px;
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.diffbar.pos{background:var(--pos-bg);color:var(--pos)}
+.diffbar.neg{background:var(--neg-bg);color:var(--neg)}
+.diffbar .pct{font-size:22px}
+.coefinfo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media(max-width:560px){.coefinfo{grid-template-columns:1fr 1fr}}
+.coefinfo .ci-item{background:var(--prez-bg);border:1px solid var(--line);border-radius:11px;padding:10px 13px}
+.coefinfo .ci-lbl{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.2px;margin-bottom:2px}
+.coefinfo .ci-val{font-size:21px;font-weight:800;letter-spacing:-.3px;color:var(--brand-d)}
+.coefinfo .ci-pct{font-size:13px;font-weight:700;color:var(--muted);margin-left:3px}
+@media(max-width:420px){.coefinfo{grid-template-columns:1fr}}
+table.bd{width:100%;border-collapse:collapse;margin-top:16px;font-size:14.5px}
+table.bd th,table.bd td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line)}
+table.bd th:first-child,table.bd td:first-child{text-align:left;color:var(--muted);font-weight:600}
+table.bd thead th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:2px solid var(--line)}
+table.bd thead th.pz{color:var(--prez)}
+table.bd thead th.nu{color:var(--brand-d)}
+table.bd tr.total td{font-weight:800;font-size:16px;border-top:2px solid var(--line);border-bottom:none;padding-top:11px}
+table.bd tr.total td:first-child{color:var(--ink)}
+table.bd td.na{color:#cbd5e1}
+table.bd td.elim{color:#e08a8a;font-weight:700;background:color-mix(in srgb,var(--neg-bg) 60%,#fff)}
+table.bd td .hrs{font-weight:500;font-size:12px;opacity:.75}
+table.bd th.df{color:var(--brand-d)}
+table.bd td.dcell .dv{font-weight:700;display:block;line-height:1.15}
+table.bd td.dcell .dp{font-size:11.5px;opacity:.85;display:block}
+table.bd td.dcell.pos{color:var(--pos)} table.bd td.dcell.neg{color:var(--neg)}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.chartcard{margin-top:22px}
+.charttitle .ct-fn{font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.charttitle .ct-meta{font-size:13px;color:var(--muted);margin-top:2px}
+.charttitle .ct-params{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.charttitle .ct-params .cp{background:var(--prez-bg);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.charttitle .ct-params .cp b{color:var(--brand-d)}
+.charttitle .ct-params .cp.spor{background:#fff5f5;border-color:#f3c6cb}
+.chartlegend{display:flex;flex-wrap:wrap;gap:14px;margin:16px 0 8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.chartlegend .lg{display:inline-flex;align-items:center;gap:6px}
+.chartlegend .lgsw{width:13px;height:13px;border-radius:4px;flex:0 0 auto}
+.chartwrap{position:relative;display:flex;gap:16%;justify-content:center;align-items:flex-end;height:400px;padding:10px 0 0;border-bottom:2px solid var(--line);margin-top:6px}
+.cbar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;flex:0 1 34%;min-width:0}
+.cbar-total{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.cbar-plot{position:relative;width:100%;max-width:260px}
+.cbar{width:100%;height:100%;display:flex;flex-direction:column-reverse;border-radius:8px 8px 0 0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cseg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:13.5px;font-weight:700;min-height:1px;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+.cseg-out{position:absolute;transform:translateY(50%);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;line-height:1}
+.cseg-out i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.cseg-out.left{right:100%;margin-right:13px;flex-direction:row-reverse}
+.cseg-out.right{left:100%;margin-left:13px}
+.cseg-out::after{content:"";position:absolute;top:50%;transform:translateY(-50%);width:11px;height:2px;background:var(--line)}
+.cseg-out.left::after{right:-13px}
+.cseg-out.right::after{left:-13px}
+.chart-arrow{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:7px 13px;box-shadow:0 3px 10px rgba(0,0,0,.12);z-index:5}
+.chart-arrow .ca-ico{font-size:24px;line-height:1;font-weight:800}
+.chart-arrow .ca-val{font-size:15px;font-weight:800}
+.chart-arrow .ca-pct{font-size:13px;font-weight:700}
+.chart-arrow.down{color:var(--neg)}
+.chart-arrow.up{color:var(--pos)}
+.chart-xlabels{display:flex;gap:16%;justify-content:center;margin-top:8px}
+.chart-xlabels span{flex:0 1 34%;min-width:0;text-align:center;font-size:14px;font-weight:700;color:var(--ink)}
+.fullsec{margin-top:22px}
+.fwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);background:#fff}
+table.full{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}
+table.full th,table.full td{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.full thead th{position:sticky;top:0;background:var(--prez-bg);text-align:right;font-size:12px;text-transform:uppercase;
+  letter-spacing:.3px;color:var(--muted);cursor:pointer;user-select:none;z-index:1}
+table.full thead th:first-child{text-align:left}
+table.full th.num,table.full td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.full th.rnr,table.full td.rnr{width:36px;text-align:right;padding-left:8px;padding-right:6px;
+  font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+/* coloane opționale: coeficienți (toggle) și versiunea MS (doar Clinic) */
+table.full .cfcol,table.full .mscol{display:none}
+table.full.showcoef .cfcol{display:table-cell}
+table.full.hasms .mscol{display:table-cell}
+table.full .cfcol.mscol{display:none}
+table.full.showcoef.hasms .cfcol.mscol{display:table-cell}
+table.full td.cfcol{color:var(--muted);font-weight:600}
+table.full th.mscol,table.full td.mscol{background:color-mix(in srgb,var(--prez-bg) 60%,#fff)}
+table.full td.mscol.msval{font-weight:700;color:var(--brand-d)}
+.tbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn.tglbtn[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+table.full td.fnname{text-align:left;white-space:normal;max-width:340px;font-weight:600}
+table.full td.stud{color:var(--muted);font-size:13px}
+table.full tbody tr:hover{background:var(--brand-l)}
+table.full tbody tr.sel{background:#fff7ed;box-shadow:inset 3px 0 0 #f59e0b}
+.pos{color:var(--pos);font-weight:700}.neg{color:var(--neg);font-weight:700}
+.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.pos{background:var(--pos-bg)}.pill.neg{background:var(--neg-bg)}
+.search{max-width:320px}
+.sub{font-size:13.5px;color:var(--muted);margin:0;font-weight:600;letter-spacing:.2px}
+.arrow{font-size:11px;opacity:.6}
+.foot{font-size:12.5px;color:var(--muted);margin-top:26px;text-align:center;line-height:1.6}
+.printbtn{margin-left:auto;font:inherit;font-size:12px;font-weight:700;padding:5px 11px;border-radius:8px;border:1.5px solid var(--brand);
+  background:var(--brand);color:#fff;cursor:pointer;transition:.15s;letter-spacing:.2px}
+.printbtn:hover{background:var(--brand-d);border-color:var(--brand-d)}
+.printbtn+.printbtn{margin-left:8px}
+.printonly{display:none}
+.printheader{align-items:center;gap:16px;background:var(--brand);color:#fff;padding:12px 18px;border-radius:10px;margin-bottom:16px}
+.printheader img{height:46px;width:auto}
+.printheader .pht{font-size:15px;font-weight:800;letter-spacing:.2px;line-height:1.3}
+.printheader .pht small{display:block;font-size:11.5px;font-weight:500;opacity:.9;letter-spacing:.3px}
+.printparams{flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.printparams .pp{background:var(--prez-bg);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.printparams .pp b{color:var(--brand-d)}
+@media print{
+  @page{margin:13mm}
+  body{background:#fff}
+  header.top,.presetcard,.fullsec,#coefview,#garziview,#cmp3view,#progview,#progtop,.noprint{display:none !important}
+  .grid{display:block !important}
+  .grid>.card{display:none !important}
+  #chartcard{display:none !important}
+  .wrap.main{padding:0;max-width:none}
+  /* comparison-only print (portrait) */
+  body.pr-cmp #cmpcard{display:block !important;box-shadow:none !important;border:none !important}
+  body.pr-cmp #cmpcard h2{display:none !important}
+  /* chart print (portrait) */
+  body.pr-chart #chartcard{display:block !important;box-shadow:none !important;border:none !important}
+  body.pr-chart #chartcard h2{display:none !important}
+  .printonly{display:flex !important}
+  .tot,.diffbar,.coefinfo .ci-item,.printheader,.printparams .pp,.cseg,.chartlegend .lgsw,.ct-params .cp{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* coeficienți view */
+.coefintro{font-size:13.5px;color:var(--ink);margin-bottom:12px;line-height:1.5}
+.coeflegend{display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:14px}
+.coeflegend .sw{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+.sw.pos{background:var(--pos-bg);border:1.5px solid var(--pos)}
+.sw.neg{background:var(--neg-bg);border:1.5px solid var(--neg)}
+.sw.zero{background:var(--prez-bg);border:1.5px solid var(--line)}
+.coefcount{margin-left:auto;font-weight:700;color:var(--ink)}
+table.coeftab{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;table-layout:fixed}
+table.coeftab th.cst,table.coeftab td.cst{width:74px}
+table.coeftab th.num,table.coeftab td.num{width:94px}
+table.coeftab th,table.coeftab td{padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.coeftab thead th{position:sticky;top:0;background:var(--prez-bg);text-align:left;font-size:11.5px;text-transform:uppercase;
+  letter-spacing:.3px;color:var(--muted);z-index:1}
+table.coeftab th.num,table.coeftab td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.coeftab th.cnr,table.coeftab td.cnr{width:30px;white-space:nowrap;padding-left:8px;padding-right:4px;text-align:right}
+table.coeftab td.cnr{color:var(--muted);font-variant-numeric:tabular-nums}
+table.coeftab td.fnc{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table.coeftab tbody tr{cursor:pointer}
+table.coeftab tbody td{height:38px;transition:background .12s}
+table.coeftab tbody tr.expanded td.fnc{white-space:normal;overflow:visible;text-overflow:clip}
+table.coeftab tbody tr.expanded td{height:auto}
+table.coeftab td.cst{color:var(--muted)}
+table.coeftab tr.grouprow td{background:#fff5f5;font-weight:700;color:var(--brand-d);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+table.coeftab tr.pos{background:color-mix(in srgb,var(--pos-bg) 55%,#fff)}
+table.coeftab tr.neg{background:color-mix(in srgb,var(--neg-bg) 55%,#fff)}
+table.coeftab tr.pos:hover{background:var(--pos-bg)} table.coeftab tr.neg:hover{background:var(--neg-bg)}
+table.coeftab td.dlt{font-weight:700}
+table.coeftab td.dlt.pos{color:var(--pos)} table.coeftab td.dlt.neg{color:var(--neg)} table.coeftab td.dlt.zero{color:var(--muted)}
+.coefnotes{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.55}
+.coefnotes .nt{margin-bottom:5px}
+.coefnotes .nt.hd{font-weight:700;color:var(--ink);margin-top:8px}
+.gsub{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--brand-d);margin:16px 0 2px;display:flex;align-items:center;gap:7px}
+.gsub::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand);flex:0 0 auto}
+.gsub .u{font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none}
+.cmp3view{grid-template-columns:3fr 7fr}
+.c3params .body{font-size:13px}
+.c3params .params{grid-template-columns:1fr}
+.c3params .pgrow{grid-template-columns:1fr}
+.c3params .pgroup{margin-bottom:10px;padding:9px 10px 10px}
+.c3params .pgroup-title{font-size:10.5px;margin-bottom:7px}
+.c3params .seg button{font-size:12.5px;padding:6px 8px}
+.c3params input,.c3params select{font-size:13px}
+.c3params .preset{font-size:12px}
+.c3params .sppreset{font-size:11.5px}
+.progview{grid-template-columns:1fr 1fr}
+@media(max-width:900px){.cmp3view,.progview{grid-template-columns:1fr}}
+.params.three{grid-template-columns:1fr 1fr 1fr}
+.infrow{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.infrow .field{width:110px;display:flex;flex-direction:column;gap:4px}
+.infsrc{flex:1;min-width:180px;font-size:12px;color:var(--muted);align-self:center;line-height:1.5}
+.prog-top{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch}
+@media(max-width:900px){.prog-top{grid-template-columns:1fr}}
+.card.pfinfcard{background:#eef3f8;border-color:#d5e1ee}
+.card.pfinfcard .preselabel{color:#37587c}
+.card.pfadjcard{background:#fffbf2;border-color:#f6d69a}
+.card.pfadjcard .preselabel{color:#b45309}
+table.pftab{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+table.pftab th,table.pftab td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+table.pftab thead th{font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);background:var(--prez-bg)}
+table.pftab th:first-child,table.pftab td.pfyr{text-align:left;font-weight:700;color:var(--ink)}
+table.pftab tr.pfbase td{background:var(--prez-bg);font-weight:700}
+table.pftab td.pos{color:var(--pos);font-weight:700} table.pftab td.neg{color:var(--neg);font-weight:700}
+table.pftab td .pfp{display:block;font-size:11.5px;font-weight:700;opacity:.85}
+table.c3tab{width:100%;border-collapse:collapse;font-size:14px;min-width:640px;table-layout:fixed}
+@media(max-width:640px){
+  .card h2{flex-wrap:wrap}
+  table.c3tab{font-size:13px}
+  table.c3tab td.c3lbl,table.c3tab th.c3lbl{width:110px}
+}
+table.c3tab th,table.c3tab td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums}
+table.c3tab thead th{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:#fff;background:var(--brand);text-align:center;font-weight:800}
+table.c3tab thead th.c3lbl{background:var(--prez-bg)}
+table.c3tab td.c3lbl,table.c3tab th.c3lbl{width:135px;text-align:left;white-space:normal;padding-right:8px}
+table.c3tab td.c3lbl{color:var(--muted);font-weight:600;font-size:13px}
+table.c3tab .c3ctrl td{text-align:center;padding:7px 8px}
+table.c3tab .c3ctrl select,table.c3tab .c3ctrl input{width:100%;font:inherit;font-size:13px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;text-align:center}
+table.c3tab .c3ctrl input:focus,table.c3tab .c3ctrl select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+table.c3tab .c3sec td{background:#fff5f5;font-weight:700;color:var(--brand-d);text-transform:uppercase;font-size:11.5px;letter-spacing:.3px;text-align:left}
+table.c3tab .c3total td{font-weight:800;font-size:15.5px;border-top:2px solid var(--line);background:var(--nou-bg)}
+table.c3tab .c3total td.c3lbl{color:var(--ink);background:var(--nou-bg)}
+table.c3tab td.c3diff{font-weight:700}
+table.c3tab td.c3diff.pos{color:var(--pos)} table.c3tab td.c3diff.neg{color:var(--neg)}
+table.c3tab td.c3diff .dp{display:block;font-size:12px;font-weight:700;opacity:.85}
+table.c3tab thead th .c3sub{display:block;font-size:10px;font-weight:600;opacity:.85;margin-top:1px;letter-spacing:.3px}
+table.c3tab thead th .c3useg{margin-top:6px;border-radius:8px;border-color:rgba(255,255,255,.5);flex-direction:column}
+table.c3tab thead th .c3useg button{font-size:10.5px;font-weight:700;padding:4px 6px;text-transform:none;letter-spacing:0;white-space:nowrap;border-right:none;border-bottom:1.5px solid var(--line)}
+table.c3tab thead th .c3useg button:last-child{border-bottom:none}
+table.c3tab thead th.c3lbl{vertical-align:bottom}
+table.c3tab thead th{position:relative}
+table.c3tab .cc4,table.c3tab .cc5{display:none}
+table.c3tab.on4 .cc4{display:table-cell}
+table.c3tab.on5 .cc5{display:table-cell}
+.cmp3view.noparams{grid-template-columns:1fr}
+.cmp3view.noparams .c3params{display:none}
+/* tab Salarii de bază */
+table.saltab{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+table.saltab th,table.saltab td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+table.saltab thead th{position:sticky;top:0;background:var(--prez-bg);font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:2px solid var(--line)}
+table.saltab th.num,table.saltab td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.saltab td.num b{color:var(--brand-d)}
+table.saltab td.rn{color:var(--muted)}
+table.saltab tbody tr:hover{background:var(--brand-l)}
+#sal_search{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px}
+#sal_search:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+.c3rm{position:absolute;top:4px;right:5px;appearance:none;border:none;background:rgba(255,255,255,.25);color:#fff;width:18px;height:18px;line-height:16px;border-radius:50%;font-size:12px;font-weight:800;cursor:pointer;padding:0}
+.c3rm:hover{background:rgba(255,255,255,.5)}
+table.c3tab td.c3warncell{background:#fdeaee}
+table.c3tab th.c3tgl,table.c3tab td.c3tgl{width:30px;padding:6px 3px;text-align:center}
+table.c3tab thead th.c3tgl{background:var(--prez-bg)}
+.c3chk{appearance:none;border:1.5px solid var(--line);background:#fff;width:16px;height:16px;border-radius:5px;cursor:pointer;padding:0;vertical-align:middle;position:relative;display:inline-block}
+.c3chk.on{background:var(--brand);border-color:var(--brand)}
+.c3chk.on::after{content:"✓";color:#fff;font-size:11px;font-weight:800;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;line-height:1}
+table.c3tab tr.compoff td:not(.c3lbl):not(.c3tgl){opacity:.25;filter:grayscale(1)}
+table.c3tab tr.compoff td.c3lbl{color:#cbd5e1}
+#c3_ppct{width:54px;font:inherit;font-size:12.5px;padding:3px 6px;border:1.5px solid var(--line);border-radius:7px;text-align:center;margin-left:4px}
+#c3_ppct:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+table.c3tab td.c3na{color:#cbd5e1;text-align:center}
+table.c3tab td .elim{color:#e08a8a;font-weight:700}
+table.c3tab td .c3d{display:block;font-size:11px;font-weight:700;margin-top:1px;opacity:.7}
+table.c3tab td .c3d+.c3d{margin-top:0}
+table.c3tab td .c3d.pos{color:var(--pos)} table.c3tab td .c3d.neg{color:var(--neg)} table.c3tab td .c3d.zero{color:var(--muted)}
+table.c3tab .c3cmpcol{background:#f7f9fb;font-weight:700;border-left:2px solid var(--line)}
+table.c3tab thead th.c3cmpcol{background:var(--prez);color:#fff}
+table.c3tab td.c3cmpcol .c3d{display:block;font-size:12.5px}
+table.c3tab.c3-warn2 thead th:nth-child(3),table.c3tab.c3-warn3 thead th:nth-child(4){background:#d6536b}
+.totrow.t3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:560px){.totrow.t3{grid-template-columns:1fr}}
+.tot.diff{background:var(--prez-bg)}
+.tot.diff.pos{background:var(--pos-bg)} .tot.diff.neg{background:var(--neg-bg)}
+.tot.diff .lbl{color:var(--muted)}
+.tot.diff.pos .val{color:var(--pos)} .tot.diff.neg .val{color:var(--neg)}
+.tot.diff .val .tdpct{font-size:13px;font-weight:700;opacity:.85;margin-left:2px}
+#garziview .tot .val small{display:block;margin:1px 0 0}
+#garziview .tot .val .tdpct{display:block;margin:1px 0 0}
+table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin-left:6px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="badge">DRAFT · 30 iulie 2026 · Anexa II — Sănătate</span>
+  <h1>Calculator salarizare — Sănătate</h1>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-ds="cmp3">Comparație cazuri</button>
+    <button class="tab" data-ds="sal">Salarii de bază</button>
+  </div>
+</div></header>
+<div class="wrap main">
+<section class="card presetcard">
+  <div class="body">
+    <div class="preselabel">Selectează rapid o funcție</div>
+    <div class="presetbar" id="presetbar"></div>
+  </div>
+</section>
+<div class="grid">
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri globali</h2>
+    <div class="body">
+      <div class="pgroup" id="grp_adjust">
+        <div class="pgroup-title">Ajustare salariu nou</div>
+        <div class="grouprow">
+          <div class="field hl"><label>Ajustare <span class="u">(%)</span></label><input type="number" id="p_adjust" step="1" title="Multiplică salariul de bază din noua lege"></div>
+          <div class="ghint">Se aplică salariului de bază din noua lege (col. „Nou"). Neclinic <b>−10%</b>, SJU/ATI <b>+10%</b>.</div>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="grad_lbl">0</b></span><span class="gradcoef" id="grad_coef">coef. 1×</span></div>
+        <input type="range" id="p_grad" min="0" max="5" step="1" value="0">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Ore lucrătoare / lună</div>
+        <input type="number" id="p_ore" step="1">
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor condiții deosebite</div>
+        <div class="params two">
+          <div class="field"><label>Actual <span class="u">(%)</span></label><input type="number" id="p_svechi" step="1"></div>
+          <div class="field"><label>Nou <span class="u">(%)</span></label><input type="number" id="p_snou" step="1"></div>
+        </div>
+        <div class="sporpresets" id="sporpresets">
+          <button type="button" class="sppreset" data-sv="85" data-sn="20">85 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="20">55 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="10">55 / 10</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="30">85 / 30</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="0">15 / 0</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="30">55 / 30</button>
+          <button type="button" class="sppreset" data-sv="30" data-sn="15">30 / 15</button>
+          <button type="button" class="sppreset" data-sv="20" data-sn="10">20 / 10</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="5">15 / 5</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="50">85 / 50</button>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor tură / noapte</div>
+        <div class="seg" id="p_mode">
+          <button type="button" data-v="Tura">Tură</button>
+          <button type="button" data-v="Noapte">Noapte</button>
+          <button type="button" data-v="Nimic">Nimic</button>
+        </div>
+        <div class="field" id="wrap_orenoapte" style="margin-top:11px"><label>Ore de noapte / lună</label><input type="number" id="p_orenoapte" step="1"></div>
+        <div class="note" style="margin-top:8px">Tură = <b>15%</b> din salariu · noapte = <b>25%</b> pe ora de noapte (fixe în lege).</div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor SDSL</div>
+        <div class="params two">
+          <div class="field"><label>Ore SDSL / lună</label><input type="number" id="p_oresdsl" step="1"></div>
+          <div class="field"><label>Tarif SDSL — <span class="u">nou (%)</span></label><input type="number" id="p_tarifsdsl" step="1"></div>
+        </div>
+      </div>
+      <div class="pgrow">
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație de hrană</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="p_hrana" role="switch" aria-checked="true"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="p_hranav" class="vinput" step="1" title="lei/lună"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație OUG 63/2023</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="p_indemn" role="switch" aria-checked="true"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="p_indemnv" class="vinput" step="1" title="lei/lună"><span class="unit">lei</span>
+          </div>
+          <label class="chk" style="display:none"><input type="checkbox" id="p_indemnall" disabled><span>Aplică tuturor funcțiilor <span class="u">(nu doar celor eligibile)</span></span></label>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Plată per performanță <span class="u">(doar noua lege)</span></div>
+          <div class="switchrow">
+            <button type="button" class="switch" id="p_perf" role="switch" aria-checked="false"><span class="knob"></span><span class="stxt">Nu</span></button>
+            <input type="number" id="p_perfv" class="vinput" step="1" min="10" max="20" title="% din salariul de bază din proiect"><span class="unit">%</span>
+          </div>
+          <div class="hint">10–20% din salariul de bază din proiect. Nu există în sistemul actual.</div>
+        </div>
+      </div>
+      <div class="note" id="dsnote"></div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+
+  <section class="card" id="cmpcard">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație pe funcție<button class="printbtn noprint" id="printcmp" title="Salvează / printează ca PDF">⎙ PDF</button></h2>
+    <div class="body">
+      <div class="printheader printonly" id="printheader"></div>
+      <div class="pgroup noprint">
+        <div class="pgroup-title">Alege funcția</div>
+        <select id="fnsel"></select>
+      </div>
+      <div class="pgroup noprint" id="msgrp" style="display:none">
+        <div class="pgroup-title">Grilă salariu nou</div>
+        <div class="seg" id="p_msgrid">
+          <button type="button" data-v="proiect" class="active">Proiect iul. 2026</button>
+          <button type="button" data-v="ms">MS — gradații noi</button>
+        </div>
+      </div>
+      <p class="selfn" id="selmeta"></p>
+      <div class="printparams printonly" id="printparams"></div>
+      <div class="totrow">
+        <div class="tot prez"><div class="lbl">Actual</div><div class="val" id="tprez">–</div></div>
+        <div class="tot nou"><div class="lbl">Noua lege</div><div class="val" id="tnou">–</div></div>
+      </div>
+      <div class="diffbar" id="diffbar"><span id="diffval"></span><span class="pct" id="diffpct"></span></div>
+      <table class="bd">
+        <thead><tr><th>Componentă</th><th class="pz">Actual</th><th class="nu">Nou</th><th class="df">Diferență</th></tr></thead>
+        <tbody id="bdbody"></tbody>
+      </table>
+      <div class="note">Valorile sunt <b>venit brut</b> lunar, în lei. „Actual” = salariu OUG 19 + sporuri pe bazele Legea 153/250. „Nou” = salariul de bază din proiectul 2026 (ajustat) + sporurile recalculate. Hrana și indemnizația sunt incluse în salariul nou.</div>
+      <div class="coefinfo" id="coefinfo"></div>
+    </div>
+  </section>
+</div>
+
+<section class="card chartcard" id="chartcard">
+  <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="5" width="3" height="12"/><rect x="17" y="13" width="3" height="4"/></svg>Grafic — Actual vs Noua lege<button class="printbtn noprint" id="printchart" title="Salvează / printează ca PDF">⎙ PDF</button><button class="printbtn noprint" id="pngchart" title="Descarcă graficul ca imagine PNG">⤓ PNG</button></h2>
+  <div class="body">
+    <div class="printheader printonly" id="chart_printhdr"></div>
+    <div class="charttitle" id="chart_title"></div>
+    <div class="chartlegend" id="chart_legend"></div>
+    <div class="chartwrap" id="chart_bars"></div>
+    <div class="chart-xlabels"><span>Actual</span><span>Noua lege</span></div>
+    <div class="note">Salariul de bază actual este cel din OUG 19/2024. Sporurile de condiții se calculează la salariile din decembrie 2018. O parte din personalul medical beneficia de indemnizație conform OUG 63/2023, dar și de indemnizația de hrană de 347 lei / lună. Sporul de sâmbete - duminici - sărbători legale este de 100% în prezent, dar raportat la salariul de bază din ianuarie 2018. În noul proiect este de 30%, raportat la viitorul salariu de bază. Sporul de tură este 15% atât în prezent, cât și în noul proiect, doar că acum se calculează în funcție de salariul din ianuarie 2018. Sporul de noapte este de 25% atât în prezent, cât și în proiect, dar la fel ca sporul de tură, în prezent se raportează la ianuarie 2018.</div>
+  </div>
+</section>
+
+<section class="fullsec">
+  <div class="toolbar">
+    <div class="sub">Toate funcțiile — <span id="rowcount"></span> poziții, recalculate live</div>
+    <div class="tbar-right">
+      <button class="btn tglbtn" type="button" id="tblcoef" aria-pressed="false" title="Arată / ascunde coeficienții">∑ Coeficienți</button>
+      <input class="search" id="search" placeholder="🔍 caută funcția…">
+    </div>
+  </div>
+  <div class="fwrap">
+    <table class="full">
+      <thead><tr>
+        <th class="rnr" data-k="idx" title="Ordinea din fișierul sursă — click pentru a reveni la ea">#<span class="arrow">▲</span></th>
+        <th data-k="fn">Funcția <span class="arrow"></span></th>
+        <th data-k="studii">Studii</th>
+        <th class="num" data-k="prez">Actual <span class="arrow"></span></th>
+        <th class="num cfcol" data-k="cfact">Coef. actual <span class="arrow"></span></th>
+        <th class="num" data-k="nou">Noua lege <span class="arrow"></span></th>
+        <th class="num cfcol" data-k="cfnou">Coef. nou <span class="arrow"></span></th>
+        <th class="num mscol" data-k="ms">Versiune MS <span class="arrow"></span></th>
+        <th class="num cfcol mscol" data-k="cfms">Coef. MS <span class="arrow"></span></th>
+        <th class="num" data-k="diff">Diferență <span class="arrow"></span></th>
+        <th class="num" data-k="pct">% <span class="arrow"></span></th>
+      </tr></thead>
+      <tbody id="fullbody"></tbody>
+    </table>
+  </div>
+  <div class="foot">
+    Sursă: registrele <b>17Jul2026 — Clinic / Neclinic / SJU ATI</b>, foaia <i>Calculator</i> · proiect lege salarizare MMFTSS 16.07.2026.<br>
+    Instrument orientativ — reproduce fidel formulele din foile de calcul. Click pe capul de tabel pentru sortare · click pe un rând pentru a-l selecta sus.
+  </div>
+</section>
+
+<section class="card coefview" id="coefview" style="display:none">
+  <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="9" width="3" height="8"/><rect x="12" y="5" width="3" height="12"/><rect x="17" y="12" width="3" height="5"/></svg>Coeficienți de salarizare — Anexa II Cap. I (Sănătate)</h2>
+  <div class="body">
+    <div class="coefintro">Compară coeficienții din <b>proiectul iulie 2026</b> cu versiunea din <b>mai 2026</b>. Coloana <b>Δ</b> arată diferența; verde = coeficient majorat, roșu = redus.</div>
+    <div class="coeflegend">
+      <span><i class="sw pos"></i> majorare (Iul &gt; Mai)</span>
+      <span><i class="sw neg"></i> reducere (Iul &lt; Mai)</span>
+      <span><i class="sw zero"></i> neschimbat</span>
+      <span class="coefcount" id="coefcount"></span>
+    </div>
+    <div class="fwrap">
+      <table class="coeftab">
+        <thead><tr>
+          <th class="cnr">Nr.</th><th>Funcția</th><th class="cst">Studii</th>
+          <th class="num">Coef. Mai</th><th class="num">Coef. Iulie</th><th class="num">Δ (Iul−Mai)</th><th class="num">Δ %</th>
+        </tr></thead>
+        <tbody id="coefbody"></tbody>
+      </table>
+    </div>
+    <div class="coefnotes" id="coefnotes"></div>
+    <div class="foot" style="text-align:left">Sursă: <b>SDS.xlsx</b>, foaia „II CI 2" — Anexa nr. II, Capitolul I, pct. 3 Coeficienți de salarizare (Gradația 0).</div>
+  </div>
+</section>
+
+<div class="grid garziview" id="garziview" style="display:none">
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Parametri gardă</h2>
+    <div class="body">
+      <div class="pgroup">
+        <div class="pgroup-title">Tip unitate</div>
+        <div class="seg" id="g_unit">
+          <button type="button" data-u="clinic">Clinic</button>
+          <button type="button" data-u="saj">SAJ · ATI</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="g_grad_lbl">0</b></span><span class="gradcoef" id="g_grad_coef">coef. 1×</span></div>
+        <input type="range" id="g_grad" min="0" max="5" step="1" value="0">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Alege funcția</div>
+        <select id="g_fnsel"></select>
+      </div>
+      <div class="pgroup">
+        <div class="params two">
+          <div class="field"><label>Ore lucrătoare / lună</label><input type="number" id="g_ore" step="1"></div>
+          <div class="field"><label>Durata unei gărzi <span class="u">(ore)</span></label><input type="number" id="g_dur" step="1"></div>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ajustare salariu nou <span class="u">(%)</span></div><input type="number" id="g_adjust" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor gardă <span class="u">(prezent · Legea 250)</span></div>
+        <div class="params two">
+          <div class="field"><label>Zi lucrătoare <span class="u">(%)</span></label><input type="number" id="g_gz" step="1"></div>
+          <div class="field"><label>Weekend <span class="u">(%)</span></label><input type="number" id="g_gw" step="1"></div>
+        </div>
+      </div>
+      <div class="note">Tariful orar = salariul de bază ÷ ore. Garda <b>prezentă</b> (Legea 250) = tarif orar Legea 250 + spor. Garda <b>nouă</b> (2026) se calculează din tariful orar 2026: urgență <b>100%</b>, monitorizare <b>75%</b>, la domiciliu <b>40%</b>.</div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="g_reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație gardă pe funcție</h2>
+    <div class="body">
+      <p class="selfn" id="g_meta"></p>
+      <div class="totrow t3">
+        <div class="tot prez"><div class="lbl">Tarif gardă / oră · prezent</div><div class="val" id="g_tp">–</div></div>
+        <div class="tot nou"><div class="lbl">Tarif gardă / oră · 2026</div><div class="val" id="g_tn">–</div></div>
+        <div class="tot diff" id="g_tdbox"><div class="lbl">Diferență</div><div class="val" id="g_td">–</div></div>
+      </div>
+      <div class="totrow t3">
+        <div class="tot prez"><div class="lbl">Gardă <span id="g_durlbl1">18</span> ore · prezent</div><div class="val" id="g_g18p">–</div></div>
+        <div class="tot nou"><div class="lbl">Gardă <span id="g_durlbl2">18</span> ore · 2026</div><div class="val" id="g_g18n">–</div></div>
+        <div class="tot diff" id="g_g18dbox"><div class="lbl">Diferență</div><div class="val" id="g_g18d">–</div></div>
+      </div>
+      <div class="note" id="g_tarifnote"></div>
+      <div class="gsub">Zi lucrătoare <span class="u">— lei/oră</span></div>
+      <table class="bd"><thead><tr><th>Tip gardă</th><th class="pz">Prezent</th><th class="nu">Nou</th><th class="df">Diferență</th></tr></thead><tbody id="g_body_zi"></tbody></table>
+      <div class="gsub">Weekend <span class="u">— lei/oră</span></div>
+      <table class="bd"><thead><tr><th>Tip gardă</th><th class="pz">Prezent</th><th class="nu">Nou</th><th class="df">Diferență</th></tr></thead><tbody id="g_body_we"></tbody></table>
+      <div class="note" id="g_note">Valorile sunt <b>tarif brut pe oră</b>, în lei. „Prezent" = garda conform Legea 250 (tarif orar Legea 250 + spor). „Nou" = garda din proiectul 2026, calculată din tariful orar 2026. Weekendul aplică un spor de <b>20%</b> asupra tarifului nou, uniform pentru toate tipurile de gardă. <i>Notă — două corecturi față de foaia sursă „Calculator gărzi": (1) celula <b>U4</b> scria <code>=M4+20%</code>, ceea ce în Excel adună <b>0,2 lei</b> în loc de a înmulți cu 1,2 (eroare de tastare — celula echivalentă pentru monitorizare, X4, folosea corect <code>×1,2</code>); (2) garda la domiciliu în weekend (<b>AA4</b>) nu primea deloc sporul de 20%. Ambele au fost corectate; restul formulelor reproduc fidel foaia sursă.</i></div>
+    </div>
+  </section>
+</div>
+
+<div class="grid cmp3view" id="cmp3view" style="display:none">
+  <section class="card c3params">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
+    <div class="body">
+      <div class="pgroup"><div class="pgroup-title">Tip unitate <span class="u">(setează toate cazurile)</span></div>
+        <div class="seg" id="c3_unitall">
+          <button type="button" data-u="clinic">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="sju">SAJ · ATI</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="c3_fnsel"></select>
+        <div class="preselabel" style="margin:10px 0 8px">Selectează rapid o funcție</div>
+        <div class="presetbar" id="c3_presetbar"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="c3_grad_lbl">5</b></span><span class="gradcoef" id="c3_grad_coef">coef. 1×</span></div>
+        <input type="range" id="c3_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="c3_ore" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor condiții deosebite</div>
+        <div class="params two">
+          <div class="field"><label>Actual <span class="u">(%)</span></label><input type="number" id="c3_svechi" step="1"></div>
+          <div class="field"><label>Nou <span class="u">(%)</span></label><input type="number" id="c3_snou" step="1"></div>
+        </div>
+        <div class="sporpresets" id="c3_sporpresets">
+          <button type="button" class="sppreset" data-sv="85" data-sn="20">85 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="20">55 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="10">55 / 10</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="30">85 / 30</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="0">15 / 0</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="30">55 / 30</button>
+          <button type="button" class="sppreset" data-sv="30" data-sn="15">30 / 15</button>
+          <button type="button" class="sppreset" data-sv="20" data-sn="10">20 / 10</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="5">15 / 5</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="50">85 / 50</button>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor tură / noapte</div>
+        <div class="seg" id="c3_mode">
+          <button type="button" data-v="Tura">Tură</button>
+          <button type="button" data-v="Noapte">Noapte</button>
+          <button type="button" data-v="Nimic">Nimic</button>
+        </div>
+        <div class="field" id="c3_wrap_orenoapte" style="margin-top:11px"><label>Ore de noapte / lună</label><input type="number" id="c3_orenoapte" step="1"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor SDSL</div>
+        <div class="params two">
+          <div class="field"><label>Ore SDSL / lună</label><input type="number" id="c3_oresdsl" step="1"></div>
+          <div class="field"><label>Tarif SDSL <span class="u">(%)</span></label><input type="number" id="c3_tarifsdsl" step="1"></div>
+        </div>
+      </div>
+      <div class="pgrow">
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație de hrană</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="c3_hrana"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="c3_hranav" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație OUG 63/2023</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="c3_indemn"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="c3_indemnv" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Plată pe performanță <span class="u">(% din salariul de bază nou)</span></div>
+          <div class="switchrow">
+            <button type="button" class="switch" id="c3_pp_sw"><span class="knob"></span><span class="stxt">Nu</span></button>
+            <input type="number" id="c3_pp_pct" class="vinput" step="1" value="15"><span class="unit">%</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="c3_reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație cazuri<button class="printbtn" id="c3_add" title="Adaugă un caz nou (max. 5)">+ Adaugă caz</button><button class="printbtn" id="c3_toggleparams" title="Arată / ascunde panoul Parametri comuni">⚙ Ascunde parametrii</button></h2>
+    <div class="body">
+      <p class="selfn" id="c3_meta"></p>
+      <div class="fwrap">
+        <table class="c3tab">
+          <thead><tr><th class="c3tgl"></th><th class="c3lbl"></th>
+            <th>Cazul 1<span class="c3sub">Prezent</span><div class="seg c3useg" id="c3_unit0"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th>Cazul 2<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="c3_unit1"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th>Cazul 3<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="c3_unit2"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th class="cc4"><button type="button" class="c3rm" id="c3_rm4" title="Elimină cazul">×</button>Cazul 4<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="c3_unit3"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th class="cc5"><button type="button" class="c3rm" id="c3_rm5" title="Elimină cazul">×</button>Cazul 5<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="c3_unit4"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th></tr></thead>
+          <tbody>
+            <tr class="c3ctrl"><td class="c3tgl"></td><td class="c3lbl">Ajustare salariu nou <span class="u">(%)</span></td>
+              <td class="c3na">—</td>
+              <td><input type="number" id="c3_adj1" step="1"></td>
+              <td><input type="number" id="c3_adj2" step="1"></td>
+              <td class="cc4"><input type="number" id="c3_adj3" step="1"></td>
+              <td class="cc5"><input type="number" id="c3_adj4" step="1"></td></tr>
+            <tr class="c3sec"><td colspan="4">Componente</td></tr>
+            <tr id="c3_row_sb"><td class="c3tgl"><button type="button" class="c3chk on" data-c="sb" title="Include / exclude componenta"></button></td><td class="c3lbl">Salariu de bază</td><td id="c3_sb0"></td><td id="c3_sb1"></td><td id="c3_sb2"></td><td class="cc4" id="c3_sb3"></td><td class="cc5" id="c3_sb4"></td></tr>
+            <tr class="c3ctrl" id="c3_row_sp"><td class="c3tgl"></td><td class="c3lbl">Spor condiții <span class="u">(%)</span></td>
+              <td><input type="number" id="c3_sp0" step="1" title="Spor actual (%) — implicit din Parametri comuni"></td>
+              <td><input type="number" id="c3_sp1" step="1" title="Spor nou (%) — implicit din Parametri comuni"></td>
+              <td><input type="number" id="c3_sp2" step="1" title="Spor nou (%) — implicit din Parametri comuni"></td>
+              <td class="cc4"><input type="number" id="c3_sp3" step="1" title="Spor nou (%) — implicit din Parametri comuni"></td>
+              <td class="cc5"><input type="number" id="c3_sp4" step="1" title="Spor nou (%) — implicit din Parametri comuni"></td></tr>
+            <tr id="c3_row_sc"><td class="c3tgl"><button type="button" class="c3chk on" data-c="sc" title="Include / exclude componenta"></button></td><td class="c3lbl">Spor condiții deosebite</td><td id="c3_sc0"></td><td id="c3_sc1"></td><td id="c3_sc2"></td><td class="cc4" id="c3_sc3"></td><td class="cc5" id="c3_sc4"></td></tr>
+            <tr id="c3_row_st"><td class="c3tgl"><button type="button" class="c3chk on" data-c="st" title="Include / exclude componenta"></button></td><td class="c3lbl">Spor tură / noapte</td><td id="c3_st0"></td><td id="c3_st1"></td><td id="c3_st2"></td><td class="cc4" id="c3_st3"></td><td class="cc5" id="c3_st4"></td></tr>
+            <tr id="c3_row_ss"><td class="c3tgl"><button type="button" class="c3chk on" data-c="ss" title="Include / exclude componenta"></button></td><td class="c3lbl">Spor SDSL</td><td id="c3_ss0"></td><td id="c3_ss1"></td><td id="c3_ss2"></td><td class="cc4" id="c3_ss3"></td><td class="cc5" id="c3_ss4"></td></tr>
+            <tr id="c3_row_ih"><td class="c3tgl"><button type="button" class="c3chk on" data-c="ih" title="Include / exclude componenta"></button></td><td class="c3lbl">Indemnizație de hrană</td><td id="c3_ih0"></td><td id="c3_ih1"></td><td id="c3_ih2"></td><td class="cc4" id="c3_ih3"></td><td class="cc5" id="c3_ih4"></td></tr>
+            <tr id="c3_row_io"><td class="c3tgl"><button type="button" class="c3chk on" data-c="io" title="Include / exclude componenta"></button></td><td class="c3lbl">Indemnizație OUG 63/2023</td><td id="c3_io0"></td><td id="c3_io1"></td><td id="c3_io2"></td><td class="cc4" id="c3_io3"></td><td class="cc5" id="c3_io4"></td></tr>
+            <tr id="c3_row_pp" class="compoff"><td class="c3tgl"><button type="button" class="c3chk" data-c="pp" title="Include / exclude componenta"></button></td><td class="c3lbl">Plată pe performanță <span class="u">(% din salariul de bază nou)</span> <input type="number" id="c3_ppct" step="1" value="15"></td><td class="c3na">—</td><td id="c3_pp1"></td><td id="c3_pp2"></td><td class="cc4" id="c3_pp3"></td><td class="cc5" id="c3_pp4"></td></tr>
+            <tr class="c3total"><td class="c3tgl"></td><td class="c3lbl">TOTAL brut / lună</td><td id="c3_tn0"></td><td id="c3_tn1"></td><td id="c3_tn2"></td><td class="cc4" id="c3_tn3"></td><td class="cc5" id="c3_tn4"></td></tr>
+            <tr><td class="c3tgl"></td><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="c3_df1"></td><td id="c3_df2"></td><td class="cc4" id="c3_df3"></td><td class="cc5" id="c3_df4"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Toate cazurile folosesc <b>aceeași funcție și aceiași parametri comuni</b>; diferă doar prin <b>tipul de unitate</b> (bazele salariale) și <b>ajustarea salariului nou</b>. Poți adăuga până la <b>5 cazuri</b> cu butonul „+ Adaugă caz”. Valori brute lunare, în lei.</div>
+    </div>
+  </section>
+</div>
+
+<div id="salview" style="display:none">
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="5" width="3" height="12"/><rect x="17" y="13" width="3" height="4"/></svg>Salarii de bază — proiect <span class="u" id="salcount" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h2>
+    <div class="body">
+      <div class="seg" id="sal_unit" style="max-width:420px;margin-bottom:12px">
+        <button type="button" data-u="clinic" class="active">Clinic</button>
+        <button type="button" data-u="neclinic">Neclinic</button>
+        <button type="button" data-u="sju">SAJ · ATI</button>
+      </div>
+      <input type="text" id="sal_search" placeholder="Caută funcția sau studiile…">
+      <div class="fwrap" style="margin-top:12px">
+        <table class="saltab">
+          <thead><tr>
+            <th class="num" style="width:44px">#</th>
+            <th>Funcția</th>
+            <th style="width:74px">Studii</th>
+            <th class="num" style="width:110px" title="Salariu de bază — grila Legea 153/2017, anul 2018">2018 <span class="u">(L.153)</span></th>
+            <th class="num" style="width:110px" title="Salariu de bază — grila Legea 153/2017, anul 2022">2022 <span class="u">(L.153)</span></th>
+            <th class="num" style="width:110px" title="Salariu de bază actual — OUG 19">OUG 19 <span class="u">(actual)</span></th>
+            <th class="num" style="width:130px" title="Salariu de bază — proiect lege MMFTSS 16.07.2026">Proiect 2026</th>
+          </tr></thead>
+          <tbody id="salbody"></tbody>
+        </table>
+      </div>
+      <div class="note">Salarii de bază la <b>gradația 0</b>, în lei. Bazele <b>2018 / 2022</b> (Legea 153) și <b>OUG 19</b> depind de tipul de unitate; salariul din <b>proiect</b> (MMFTSS 16.07.2026) este identic pentru Clinic / Neclinic / SAJ · ATI. Gradația de vechime și sporurile se aplică peste aceste valori.</div>
+    </div>
+  </section>
+</div>
+
+<div class="prog-top" id="progtop" style="display:none">
+  <section class="card pfinfcard">
+    <div class="body">
+      <div class="preselabel" style="margin-bottom:10px">📈 Prognoză inflație <span class="u" style="text-transform:none;letter-spacing:0">(%, editabilă)</span></div>
+      <div class="infrow">
+        <div class="field"><label>2027</label><input type="number" id="pf_inf27" step="0.1"></div>
+        <div class="field"><label>2028</label><input type="number" id="pf_inf28" step="0.1"></div>
+        <div class="field"><label>2029</label><input type="number" id="pf_inf29" step="0.1"></div>
+      </div>
+      <div class="infsrc" style="margin-top:8px">Sursă: <b>Comisia Națională de Prognoză</b> — prognoza de primăvară 2026.</div>
+    </div>
+  </section>
+  <section class="card pfadjcard">
+    <div class="body">
+      <div class="preselabel" style="margin-bottom:10px">⚙️ Ajustare salariu nou <span class="u" style="text-transform:none;letter-spacing:0">(%)</span></div>
+      <div class="infrow">
+        <div class="field hl"><input type="number" id="pf_adjust" step="1"></div>
+        <div class="infsrc" style="margin-top:0">Se aplică salariului de bază din noua lege. Neclinic <b>−10%</b>, SJU/ATI <b>+10%</b>.</div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="grid progview" id="progview" style="display:none">
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 13l3-3 3 3 5-6"/></svg>Parametri</h2>
+    <div class="body">
+      <div class="pgroup"><div class="pgroup-title">Tip unitate</div>
+        <div class="seg" id="pf_unit">
+          <button type="button" data-u="clinic">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="sju">SAJ · ATI</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="pf_fnsel"></select>
+        <div class="preselabel" style="margin:10px 0 8px">Selectează rapid o funcție</div>
+        <div class="presetbar" id="pf_presetbar"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="pf_grad_lbl">5</b></span><span class="gradcoef" id="pf_grad_coef">coef. 1×</span></div>
+        <input type="range" id="pf_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor condiții deosebite</div>
+        <div class="params two">
+          <div class="field"><label>Actual <span class="u">(%)</span></label><input type="number" id="pf_svechi" step="1"></div>
+          <div class="field"><label>Nou <span class="u">(%)</span></label><input type="number" id="pf_snou" step="1"></div>
+        </div>
+        <div class="sporpresets" id="pf_sporpresets">
+          <button type="button" class="sppreset" data-sv="85" data-sn="20">85 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="20">55 / 20</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="10">55 / 10</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="30">85 / 30</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="0">15 / 0</button>
+          <button type="button" class="sppreset" data-sv="55" data-sn="30">55 / 30</button>
+          <button type="button" class="sppreset" data-sv="30" data-sn="15">30 / 15</button>
+          <button type="button" class="sppreset" data-sv="20" data-sn="10">20 / 10</button>
+          <button type="button" class="sppreset" data-sv="15" data-sn="5">15 / 5</button>
+          <button type="button" class="sppreset" data-sv="85" data-sn="50">85 / 50</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="pf_ore" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor tură / noapte</div>
+        <div class="seg" id="pf_mode">
+          <button type="button" data-v="Tura">Tură</button>
+          <button type="button" data-v="Noapte">Noapte</button>
+          <button type="button" data-v="Nimic">Nimic</button>
+        </div>
+        <div class="field" id="pf_wrap_orenoapte" style="margin-top:11px"><label>Ore de noapte / lună</label><input type="number" id="pf_orenoapte" step="1"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor SDSL</div>
+        <div class="params two">
+          <div class="field"><label>Ore SDSL / lună</label><input type="number" id="pf_oresdsl" step="1"></div>
+          <div class="field"><label>Tarif SDSL <span class="u">(%)</span></label><input type="number" id="pf_tarifsdsl" step="1"></div>
+        </div>
+      </div>
+      <div class="pgrow">
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație de hrană</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="pf_hrana"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="pf_hranav" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație OUG 63/2023</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="pf_indemn"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="pf_indemnv" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">Se indexează salariul cu inflația prognozată în fiecare an.</div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="pf_reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 13l3-3 3 3 5-6"/></svg>Prognoză salariu <span style="font-weight:500;opacity:.75;font-size:13px;margin-left:6px">2026 → 2029</span></h2>
+    <div class="body">
+      <p class="selfn" id="pf_meta"></p>
+      <div class="totrow">
+        <div class="tot prez"><div class="lbl">Prezent 2026</div><div class="val" id="pf_present">–</div></div>
+        <div class="tot nou"><div class="lbl">Nou proiectat 2029</div><div class="val" id="pf_nou29">–</div></div>
+      </div>
+      <div class="fwrap">
+        <table class="pftab">
+          <thead><tr><th>An</th><th class="num">Inflație</th><th class="num">Salariu nou <span class="u">(proiectat)</span></th><th class="num">Diferență <span class="u">față de prezent</span></th></tr></thead>
+          <tbody id="pfbody"></tbody>
+        </table>
+      </div>
+      <div class="note">„Prezent 2026" = venitul actual (rămâne referință). „Salariu nou" = salariul din proiectul 2026, indexat cu inflația în anii următori. Valori brute lunare, în lei. Prognoză inflație (editabilă): <b>Comisia Națională de Prognoză — prognoza de primăvară 2026</b>.</div>
+    </div>
+  </section>
+</div>
+</div>
+<script>
+const DS={"clinic":{"rows":[{"fn":"Medic primar","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":14125,"G":12500,"H":5637.5},{"fn":"Medic primar dentist","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":14125,"G":12500,"H":5637.5},{"fn":"Medic specialist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":11187,"G":9900,"H":4430},{"fn":"Medic specialist dentist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":11187,"G":9900,"H":4430},{"fn":"Medic rezident anul VI","studii":"S","an":2022,"oug63":"Nu","E":10496,"F":9875,"G":7900,"H":4077.5},{"fn":"Medic rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":9125,"G":7300,"H":3386.25},{"fn":"Medic dentist rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":9125,"G":7300,"H":3386.25},{"fn":"Medic rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":8375,"G":6700,"H":3293.75},{"fn":"Medic dentist rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":8375,"G":6700,"H":3293.75},{"fn":"Medic rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":7625,"G":6100,"H":2951.25},{"fn":"Medic dentist rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":7625,"G":6100,"H":2951.25},{"fn":"Medic rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":7125,"G":5700,"H":2631.25},{"fn":"Medic dentist rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":7125,"G":5700,"H":2631.25},{"fn":"Medic","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":8000,"G":6400,"H":3250},{"fn":"Medic dentist","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":8000,"G":6400,"H":3250},{"fn":"Farmacist primar *1)","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":8569,"G":6855,"H":5637.5},{"fn":"Farmacist specialist","studii":"S","an":2018,"oug63":"Nu","E":10168,"F":8239,"G":6591,"H":4430},{"fn":"Farmacist","studii":"S","an":2018,"oug63":"Nu","E":9020,"F":6936,"G":5549,"H":3250},{"fn":"Farmacist rezident anul III","studii":"S","an":2018,"oug63":"Nu","E":7847.4,"F":6801,"G":5441,"H":3293.75},{"fn":"Farmacist rezident anul II","studii":"S","an":2018,"oug63":"Nu","E":7486.6,"F":6735,"G":5388,"H":2951.25},{"fn":"Farmacist rezident anul I","studii":"S","an":2018,"oug63":"Nu","E":7216,"F":6668,"G":5334,"H":2631.25},{"fn":"Bioinginer medical; principal","studii":"S","an":2018,"oug63":"Nu","E":8265.6,"F":7470,"G":5976,"H":3872.5},{"fn":"Bioinginer medical; specialist","studii":"S","an":2018,"oug63":"Nu","E":7777.536,"F":6560,"G":5248,"H":3172.5},{"fn":"Bioinginer medical","studii":"S","an":2018,"oug63":"Nu","E":7388.6592,"F":6130,"G":4904,"H":2518.75},{"fn":"Bioinginer medical; debutant","studii":"S","an":2018,"oug63":"Nu","E":7019.22624,"F":5679,"G":4543,"H":2255},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; principal","studii":"S","an":2022,"oug63":"Da","E":7872,"F":6083,"G":4345,"H":3450},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă","studii":"S","an":2022,"oug63":"Da","E":7478.4,"F":5842,"G":4173,"H":2665},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; debutant","studii":"S","an":2022,"oug63":"Da","E":7104.48,"F":5530,"G":3950,"H":2130},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică; radiologie; radioterapie şi radiodiagnostic; cosmetician medical specialist; asistent medical specializat; tehnician de laborator clinic; tehnician de farmacie; asistent de fiziokinetoterapie; asistent medical de urgenţe medico-chirurgicale; asistent medico-social; tehnician dentar specializat; asistent de profilaxie stomatologică; asistent igienist pentru cabinet stomatologic; asistent pentru stomatologie; asistent medical generalist; tehnician de radiologie şi imagistică; tehnician de audiologie şi protezare auditivă; tehnician de protezare oculară; asistent medical de geriatrie; gerontologie şi asistenţă socială pentru vârstnici; asistent medical de igienă şi sănătate publică; cosmetician medical; asistent medical nutriţionist şi dietetician; tehnician dentar specialist; asistent dentar; principal","studii":"SSD","an":2022,"oug63":"Da","E":7084.8,"F":5722,"G":4087,"H":2986.25},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar","studii":"SSD","an":2022,"oug63":"Da","E":6730.56,"F":5460,"G":3900,"H":2616.25},{"fn":"Asistent medical, asistent medical specialist, tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar; debutant","studii":"SSD","an":2022,"oug63":"Da","E":6536.1216,"F":5390,"G":3850,"H":2057.5},{"fn":"Asistent medical,tehnician dentar principal *2)","studii":"PL","an":2022,"oug63":"Da","E":7052,"F":5474,"G":3910,"H":2856.25},{"fn":"Asistent medical,tehnician dentar  *2)","studii":"PL","an":2022,"oug63":"Da","E":6595.9488,"F":5404,"G":3860,"H":2572.5},{"fn":"Asistent medical,tehnician dentar debutant*2)","studii":"PL","an":2022,"oug63":"Da","E":6438.079776,"F":5250,"G":3750,"H":3285},{"fn":"Asistent medical principal *2)","studii":"M","an":2022,"oug63":"Da","E":6840.44,"F":5390,"G":3850,"H":2601.25},{"fn":"Asistent medical *2)","studii":"M","an":2022,"oug63":"Da","E":6398.070336,"F":5250,"G":3750,"H":2290},{"fn":"Asistent medical debutant *2)","studii":"M","an":2022,"oug63":"Da","E":6232,"F":5054,"G":3610,"H":1991.25},{"fn":"Tehnician dentar principal *3)","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":5390,"G":3850,"H":2601.25},{"fn":"Tehnician dentar  *3)","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":5250,"G":3750,"H":2290},{"fn":"Tehnician dentar debutant *3)","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":5054,"G":3610,"H":1991.25},{"fn":"Soră medicală principală *4)","studii":"M","an":2022,"oug63":"Da","E":6430.0136,"F":5320,"G":3800,"H":2237.5},{"fn":"Soră medicală  *4)","studii":"M","an":2022,"oug63":"Da","E":6078.1668192,"F":5180,"G":3700,"H":2047.5},{"fn":"Soră medicală debutant *4)","studii":"M","an":2022,"oug63":"Da","E":5920.4,"F":5054,"G":3610,"H":1991.25},{"fn":"Autopsier principal","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":4688,"G":3750,"H":2237.5},{"fn":"Autopsier","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":4625,"G":3700,"H":2047.5},{"fn":"Autopsier debutant","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":4513,"G":3610,"H":1991.25},{"fn":"Statistician medical; registrator medical; operator registrator de urgență, principal","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":4688,"G":3750,"H":2237.5},{"fn":"Statistician medical; registrator medical; operator registrator de urgență","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4625,"G":3700,"H":2047.5},{"fn":"Statistician medical; registrator medical;operator registrator de urgență, debutant","studii":"M","an":2018,"oug63":"Nu","E":5485.545554328,"F":4513,"G":3610,"H":1991.25},{"fn":"Biolog,biochimist,chimist, fizician - principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7603,"G":6082,"H":3685},{"fn":"Biolog, biochimist, chimist, fizician- specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6693,"G":5354,"H":3377.5},{"fn":"Biolog, biochimist, chimist, fizician","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6130,"G":4904,"H":3095},{"fn":"Biolog, biochimist, chimist, fizician - debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2125},{"fn":"Logoped, sociolog, asistent social; principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7336,"G":5869,"H":3477.5},{"fn":"Logoped, sociolog, asistent social","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6495,"G":5196,"H":2920},{"fn":"Logoped, sociolog, asistent social; debutant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":5679,"G":4543,"H":2125},{"fn":"Profesor CFM; biolog; chimist,  principal *5)","studii":"SSD","an":2018,"oug63":"Nu","E":6907.68,"F":5378,"G":4302,"H":2836.25},{"fn":"Profesor CFM; biolog; chimist*5)","studii":"SSD","an":2018,"oug63":"Nu","E":6355.0656,"F":4938,"G":3950,"H":2676.25},{"fn":"Profesor CFM; biolog; chimist;  debutant *5)","studii":"SSD","an":2018,"oug63":"Nu","E":5846.660352,"F":4813,"G":3850,"H":2125},{"fn":"Psiholog principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7603,"G":6082,"H":3477.5},{"fn":"Psiholog specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6693,"G":5354,"H":3377.5},{"fn":"Psiholog practicant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6195,"G":4956,"H":2920},{"fn":"Psiholog stagiar","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2125},{"fn":"Fizioterapeut principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7470,"G":5976,"H":3477.5},{"fn":"Fizioterapeut specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6560,"G":5248,"H":4430},{"fn":"Fizioterapeut","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6130,"G":4904,"H":2920},{"fn":"Fizioterapeut debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2125},{"fn":"Fizician medical - principal ; Expert în fizică medicală ","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":7603,"G":6082,"H":3685},{"fn":"Fizician medical - specialist  ","studii":"S","an":2018,"oug63":"Nu","E":9963,"F":6693,"G":5354,"H":3377.5},{"fn":"Fizician medical","studii":"S","an":2018,"oug63":"Nu","E":9151.2,"F":6130,"G":4904,"H":3095},{"fn":"Fizician medical - debutant","studii":"S","an":2018,"oug63":"Nu","E":8118,"F":5679,"G":4543,"H":2125},{"fn":"Infirmieră, agent DDD","studii":"M;G","an":2018,"oug63":"Nu","E":5699,"F":4615,"G":3550,"H":1725},{"fn":"Infirmieră, agent DDD; debutant","studii":"M;G","an":2018,"oug63":"Nu","E":5528.03,"F":4485,"G":3450,"H":1706.25},{"fn":"Brancardier, băieş, nămolar, spălătoreasă, îngrijitoare","studii":null,"an":2018,"oug63":"Nu","E":5362.1891,"F":4290,"G":2950,"H":1700},{"fn":"Ambulanţier ","studii":"M","an":2018,"oug63":"Nu","E":6781.95455616,"F":4813,"G":3850,"H":1737.5},{"fn":"Şofer autosanitară I *6","studii":"M","an":2018,"oug63":"Nu","E":6442.856828352,"F":4813,"G":3850,"H":1737.5},{"fn":"Şofer autosanitară II *6","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":4813,"G":3850,"H":1737.5},{"fn":"Şofer autosanitară III *6","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4688,"G":3750,"H":1712.5}],"defaults":{"adjust":0,"ore":168,"grad":5,"svechi":0.85,"snou":0.2,"noapte":"Nu","orenoapte":0,"tura":"Da","oresdsl":48,"tarifsdsl":0.3,"hrana":"Da","hranav":347,"indemn":"Da","indemnv":800}},"neclinic":{"rows":[{"fn":"Medic primar","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":13843,"G":12250,"H":4501.25},{"fn":"Medic primar dentist","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":13843,"G":12250,"H":4501.25},{"fn":"Medic specialist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":10963,"G":9702,"H":3921.25},{"fn":"Medic specialist dentist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":10963,"G":9702,"H":3921.25},{"fn":"Medic rezident anul VI","studii":"S","an":2022,"oug63":"Nu","E":10496,"F":0,"G":0,"H":3748.75},{"fn":"Medic rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":0,"G":0,"H":3655},{"fn":"Medic dentist rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":0,"G":0,"H":3655},{"fn":"Medic rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":0,"G":0,"H":3068.75},{"fn":"Medic dentist rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":0,"G":0,"H":3068.75},{"fn":"Medic rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":0,"G":0,"H":2763.75},{"fn":"Medic dentist rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":0,"G":0,"H":2763.75},{"fn":"Medic rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":0,"G":0,"H":2481.25},{"fn":"Medic dentist rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":0,"G":0,"H":2481.25},{"fn":"Medic","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":7840,"G":6272,"H":3106.25},{"fn":"Medic dentist","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":7840,"G":6272,"H":3106.25},{"fn":"Farmacist primar *1)","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":8139,"G":6511,"H":4501.25},{"fn":"Farmacist specialist","studii":"S","an":2018,"oug63":"Nu","E":10168,"F":7826,"G":6261,"H":3921.25},{"fn":"Farmacist","studii":"S","an":2018,"oug63":"Nu","E":9020,"F":6589,"G":5271,"H":2958.75},{"fn":"Farmacist rezident anul III","studii":"S","an":2018,"oug63":"Nu","E":7847.4,"F":0,"G":0,"H":3068.75},{"fn":"Farmacist rezident anul II","studii":"S","an":2018,"oug63":"Nu","E":7486.6,"F":0,"G":0,"H":2763.75},{"fn":"Farmacist rezident anul I","studii":"S","an":2018,"oug63":"Nu","E":7216,"F":0,"G":0,"H":2481.25},{"fn":"Bioinginer medical; principal","studii":"S","an":2018,"oug63":"Nu","E":8265.6,"F":7096,"G":5677,"H":2756.25},{"fn":"Bioinginer medical; specialist","studii":"S","an":2018,"oug63":"Nu","E":7777.536,"F":6405,"G":5124,"H":2401.25},{"fn":"Bioinginer medical","studii":"S","an":2018,"oug63":"Nu","E":7388.6592,"F":6130,"G":4904,"H":2266.25},{"fn":"Bioinginer medical; debutant","studii":"S","an":2018,"oug63":"Nu","E":7019.22624,"F":5679,"G":4543,"H":2031.25},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; principal","studii":"S","an":2022,"oug63":"Da","E":7872,"F":5779,"G":4128,"H":2877.5},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă","studii":"S","an":2022,"oug63":"Da","E":7478.4,"F":5628,"G":4020,"H":2395},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; debutant","studii":"S","an":2022,"oug63":"Da","E":7104.48,"F":5530,"G":3950,"H":2103.75},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică; radiologie; radioterapie şi radiodiagnostic; cosmetician medical specialist; asistent medical specializat; tehnician de laborator clinic; tehnician de farmacie; asistent de fiziokinetoterapie; asistent medical de urgenţe medico-chirurgicale; asistent medico-social; tehnician dentar specializat; asistent de profilaxie stomatologică; asistent igienist pentru cabinet stomatologic; asistent pentru stomatologie; asistent medical generalist; tehnician de radiologie şi imagistică; tehnician de audiologie şi protezare auditivă; tehnician de protezare oculară; asistent medical de geriatrie; gerontologie şi asistenţă socială pentru vârstnici; asistent medical de igienă şi sănătate publică; cosmetician medical; asistent medical nutriţionist şi dietetician; tehnician dentar specialist; asistent dentar; principal","studii":"SSD","an":2022,"oug63":"Da","E":7084.8,"F":5530,"G":3950,"H":2656.25},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar","studii":"SSD","an":2022,"oug63":"Da","E":6730.56,"F":5460,"G":3900,"H":2311.25},{"fn":"Asistent medical, asistent medical specialist, tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar; debutant","studii":"SSD","an":2022,"oug63":"Da","E":6536.1216,"F":5390,"G":3850,"H":2057.5},{"fn":"Asistent medical,tehnician dentar principal *2)","studii":"PL","an":2022,"oug63":"Da","E":7052,"F":5460,"G":3900,"H":2515},{"fn":"Asistent medical,tehnician dentar  *2)","studii":"PL","an":2022,"oug63":"Da","E":6595.9488,"F":5390,"G":3850,"H":2270},{"fn":"Asistent medical,tehnician dentar debutant*2)","studii":"PL","an":2022,"oug63":"Da","E":6438.079776,"F":5250,"G":3750,"H":1982.5},{"fn":"Asistent medical principal *2)","studii":"M","an":2022,"oug63":"Da","E":6840.44,"F":5390,"G":3850,"H":2323.75},{"fn":"Asistent medical *2)","studii":"M","an":2022,"oug63":"Da","E":6398.070336,"F":5250,"G":3750,"H":2103.75},{"fn":"Asistent medical debutant *2)","studii":"M","an":2022,"oug63":"Da","E":6232,"F":5054,"G":3610,"H":1941.25},{"fn":"Tehnician dentar principal *3)","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":5390,"G":3850,"H":2141.25},{"fn":"Tehnician dentar  *3)","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":5250,"G":3750,"H":2035},{"fn":"Tehnician dentar debutant *3)","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":5054,"G":3610,"H":1986.25},{"fn":"Soră medicală principală *4)","studii":"M","an":2022,"oug63":"Da","E":6430.0136,"F":5250,"G":3750,"H":2047.5},{"fn":"Soră medicală  *4)","studii":"M","an":2022,"oug63":"Da","E":6078.1668192,"F":5180,"G":3700,"H":2011.25},{"fn":"Soră medicală debutant *4)","studii":"M","an":2022,"oug63":"Da","E":5920.4,"F":5054,"G":3610,"H":1986.25},{"fn":"Autopsier principal","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":4688,"G":3750,"H":2047.5},{"fn":"Autopsier","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":4625,"G":3700,"H":2011.25},{"fn":"Autopsier debutant","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":4513,"G":3610,"H":1986.25},{"fn":"Statistician medical; registrator medical; operator registrator de urgență, principal","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":4688,"G":3750,"H":2047.5},{"fn":"Statistician medical; registrator medical; operator registrator de urgență","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4625,"G":3700,"H":2011.25},{"fn":"Statistician medical; registrator medical;operator registrator de urgență, debutant","studii":"M","an":2018,"oug63":"Nu","E":5485.545554328,"F":4513,"G":3610,"H":1986.25},{"fn":"Biolog,biochimist,chimist, fizician - principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7241,"G":5793,"H":3477.5},{"fn":"Biolog, biochimist, chimist, fizician- specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6373,"G":5098,"H":2920},{"fn":"Biolog, biochimist, chimist, fizician","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6000,"G":4800,"H":2676.25},{"fn":"Biolog, biochimist, chimist, fizician - debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2125},{"fn":"Logoped, sociolog, asistent social; principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":6988,"G":5590,"H":2843.75},{"fn":"Logoped, sociolog, asistent social","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6233,"G":4986,"H":2426.25},{"fn":"Logoped, sociolog, asistent social; debutant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":5679,"G":4543,"H":2125},{"fn":"Profesor CFM; biolog; chimist,  principal *5)","studii":"SSD","an":2018,"oug63":"Nu","E":6907.68,"F":5109,"G":4087,"H":2503.75},{"fn":"Profesor CFM; biolog; chimist*5)","studii":"SSD","an":2018,"oug63":"Nu","E":6355.0656,"F":4875,"G":3900,"H":2286.25},{"fn":"Profesor CFM; biolog; chimist;  debutant *5)","studii":"SSD","an":2018,"oug63":"Nu","E":5846.660352,"F":4813,"G":3850,"H":2125},{"fn":"Psiholog principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7241,"G":5793,"H":3477.5},{"fn":"Psiholog specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6373,"G":5098,"H":2920},{"fn":"Psiholog practicant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6000,"G":4800,"H":2676.25},{"fn":"Psiholog stagiar","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2125},{"fn":"Fizioterapeut principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7096,"G":5677,"H":2756.25},{"fn":"Fizioterapeut specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6405,"G":5124,"H":2401.25},{"fn":"Fizioterapeut","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6130,"G":4904,"H":2266.25},{"fn":"Fizioterapeut debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":5679,"G":4543,"H":2031.25},{"fn":"Fizician medical - principal ; Expert în fizică medicală ","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":7241,"G":5793,"H":3477.5},{"fn":"Fizician medical - specialist  ","studii":"S","an":2018,"oug63":"Nu","E":9963,"F":6373,"G":5098,"H":2920},{"fn":"Fizician medical","studii":"S","an":2018,"oug63":"Nu","E":9151.2,"F":6000,"G":4800,"H":2676.25},{"fn":"Fizician medical - debutant","studii":"S","an":2018,"oug63":"Nu","E":8118,"F":5679,"G":4543,"H":2125},{"fn":"Infirmieră, agent DDD","studii":"M;G","an":2018,"oug63":"Nu","E":5699,"F":4615,"G":3550,"H":1712.5},{"fn":"Infirmieră, agent DDD; debutant","studii":"M;G","an":2018,"oug63":"Nu","E":5528.03,"F":4485,"G":3450,"H":1700},{"fn":"Brancardier, băieş, nămolar, spălătoreasă, îngrijitoare","studii":null,"an":2018,"oug63":"Nu","E":5362.1891,"F":4290,"G":2950,"H":1687.5},{"fn":"Ambulanţier ","studii":"M","an":2018,"oug63":"Nu","E":6781.95455616,"F":4813,"G":3850,"H":1718.75},{"fn":"Şofer autosanitară I *6","studii":"M","an":2018,"oug63":"Nu","E":6442.856828352,"F":4813,"G":3850,"H":1718.75},{"fn":"Şofer autosanitară II *6","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":4813,"G":3850,"H":1718.75},{"fn":"Şofer autosanitară III *6","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4688,"G":3750,"H":1706.25}],"defaults":{"adjust":-0.1,"ore":168,"grad":5,"svechi":0.85,"snou":0.2,"noapte":"Nu","orenoapte":0,"tura":"Da","oresdsl":48,"tarifsdsl":0.3,"hrana":"Da","hranav":347,"indemn":"Da","indemnv":800}},"sju":{"rows":[{"fn":"Medic primar","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":15072,"G":13338,"H":6010},{"fn":"Medic primar dentist","studii":"S","an":2022,"oug63":"Nu","E":16400,"F":15072,"G":13338,"H":6010},{"fn":"Medic specialist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":11936,"G":10563,"H":4675},{"fn":"Medic specialist dentist","studii":"S","an":2022,"oug63":"Nu","E":13120,"F":11936,"G":10563,"H":4675},{"fn":"Medic rezident anul VI","studii":"S","an":2022,"oug63":"Nu","E":10496,"F":9125,"G":7300,"H":3523.75},{"fn":"Medic rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":9125,"G":7300,"H":3523.75},{"fn":"Medic dentist rezident anul IV-V","studii":"S","an":2022,"oug63":"Nu","E":9840,"F":9125,"G":7300,"H":3523.75},{"fn":"Medic rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":8375,"G":6700,"H":3431.25},{"fn":"Medic dentist rezident anul III","studii":"S","an":2022,"oug63":"Nu","E":9184,"F":8375,"G":6700,"H":3431.25},{"fn":"Medic rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":7625,"G":6100,"H":3088.75},{"fn":"Medic dentist rezident anul II","studii":"S","an":2022,"oug63":"Nu","E":8528,"F":7625,"G":6100,"H":3088.75},{"fn":"Medic rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":7125,"G":5700,"H":2768.75},{"fn":"Medic dentist rezident anul I","studii":"S","an":2022,"oug63":"Nu","E":7872,"F":7125,"G":5700,"H":2768.75},{"fn":"Medic","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":8136,"G":6509,"H":3387.5},{"fn":"Medic dentist","studii":"S","an":2022,"oug63":"Nu","E":8856,"F":8136,"G":6509,"H":3387.5},{"fn":"Farmacist primar *1)","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":9143,"G":7314,"H":6010},{"fn":"Farmacist specialist","studii":"S","an":2018,"oug63":"Nu","E":10168,"F":8790,"G":7032,"H":4675},{"fn":"Farmacist","studii":"S","an":2018,"oug63":"Nu","E":9020,"F":7400,"G":5920,"H":3387.5},{"fn":"Farmacist rezident anul III","studii":"S","an":2018,"oug63":"Nu","E":7847.4,"F":7258,"G":5806,"H":3431.25},{"fn":"Farmacist rezident anul II","studii":"S","an":2018,"oug63":"Nu","E":7486.6,"F":7186,"G":5749,"H":3088.75},{"fn":"Farmacist rezident anul I","studii":"S","an":2018,"oug63":"Nu","E":7216,"F":7116,"G":5693,"H":2768.75},{"fn":"Bioinginer medical; principal","studii":"S","an":2018,"oug63":"Nu","E":8265.6,"F":7970,"G":6376,"H":3877.5},{"fn":"Bioinginer medical; specialist","studii":"S","an":2018,"oug63":"Nu","E":7777.536,"F":7001,"G":5601,"H":3176.25},{"fn":"Bioinginer medical","studii":"S","an":2018,"oug63":"Nu","E":7388.6592,"F":6541,"G":5233,"H":2750},{"fn":"Bioinginer medical; debutant","studii":"S","an":2018,"oug63":"Nu","E":7019.22624,"F":6059,"G":4847,"H":2305},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; principal","studii":"S","an":2022,"oug63":"Da","E":7872,"F":6490,"G":4636,"H":3456.25},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă","studii":"S","an":2022,"oug63":"Da","E":7478.4,"F":6234,"G":4453,"H":2668.75},{"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; debutant","studii":"S","an":2022,"oug63":"Da","E":7104.48,"F":5901,"G":4215,"H":2090},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică; radiologie; radioterapie şi radiodiagnostic; cosmetician medical specialist; asistent medical specializat; tehnician de laborator clinic; tehnician de farmacie; asistent de fiziokinetoterapie; asistent medical de urgenţe medico-chirurgicale; asistent medico-social; tehnician dentar specializat; asistent de profilaxie stomatologică; asistent igienist pentru cabinet stomatologic; asistent pentru stomatologie; asistent medical generalist; tehnician de radiologie şi imagistică; tehnician de audiologie şi protezare auditivă; tehnician de protezare oculară; asistent medical de geriatrie; gerontologie şi asistenţă socială pentru vârstnici; asistent medical de igienă şi sănătate publică; cosmetician medical; asistent medical nutriţionist şi dietetician; tehnician dentar specialist; asistent dentar; principal","studii":"SSD","an":2022,"oug63":"Da","E":7084.8,"F":6105,"G":4361,"H":3032.5},{"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar","studii":"SSD","an":2022,"oug63":"Da","E":6730.56,"F":5825,"G":4161,"H":2618.75},{"fn":"Asistent medical, asistent medical specialist, tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar; debutant","studii":"SSD","an":2022,"oug63":"Da","E":6536.1216,"F":5751,"G":4108,"H":2057.5},{"fn":"Asistent medical,tehnician dentar principal *2)","studii":"PL","an":2022,"oug63":"Da","E":7052,"F":5825,"G":4161,"H":2970},{"fn":"Asistent medical,tehnician dentar  *2)","studii":"PL","an":2022,"oug63":"Da","E":6595.9488,"F":5601,"G":4001,"H":2677.5},{"fn":"Asistent medical,tehnician dentar debutant*2)","studii":"PL","an":2022,"oug63":"Da","E":6438.079776,"F":5527,"G":3948,"H":2125},{"fn":"Asistent medical principal *2)","studii":"M","an":2022,"oug63":"Da","E":6840.44,"F":5751,"G":4108,"H":2927.5},{"fn":"Asistent medical *2)","studii":"M","an":2022,"oug63":"Da","E":6398.070336,"F":5527,"G":3948,"H":2385},{"fn":"Asistent medical debutant *2)","studii":"M","an":2022,"oug63":"Da","E":6232,"F":5393,"G":3852,"H":2071.25},{"fn":"Tehnician dentar principal *3)","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":5751,"G":4108,"H":2608.75},{"fn":"Tehnician dentar  *3)","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":5527,"G":3948,"H":3635},{"fn":"Tehnician dentar debutant *3)","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":5393,"G":3852,"H":2071.25},{"fn":"Soră medicală principală *4)","studii":"M","an":2022,"oug63":"Da","E":6430.0136,"F":5601,"G":4001,"H":2330},{"fn":"Soră medicală  *4)","studii":"M","an":2022,"oug63":"Da","E":6078.1668192,"F":5453,"G":3895,"H":2138.75},{"fn":"Soră medicală debutant *4)","studii":"M","an":2022,"oug63":"Da","E":5920.4,"F":5393,"G":3852,"H":2071.25},{"fn":"Autopsier principal","studii":"M","an":2018,"oug63":"Nu","E":6840.44,"F":5751,"G":4108,"H":2927.5},{"fn":"Autopsier","studii":"M","an":2018,"oug63":"Nu","E":6398.070336,"F":5527,"G":3948,"H":2385},{"fn":"Autopsier debutant","studii":"M","an":2018,"oug63":"Nu","E":6232,"F":5393,"G":3852,"H":2071.25},{"fn":"Statistician medical; registrator medical; operator registrator de urgență, principal","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":5001,"G":4001,"H":2330},{"fn":"Statistician medical; registrator medical; operator registrator de urgență","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4869,"G":3895,"H":2138.75},{"fn":"Statistician medical; registrator medical;operator registrator de urgență, debutant","studii":"M","an":2018,"oug63":"Nu","E":5485.545554328,"F":4815,"G":3852,"H":2071.25},{"fn":"Biolog,biochimist,chimist, fizician - principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":8113,"G":6490,"H":3877.5},{"fn":"Biolog, biochimist, chimist, fizician- specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":7140,"G":5712,"H":3176.25},{"fn":"Biolog, biochimist, chimist, fizician","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6610,"G":5288,"H":2750},{"fn":"Biolog, biochimist, chimist, fizician - debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":6059,"G":4847,"H":2305},{"fn":"Logoped, sociolog, asistent social; principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7828,"G":6262,"H":3685},{"fn":"Logoped, sociolog, asistent social","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":6931,"G":5545,"H":3063.75},{"fn":"Logoped, sociolog, asistent social; debutant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6059,"G":4847,"H":2386.25},{"fn":"Profesor CFM; biolog; chimist,  principal *5)","studii":"SSD","an":2018,"oug63":"Nu","E":6907.68,"F":5739,"G":4591,"H":3186.25},{"fn":"Profesor CFM; biolog; chimist*5)","studii":"SSD","an":2018,"oug63":"Nu","E":6355.0656,"F":5269,"G":4215,"H":2518.75},{"fn":"Profesor CFM; biolog; chimist;  debutant *5)","studii":"SSD","an":2018,"oug63":"Nu","E":5846.660352,"F":5135,"G":4108,"H":2125},{"fn":"Psiholog principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":8113,"G":6490,"H":3685},{"fn":"Psiholog specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":7140,"G":5712,"H":3063.75},{"fn":"Psiholog practicant","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6610,"G":5288,"H":2386.25},{"fn":"Psiholog stagiar","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":6059,"G":4847,"H":2197.5},{"fn":"Fizioterapeut principal","studii":"S","an":2018,"oug63":"Nu","E":8651,"F":7970,"G":6376,"H":3877.5},{"fn":"Fizioterapeut specialist","studii":"S","an":2018,"oug63":"Nu","E":7958.92,"F":7001,"G":5601,"H":3176.25},{"fn":"Fizioterapeut","studii":"S","an":2018,"oug63":"Nu","E":7322.2064,"F":6541,"G":5233,"H":2750},{"fn":"Fizioterapeut debutant","studii":"S","an":2018,"oug63":"Nu","E":6736.429888,"F":6059,"G":4847,"H":2305},{"fn":"Fizician medical - principal ; Expert în fizică medicală ","studii":"S","an":2018,"oug63":"Nu","E":11070,"F":8113,"G":6490,"H":3877.5},{"fn":"Fizician medical - specialist  ","studii":"S","an":2018,"oug63":"Nu","E":9963,"F":7140,"G":5712,"H":3176.25},{"fn":"Fizician medical","studii":"S","an":2018,"oug63":"Nu","E":9151.2,"F":6610,"G":5288,"H":2750},{"fn":"Fizician medical - debutant","studii":"S","an":2018,"oug63":"Nu","E":8118,"F":6059,"G":4847,"H":2305},{"fn":"Infirmieră, agent DDD","studii":"M;G","an":2018,"oug63":"Nu","E":5699,"F":4693,"G":3610,"H":1855},{"fn":"Infirmieră, agent DDD; debutant","studii":"M;G","an":2018,"oug63":"Nu","E":5528.03,"F":4615,"G":3550,"H":1833.75},{"fn":"Brancardier, băieş, nămolar, spălătoreasă, îngrijitoare","studii":null,"an":2018,"oug63":"Nu","E":5362.1891,"F":4290,"G":3000,"H":1827.5},{"fn":"Ambulanţier ","studii":"M","an":2018,"oug63":"Nu","E":6781.95455616,"F":5163,"G":4130,"H":2600},{"fn":"Şofer autosanitară I *6","studii":"M","an":2018,"oug63":"Nu","E":6442.856828352,"F":4875,"G":3900,"H":2201.25},{"fn":"Şofer autosanitară II *6","studii":"M","an":2018,"oug63":"Nu","E":6078.1668192,"F":4813,"G":3850,"H":1937.5},{"fn":"Şofer autosanitară III *6","studii":"M","an":2018,"oug63":"Nu","E":5774.25847824,"F":4813,"G":3850,"H":1937.5}],"defaults":{"adjust":0.1,"ore":168,"grad":5,"svechi":0.85,"snou":0.2,"noapte":"Da","orenoapte":48,"tura":"Da","oresdsl":48,"tarifsdsl":0.3,"hrana":"Da","hranav":347,"indemn":"Da","indemnv":800}}};
+// Coeficienți propuși de Ministerul Sănătății ("MS - gradații noi"), pe indexul rândurilor din Clinic.
+// Salariul de bază = coeficient × 4100 lei (aceeași bază ca în proiectul iul. 2026).
+const MS_COEF_CLINIC=[
+  4,4,3.33,3.33,                 // medic primar / primar dentist / specialist / specialist dentist
+  2.75,2.38,2.38,2.21,2.21,2.06,2.06,1.92,1.92, // rezidenți VI → I
+  2.38,2.38,                     // medic / medic dentist
+  2.93,2.44,2.07,1.88,1.75,1.63, // farmacist + rezidenți
+  2.2,2,1.82,1.65,               // bioinginer medical
+  2,1.82,1.65,                   // asistent licenţiat (S)
+  1.8,1.64,1.49,                 // asistent SSD
+  1.72,1.56,1.42,                // asistent / tehnician dentar PL
+  1.67,1.52,1.38,                // asistent medical M
+  1.67,1.52,1.38,                // tehnician dentar M
+  1.56,1.42,1.29,                // soră medicală
+  1.67,1.52,1.38,                // autopsier
+  1.52,1.38,1.25,                // statistician / registrator
+  2.12,1.93,1.75,1.59,           // biolog; biochimist; chimist; fizician
+  2.12,1.93,1.75,                // logoped; sociolog; asistent social
+  1.7,1.55,1.41,                 // profesor CFM; biolog; chimist (SSD)
+  2.12,1.93,1.75,1.59,           // psiholog
+  2.2,2,1.82,1.65,               // fizioterapeut
+  2.64,2.4,2.18,1.98,            // fizician medical / expert în fizică medicală
+  1.42,1.29,                     // infirmieră; agent DDD
+  1.35,                          // brancardier; băieş; nămolar; spălătoreasă; îngrijitoare
+  1.65,                          // ambulanţier
+  1.57,1.5,1.43                  // şofer autosanitară I / II / III
+];
+const MS_BASE=4100;
+// Grila MS e publicată pentru Clinic; Neclinic și SAJ folosesc același coeficient de bază,
+// ajustat apoi cu „ajustare salariu nou" (aplicată în calc prin ×(1+adjust)).
+['clinic','neclinic','sju'].forEach(k=>{
+  (DS[k]?.rows||[]).forEach((r,i)=>{ if(MS_COEF_CLINIC[i]!=null) r.ms=MS_COEF_CLINIC[i]; });
+});
+const GRAD={0:1,1:1.075,2:1.12875,3:1.1851875,4:1.2148171875,5:1.2451876171874998};
+const GRADPAIRS=[[0,1],[1,1.075],[2,1.12875],[3,1.1851875],[4,1.2148171875],[5,1.2451876171874998]];
+const COEF={"items":[{"t":"group","text":"a) Coeficienți de salarizare pentru personalul de specialitate medico-sanitar"},{"t":"row","nr":1,"fn":"Medic primar","studii":"S","mai":4,"iul":4,"delta":0},{"t":"row","nr":2,"fn":"Medic primar dentist","studii":"S","mai":4,"iul":4,"delta":0},{"t":"row","nr":3,"fn":"Medic specialist","studii":"S","mai":3.2,"iul":3.2,"delta":0},{"t":"row","nr":4,"fn":"Medic specialist dentist","studii":"S","mai":3.2,"iul":3.2,"delta":0},{"t":"row","nr":5,"fn":"Medic rezident anul VI","studii":"S","mai":2.56,"iul":2.56,"delta":0},{"t":"row","nr":6,"fn":"Medic rezident anul IV-V","studii":"S","mai":2.4,"iul":2.4,"delta":0},{"t":"row","nr":7,"fn":"Medic dentist rezident anul IV-V","studii":"S","mai":2.4,"iul":2.4,"delta":0},{"t":"row","nr":8,"fn":"Medic rezident anul III","studii":"S","mai":2.24,"iul":2.24,"delta":0},{"t":"row","nr":9,"fn":"Medic dentist rezident anul III","studii":"S","mai":2.24,"iul":2.24,"delta":0},{"t":"row","nr":10,"fn":"Medic rezident anul II","studii":"S","mai":2.08,"iul":2.08,"delta":0},{"t":"row","nr":11,"fn":"Medic dentist rezident anul II","studii":"S","mai":2.08,"iul":2.08,"delta":0},{"t":"row","nr":12,"fn":"Medic rezident anul I","studii":"S","mai":1.92,"iul":1.92,"delta":0},{"t":"row","nr":13,"fn":"Medic dentist rezident anul I","studii":"S","mai":1.92,"iul":1.92,"delta":0},{"t":"row","nr":14,"fn":"Medic","studii":"S","mai":1.76,"iul":2.16,"delta":0.4},{"t":"row","nr":15,"fn":"Medic dentist","studii":"S","mai":1.76,"iul":2.16,"delta":0.4},{"t":"row","nr":16,"fn":"Farmacist primar *1)","studii":"S","mai":2.4,"iul":2.7,"delta":0.3},{"t":"row","nr":17,"fn":"Farmacist specialist","studii":"S","mai":2.24,"iul":2.48,"delta":0.24},{"t":"row","nr":18,"fn":"Farmacist","studii":"S","mai":1.92,"iul":2.2,"delta":0.28},{"t":"row","nr":19,"fn":"Farmacist rezident anul III","studii":"S","mai":1.7664,"iul":1.914,"delta":0.1476},{"t":"row","nr":20,"fn":"Farmacist rezident anul II","studii":"S","mai":1.728,"iul":1.826,"delta":0.098},{"t":"row","nr":21,"fn":"Farmacist rezident anul I","studii":"S","mai":1.632,"iul":1.76,"delta":0.128},{"t":"row","nr":22,"fn":"Bioinginer medical; principal","studii":"S","mai":1.995,"iul":2.016,"delta":0.021},{"t":"row","nr":23,"fn":"Bioinginer medical; specialist","studii":"S","mai":1.8411,"iul":1.89696,"delta":0.05586},{"t":"row","nr":24,"fn":"Bioinginer medical","studii":"S","mai":1.749045,"iul":1.802112,"delta":0.053067},{"t":"row","nr":25,"fn":"Bioinginer medical; debutant","studii":"S","mai":1.661593,"iul":1.712006,"delta":0.050414},{"t":"row","nr":26,"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; principal","studii":"S","mai":1.9,"iul":1.92,"delta":0.02},{"t":"row","nr":27,"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă","studii":"S","mai":1.805,"iul":1.824,"delta":0.019},{"t":"row","nr":28,"fn":"Asistent medical; tehnician de radiologie şi imagistică licenţiat; asistent medical de laborator clinic licenţiat; licenţiat în balneofiziokinetoterapie şi recuperare; tehnician dentar licenţiat; asistent medical dentar licenţiat; tehnician de farmacie licenţiat; tehnician de audiologie şi protezare auditivă licenţiat; asistent medical de profilaxie dentară licenţiat; dietetician; moaşă; debutant","studii":"S","mai":1.71475,"iul":1.7328,"delta":0.01805},{"t":"row","nr":29,"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică; radiologie; radioterapie şi radiodiagnostic; cosmetician medical specialist; asistent medical specializat; tehnician de laborator clinic; tehnician de farmacie; asistent de fiziokinetoterapie; asistent medical de urgenţe medico-chirurgicale; asistent medico-social; tehnician dentar specializat; asistent de profilaxie stomatologică; asistent igienist pentru cabinet stomatologic; asistent pentru stomatologie; asistent medical generalist; tehnician de radiologie şi imagistică; tehnician de audiologie şi protezare auditivă; tehnician de protezare oculară; asistent medical de geriatrie; gerontologie şi asistenţă socială pentru vârstnici; asistent medical de igienă şi sănătate publică; cosmetician medical; asistent medical nutriţionist şi dietetician; tehnician dentar specialist; asistent dentar; principal","studii":"SSD","mai":1.71,"iul":1.728,"delta":0.018},{"t":"row","nr":30,"fn":"Asistent medical; asistent medical specialist; tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar","studii":"SSD","mai":1.6245,"iul":1.6416,"delta":0.0171},{"t":"row","nr":31,"fn":"Asistent medical, asistent medical specialist, tehnician superior de imagistică, radiologie, radioterapie şi radiodiagnostic, cosmetician medical specialist, asistent medical specializat, tehnician de laborator clinic, tehnician de farmacie, asistent de fiziokinetoterapie, asistent medical de urgenţe medico-chirurgicale, asistent medico-social, tehnician dentar specializat, asistent de profilaxie stomatologică, asistent igienist pentru cabinet stomatologic, asistent pentru stomatologie, asistent medical generalist, tehnician de radiologie şi imagistică, tehnician de audiologie şi protezare auditivă, tehnician de protezare oculară, asistent medical de geriatrie, gerontologie şi asistenţă socială pentru vârstnici, asistent medical de igienă şi sănătate publică, cosmetician medical, asistent medical nutriţionist şi dietetician, tehnician dentar specialist, asistent dentar; debutant","studii":"SSD","mai":1.57757,"iul":1.594176,"delta":0.016606},{"t":"row","nr":32,"fn":"Asistent medical,tehnician dentar principal *2)","studii":"PL","mai":1.68,"iul":1.72,"delta":0.04},{"t":"row","nr":33,"fn":"Asistent medical,tehnician dentar  *2)","studii":"PL","mai":1.59201,"iul":1.608768,"delta":0.016758},{"t":"row","nr":34,"fn":"Asistent medical,tehnician dentar debutant*2)","studii":"PL","mai":1.546019,"iul":1.570263,"delta":0.024245},{"t":"row","nr":35,"fn":"Asistent medical principal *2)","studii":"M","mai":1.6464,"iul":1.6684,"delta":0.022},{"t":"row","nr":36,"fn":"Asistent medical *2)","studii":"M","mai":1.56017,"iul":1.560505,"delta":0.000335},{"t":"row","nr":37,"fn":"Asistent medical debutant *2)","studii":"M","mai":1.52,"iul":1.52,"delta":0},{"t":"row","nr":38,"fn":"Tehnician dentar principal *3)","studii":"M","mai":1.6464,"iul":1.6684,"delta":0.022},{"t":"row","nr":39,"fn":"Tehnician dentar  *3)","studii":"M","mai":1.56017,"iul":1.560505,"delta":0.000335},{"t":"row","nr":40,"fn":"Tehnician dentar debutant *3)","studii":"M","mai":1.52,"iul":1.52,"delta":0},{"t":"row","nr":41,"fn":"Soră medicală principală *4)","studii":"M","mai":1.56408,"iul":1.568296,"delta":0.004216},{"t":"row","nr":42,"fn":"Soră medicală  *4)","studii":"M","mai":1.482161,"iul":1.48248,"delta":0.000318},{"t":"row","nr":43,"fn":"Soră medicală debutant *4)","studii":"M","mai":1.444,"iul":1.444,"delta":0},{"t":"row","nr":44,"fn":"Autopsier principal","studii":"M","mai":1.6464,"iul":1.6684,"delta":0.022},{"t":"row","nr":45,"fn":"Autopsier","studii":"M","mai":1.56017,"iul":1.560505,"delta":0.000335},{"t":"row","nr":46,"fn":"Autopsier debutant","studii":"M","mai":1.52,"iul":1.52,"delta":0},{"t":"row","nr":47,"fn":"Statistician medical; registrator medical; operator registrator de urgență, principal","studii":"M","mai":1.482161,"iul":1.48248,"delta":0.000318},{"t":"row","nr":48,"fn":"Statistician medical; registrator medical; operator registrator de urgență","studii":"M","mai":1.408053,"iul":1.408356,"delta":0.000302},{"t":"row","nr":49,"fn":"Statistician medical; registrator medical;operator registrator de urgență, debutant","studii":"M","mai":1.337651,"iul":1.337938,"delta":0.000287},{"t":"row","nr":50,"fn":"Biolog,biochimist,chimist, fizician - principal","studii":"S","mai":2.144625,"iul":2.11,"delta":-0.034625},{"t":"row","nr":51,"fn":"Biolog, biochimist, chimist, fizician- specialist","studii":"S","mai":1.973055,"iul":1.9412,"delta":-0.031855},{"t":"row","nr":52,"fn":"Biolog, biochimist, chimist, fizician","studii":"S","mai":1.815211,"iul":1.785904,"delta":-0.029307},{"t":"row","nr":53,"fn":"Biolog, biochimist, chimist, fizician - debutant","studii":"S","mai":1.669994,"iul":1.643032,"delta":-0.026962},{"t":"row","nr":54,"fn":"Logoped, sociolog, asistent social; principal","studii":"S","mai":2.144625,"iul":2.11,"delta":-0.034625},{"t":"row","nr":55,"fn":"Logoped, sociolog, asistent social","studii":"S","mai":1.973055,"iul":1.9412,"delta":-0.031855},{"t":"row","nr":56,"fn":"Logoped, sociolog, asistent social; debutant","studii":"S","mai":1.815211,"iul":1.785904,"delta":-0.029307},{"t":"row","nr":57,"fn":"Profesor CFM; biolog; chimist,  principal *5)","studii":"SSD","mai":1.71,"iul":1.6848,"delta":-0.0252},{"t":"row","nr":58,"fn":"Profesor CFM; biolog; chimist*5)","studii":"SSD","mai":1.5732,"iul":1.550016,"delta":-0.023184},{"t":"row","nr":59,"fn":"Profesor CFM; biolog; chimist;  debutant *5)","studii":"SSD","mai":1.447344,"iul":1.426015,"delta":-0.021329},{"t":"row","nr":60,"fn":"Psiholog principal","studii":"S","mai":2.144625,"iul":2.11,"delta":-0.034625},{"t":"row","nr":61,"fn":"Psiholog specialist","studii":"S","mai":1.973055,"iul":1.9412,"delta":-0.031855},{"t":"row","nr":62,"fn":"Psiholog practicant","studii":"S","mai":1.815211,"iul":1.785904,"delta":-0.029307},{"t":"row","nr":63,"fn":"Psiholog stagiar","studii":"S","mai":1.669994,"iul":1.643032,"delta":-0.026962},{"t":"row","nr":64,"fn":"Fizioterapeut principal","studii":"S","mai":2.144625,"iul":2.11,"delta":-0.034625},{"t":"row","nr":65,"fn":"Fizioterapeut specialist","studii":"S","mai":1.973055,"iul":1.9412,"delta":-0.031855},{"t":"row","nr":66,"fn":"Fizioterapeut","studii":"S","mai":1.815211,"iul":1.785904,"delta":-0.029307},{"t":"row","nr":67,"fn":"Fizioterapeut debutant","studii":"S","mai":1.669994,"iul":1.643032,"delta":-0.026962},{"t":"row","nr":68,"fn":"Fizician medical - principal ; Expert în fizică medicală","studii":"S","mai":2.64,"iul":2.7,"delta":0.06},{"t":"row","nr":69,"fn":"Fizician medical - specialist","studii":"S","mai":2.4,"iul":2.43,"delta":0.03},{"t":"row","nr":70,"fn":"Fizician medical","studii":"S","mai":2.24,"iul":2.232,"delta":-0.008},{"t":"row","nr":71,"fn":"Fizician medical - debutant","studii":"S","mai":1.92,"iul":1.98,"delta":0.06},{"t":"group","text":"b) Coeficienți de salarizare pentru personalul auxiliar sanitar"},{"t":"row","nr":"72","fn":"Infirmieră, agent DDD","studii":"M;G","mai":1.3718,"iul":1.39,"delta":0.0182},{"t":"row","nr":"73","fn":"Infirmieră, agent DDD; debutant","studii":"M;G","mai":1.330646,"iul":1.3483,"delta":0.017654},{"t":"row","nr":"74","fn":"Brancardier, băieş, nămolar, spălătoreasă, îngrijitoare","studii":"","mai":1.290727,"iul":1.307851,"delta":0.017124},{"t":"row","nr":"75","fn":"Ambulanţier","studii":"M","mai":1.482161,"iul":1.654135,"delta":0.171974},{"t":"row","nr":"76","fn":"Şofer autosanitară I *6","studii":"M","mai":1.408053,"iul":1.571428,"delta":0.163375},{"t":"row","nr":"77","fn":"Şofer autosanitară II *6","studii":"M","mai":1.408053,"iul":1.48248,"delta":0.074426},{"t":"row","nr":"78","fn":"Şofer autosanitară III *6","studii":"M","mai":1.408053,"iul":1.408356,"delta":0.000302}],"notes":["*1) Se poate utiliza numai în unităţi sanitare umane.","*2) Se aplică şi funcţiilor de asistent farmacie, asistent social şi educator-puericultor, instructor de ergoterapie, tehnician sanitar din profilurile: utilaje medicale, optician, protezare ortopedică şi protezare auditivă care au studii de acest nivel.","*3) Se aplică şi funcţiilor de tehnician sanitar din profilurile: utilaje medicale, optician, protezare ortopedică şi protezare auditivă.","*4) Se aplică şi funcţiilor de oficiant medical, laborant cu liceul sanitar, moaşă, maseur, gipsar, autopsier, instructor CFM, instructor de educaţie, instructor de ergoterapie, asistent social, educator-puericultor.","*5) Se aplică şi funcţiilor de educator-puericultor, asistent social şi cosmetician ocupate de persoane care au absolvit cu diplomă învăţământul superior de scurtă durată, cu durata studiilor de 2-3 ani învăţământ de zi sau de 3-4 ani învăţământ seral sau fără frecvenţă.","* 6 Se aplică nivelurile I şi II pentru salarizarea şoferilor autosanitarelor din serviciile de ambulanţă judeţene şi al municipiului Bucureşti - Ilfov, iar nivelurile de salarizare II şi III, şoferilor autosanitarelor din alte unităţi sanitare.","NOTĂ:","1. Nivelul de salarizare prevăzut pentru personalul de specialitate medico-sanitar și auxiliar-sanitar din unități medico-sociale se utilizează şi pentru dispensarele medicale şcolare, pentru asistență medicală comunitară, pentru personalul din creşe, pentru personalul medical din cadrul cabinetelor medicale din structurile teritoriale de expertiză medicală şi recuperare a capacităţii de muncă, personalul medico-sanitar din direcţiile judeţene pentru tineret şi sport, complexele sportive naţionale şi cluburile sportive, precum şi pentru medicii din asistenţa socială.","2. Coeficienții de salarizare prevăzuți de la nr. crt. 1 până la nr. crt.78 sunt pentru gradaţia 0. Salariile de bază pentru gradaţiile 1-5 se determină prin majorarea salariilor de bază pentru gradaţia 0 potrivit prevederilor art. 13 din prezenta lege.","3.Membrii comisiilor de avizare medico-legală, ai comisiilor de expertiză şi recuperare a capacităţii de muncă şi ai comisiilor medicale, pentru activităţi prestate în afara obligaţiilor funcţiei de bază, beneficiază, în cursul unei luni, de indemnizaţii de cel mult 10% din salariul de bază al funcţiei de execuţie îndeplinite, care nu fac parte din salariul de bază.","4. Salarizarea prevăzută pentru funcţia de infirmier se utilizează şi pentru muncitorii care asigură supravegherea bolnavilor psihici periculoşi din unităţile, secţiile sau compartimentele de psihiatrie.","5. Nivelul de salarizare prevăzut in prezenta anexă se poate aplica şi pentru personalul de cercetare cu studii superioare, din institutele şi centrele medicale.","6. Nivelul de salarizare prevăzut în prezenta anexă se aplică în condițiile art.10 din capitolul II din prezenta anexă şi personalului de specialitate medico-sanitar din direcţiile de sănătate publică."]};
+const DSMETA={
+  clinic:{note:'Personal clinic — parametri standard. Fără ajustare pe salariul nou.'},
+  neclinic:{note:'Personal neclinic — salariul de bază din noua lege este <b>redus cu 10%</b> (col. „Ajustare”). Sporurile actuale sunt mai mici (spor condiții 10% / nou 5%).'},
+  sju:{note:'SJU · ATI — secții cu sporuri majorate (spor condiții actual <b>85%</b>, gardă de noapte activă) și salariul nou <b>majorat cu 10%</b>.'}
+};
+const $=id=>document.getElementById(id);
+const IDS={adjust:'p_adjust',ore:'p_ore',grad:'p_grad',svechi:'p_svechi',snou:'p_snou',orenoapte:'p_orenoapte',oresdsl:'p_oresdsl',tarifsdsl:'p_tarifsdsl',hranav:'p_hranav',indemnv:'p_indemnv',perfv:'p_perfv'};
+function setSwitch(id,on){const el=$(id);el.classList.toggle('on',on);el.setAttribute('aria-checked',on);el.querySelector('.stxt').textContent=on?'Da':'Nu';}
+function getSwitch(id){return $(id).classList.contains('on')?'Da':'Nu';}
+function setMode(m){document.querySelectorAll('#p_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));
+  $('wrap_orenoapte').style.display = (m==='Noapte') ? '' : 'none';}
+function getMode(){return document.querySelector('#p_mode button.active')?.dataset.v||'Nimic';}
+
+function updateGrad(){const v=+$('p_grad').value; $('grad_lbl').textContent=v;
+  $('grad_coef').textContent='coef. '+(+ (GRAD[v]??1).toFixed(2))+'×';
+  const pct=v/5*100; $('p_grad').style.background=`linear-gradient(90deg,var(--brand) ${pct}%,var(--line) ${pct}%)`;}
+
+let curDS='clinic', selIdx=0, sortK='idx', sortDir=1;   // implicit: ordinea din fișierul sursă (Excel)
+
+// convert stored sheet defaults (fractions / Da-Nu) to form values
+function applyDefaults(){
+  const d=DS[curDS].defaults;
+  $('p_adjust').value=Math.round((d.adjust||0)*100);
+  $('p_ore').value=d.ore; $('p_grad').value=d.grad; updateGrad();
+  $('p_svechi').value=+(d.svechi*100).toFixed(4); $('p_snou').value=+(d.snou*100).toFixed(4);
+  $('p_indemnall').checked=(d.indemn==='Da');
+  setMode(d.noapte==='Da' ? 'Noapte' : (d.tura==='Da' ? 'Tura' : 'Nimic')); $('p_orenoapte').value=d.orenoapte;
+  $('p_oresdsl').value=d.oresdsl; $('p_tarifsdsl').value=+(d.tarifsdsl*100).toFixed(4);
+  setSwitch('p_hrana', d.hrana==='Da'); $('p_hranav').value=d.hranav;
+  setSwitch('p_indemn', d.indemn==='Da'); $('p_indemnv').value=d.indemnv;
+  setSwitch('p_perf', false); $('p_perfv').value=15;   // plată per performanță: dezactivată implicit (nu există azi)
+}
+function getP(){
+  return {
+    adjust:(+$('p_adjust').value||0)/100,
+    ore:+$('p_ore').value||1, grad:+$('p_grad').value,
+    svechi:(+$('p_svechi').value||0)/100, snou:(+$('p_snou').value||0)/100,
+    noapte:getMode()==='Noapte'?'Da':'Nu', orenoapte:+$('p_orenoapte').value||0,
+    tura:getMode()==='Tura'?'Da':'Nu', oresdsl:+$('p_oresdsl').value||0,
+    tarifsdsl:(+$('p_tarifsdsl').value||0)/100,
+    hrana:getSwitch('p_hrana'), hranav:+$('p_hranav').value||0,
+    indemn:getSwitch('p_indemn'), indemnv:+$('p_indemnv').value||0, indemnAll:$('p_indemnall').checked,
+    perf:getSwitch('p_perf'), perfv:Math.min(20,Math.max(10,+$('p_perfv').value||15))/100,
+    msgrid:getMsGrid()==='ms'
+  };
+}
+function getMsGrid(){const b=document.querySelector('#p_msgrid button.active');return b?b.dataset.v:'proiect';}
+function setMsGrid(v){document.querySelectorAll('#p_msgrid button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));}
+// Core computation — faithful to sheet formulas (I has *(1+adjust))
+function calc(r,p){
+  const coeff=GRAD[p.grad]??1, ore=p.ore||1;
+  const Ebase=(p.msgrid && r.ms!=null) ? r.ms*MS_BASE : r.E;
+  const I=Ebase*coeff*(1+p.adjust), J=r.F*coeff, K=r.G*coeff, L=r.H*coeff;
+  const M=(r.an===2022?K:L)*p.svechi;
+  const N=p.noapte==='Da' ? (L/ore)*p.orenoapte*0.25 : (p.tura==='Da'? L*0.15 : 0);
+  const O=L/ore*p.oresdsl;
+  const hrana=p.hrana==='Da'? p.hranav : 0;
+  const indemn=((r.oug63==='Da'||p.indemnAll) && p.indemn==='Da')? p.indemnv : 0;
+  const P=J+M+N+O+hrana+indemn;
+  const R=I*p.snou;
+  const T=p.noapte==='Da' ? I/ore*p.orenoapte*0.25 : (p.tura==='Da'? I*0.15 : 0);
+  const V=I/ore*p.oresdsl*p.tarifsdsl;
+  // Plată per performanță — doar în noua lege (10–20% din salariul de bază din proiect); nu există în prezent.
+  const perf=p.perf==='Da' ? I*p.perfv : 0;
+  const X=I+R+T+V+perf;
+  return {I,J,K,L,M,N,O,hrana,indemn,perf,P,R,T,V,X,diff:X-P,pct:P!==0?X/P-1:0};
+}
+const lei=n=>Math.round(n).toLocaleString('ro-RO');
+const pct=n=>(n>=0?'+':'')+(n*100).toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+const shortName=s=>s.length>70? s.slice(0,68).replace(/[;,]\s*\S*$/,'')+'…' : s;
+
+function rowsNow(){return DS[curDS].rows;}
+
+const PRESETS=[
+  {label:'Medic primar', studii:'S', match:r=>r.fn==='Medic primar'},
+  {label:'Asistent medical principal', studii:'PL', match:r=>r.studii==='PL' && /principal/i.test(r.fn)},
+  {label:'Farmacist primar', studii:'S', match:r=>/^Farmacist primar/i.test(r.fn)},
+  {label:'Asistent medical principal', studii:'S', match:r=>r.studii==='S' && /^Asistent/i.test(r.fn) && /principal/i.test(r.fn)},
+  {label:'Infirmieră', studii:'M;G', match:r=>/^Infirmier/i.test(r.fn) && !/debutant/i.test(r.fn)},
+  {label:'Asistent social', studii:'S', match:r=>/^Logoped/i.test(r.fn) && /asistent social/i.test(r.fn) && /principal/i.test(r.fn)},
+];
+function presetIdx(pr){return rowsNow().findIndex(pr.match);}
+function buildPresets(){
+  $('presetbar').innerHTML=PRESETS.map((pr,i)=>
+    `<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
+  document.querySelectorAll('#presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
+    const idx=presetIdx(PRESETS[+b.dataset.p]);
+    if(idx<0) return;
+    selIdx=idx; $('fnsel').value=idx; renderAll();
+    document.querySelector('.grid')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+}
+function updatePresetActive(){
+  document.querySelectorAll('#presetbar .preset').forEach(b=>{
+    b.classList.toggle('active', presetIdx(PRESETS[+b.dataset.p])===selIdx);
+  });
+}
+
+const cfmt=n=> n==null?'—':(+n).toLocaleString('ro-RO',{minimumFractionDigits:0,maximumFractionDigits:2});
+const GARZI={"units":{"clinic":[{"fn":"Medic primar","studii":"S","E":16400,"H":5637.5},{"fn":"Medic primar dentist","studii":"S","E":16400,"H":5637.5},{"fn":"Medic specialist","studii":"S","E":13120,"H":4430},{"fn":"Medic specialist dentist","studii":"S","E":13120,"H":4430},{"fn":"Medic rezident anul VI","studii":"S","E":10496,"H":4077.5},{"fn":"Medic rezident anul IV-V","studii":"S","E":9840,"H":3386.25},{"fn":"Medic dentist rezident anul IV-V","studii":"S","E":9840,"H":3386.25},{"fn":"Medic rezident anul III","studii":"S","E":9184,"H":3293.75},{"fn":"Medic dentist rezident anul III","studii":"S","E":9184,"H":3293.75},{"fn":"Medic rezident anul II","studii":"S","E":8528,"H":2951.25},{"fn":"Medic dentist rezident anul II","studii":"S","E":8528,"H":2951.25},{"fn":"Medic rezident anul I","studii":"S","E":7872,"H":2631.25},{"fn":"Medic dentist rezident anul I","studii":"S","E":7872,"H":2631.25},{"fn":"Medic","studii":"S","E":8856,"H":3250},{"fn":"Medic dentist","studii":"S","E":8856,"H":3250}],"saj":[{"fn":"Medic primar","studii":"S","E":18040,"H":6010},{"fn":"Medic primar dentist","studii":"S","E":18040,"H":6010},{"fn":"Medic specialist","studii":"S","E":14432.0,"H":4675},{"fn":"Medic specialist dentist","studii":"S","E":14432.0,"H":4675},{"fn":"Medic rezident anul VI","studii":"S","E":11545.6,"H":3523.75},{"fn":"Medic rezident anul IV-V","studii":"S","E":10824,"H":3523.75},{"fn":"Medic dentist rezident anul IV-V","studii":"S","E":10824,"H":3523.75},{"fn":"Medic rezident anul III","studii":"S","E":10102.4,"H":3431.25},{"fn":"Medic dentist rezident anul III","studii":"S","E":10102.4,"H":3431.25},{"fn":"Medic rezident anul II","studii":"S","E":9380.8,"H":3088.75},{"fn":"Medic dentist rezident anul II","studii":"S","E":9380.8,"H":3088.75},{"fn":"Medic rezident anul I","studii":"S","E":8659.2,"H":2768.75},{"fn":"Medic dentist rezident anul I","studii":"S","E":8659.2,"H":2768.75},{"fn":"Medic","studii":"S","E":9741.6,"H":3387.5},{"fn":"Medic dentist","studii":"S","E":9741.6,"H":3387.5}],"neclinic":[{"fn":"Medic primar","studii":"S","E":15170,"H":4501.25},{"fn":"Medic primar dentist","studii":"S","E":15170,"H":4501.25},{"fn":"Medic specialist","studii":"S","E":15170,"H":3921.25},{"fn":"Medic specialist dentist","studii":"S","E":15170,"H":3921.25}]},"defaults":{"ore":140,"gz":0.75,"gw":1}};
+const COEF_ROWS=COEF.items.filter(x=>x.t==='row');
+function coefFor(r,idx){
+  return COEF_ROWS.find(x=>x.fn===r.fn && (x.studii||'')===(r.studii||''))
+      || COEF_ROWS.find(x=>x.fn===r.fn) || COEF_ROWS[idx] || null;
+}
+const COEF_MP=(COEF_ROWS.find(x=>x.fn==='Medic primar')||{iul:4}).iul;
+function renderCoef(){
+  let up=0,dn=0;
+  $('coefbody').innerHTML=COEF.items.map(it=>{
+    if(it.t==='group') return '';
+    const d=it.delta==null?0:it.delta;
+    const rcl=d>1e-9?'pos':(d<-1e-9?'neg':'');
+    if(d>1e-9)up++; else if(d<-1e-9)dn++;
+    const dcl=d>1e-9?'pos':(d<-1e-9?'neg':'zero'), sgn=d>0?'+':'';
+    const dp=(it.mai&&it.delta!=null)?it.delta/it.mai:null;
+    return `<tr class="${rcl}">
+      <td class="cnr">${it.nr}</td>
+      <td class="fnc" title="${it.fn.replace(/"/g,'&quot;')}">${it.fn}</td>
+      <td class="cst">${it.studii||'—'}</td>
+      <td class="num">${cfmt(it.mai)}</td>
+      <td class="num">${cfmt(it.iul)}</td>
+      <td class="num dlt ${dcl}">${it.delta==null?'—':sgn+cfmt(it.delta)}</td>
+      <td class="num dlt ${dcl}">${dp==null?'—':sgn+(dp*100).toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'}</td>
+    </tr>`;
+  }).join('');
+  $('coefcount').textContent=`${up} majorări · ${dn} reduceri`;
+  document.querySelectorAll('#coefbody tr').forEach(tr=>tr.addEventListener('click',()=>tr.classList.toggle('expanded')));
+  $('coefnotes').innerHTML=COEF.notes.map(n=>`<div class="nt${/^NOT/i.test(n)?' hd':''}">${n}</div>`).join('');
+}
+function showView(ds){
+  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal';
+  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal;
+  $('salview').style.display=isSal?'':'none';
+  if(isSal) renderSal();
+  document.querySelector('.presetcard').style.display=isCalc?'':'none';
+  document.querySelector('.grid:not(.garziview):not(.cmp3view):not(.progview):not(.prog-top)').style.display=isCalc?'':'none';
+  document.querySelector('.fullsec').style.display=isCalc?'':'none';
+  $('chartcard').style.display=isCalc?'':'none';
+  $('coefview').style.display=isCoef?'':'none';
+  $('garziview').style.display=isGarzi?'':'none';
+  $('cmp3view').style.display=isCmp3?'':'none';
+  $('progview').style.display=isProg?'':'none';
+  $('progtop').style.display=isProg?'':'none';
+  if(isCoef) renderCoef();
+  else if(isGarzi) renderGarzi();
+  else if(isCmp3) renderCmp3();
+  else if(isProg) renderProg();
+  else { curDS=ds; $('search').value=''; loadDS(); }
+}
+
+// ===== Prognoză inflație =====
+let pfsel=0, pfunit='clinic';
+function pfUpdateGrad(){const v=+$('pf_grad').value;$('pf_grad_lbl').textContent=v;$('pf_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('pf_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function pfMode(){return document.querySelector('#pf_mode button.active')?.dataset.v||'Nimic';}
+function pfSetMode(m){document.querySelectorAll('#pf_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));$('pf_wrap_orenoapte').style.display=(m==='Noapte')?'':'none';}
+function pfSw(id){return $(id).classList.contains('on')?'Da':'Nu';}
+function pfSetSw(id,on){const el=$(id);el.classList.toggle('on',on);el.querySelector('.stxt').textContent=on?'Da':'Nu';}
+function pfGetP(){return {
+  adjust:(+$('pf_adjust').value||0)/100, ore:+$('pf_ore').value||1, grad:+$('pf_grad').value,
+  svechi:(+$('pf_svechi').value||0)/100, snou:(+$('pf_snou').value||0)/100,
+  noapte:pfMode()==='Noapte'?'Da':'Nu', orenoapte:+$('pf_orenoapte').value||0,
+  tura:pfMode()==='Tura'?'Da':'Nu', oresdsl:+$('pf_oresdsl').value||0,
+  tarifsdsl:(+$('pf_tarifsdsl').value||0)/100,
+  hrana:pfSw('pf_hrana'), hranav:+$('pf_hranav').value||0,
+  indemn:pfSw('pf_indemn'), indemnv:+$('pf_indemnv').value||0, indemnAll:pfSw('pf_indemn')==='Da'
+};}
+function pfApplyDefaults(){
+  pfunit='clinic'; document.querySelectorAll('#pf_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
+  $('pf_grad').value=5; pfUpdateGrad(); $('pf_ore').value=168;
+  $('pf_svechi').value=85; $('pf_snou').value=20; $('pf_adjust').value=0;
+  pfSetMode('Tura'); $('pf_orenoapte').value=0; $('pf_oresdsl').value=48; $('pf_tarifsdsl').value=30;
+  pfSetSw('pf_hrana',true); $('pf_hranav').value=347; pfSetSw('pf_indemn',true); $('pf_indemnv').value=800;
+  $('pf_inf27').value=3.8; $('pf_inf28').value=3.0; $('pf_inf29').value=2.8;
+}
+function renderProg(){
+  const p=pfGetP(); const r=DS[pfunit].rows[pfsel]; const meta=DS.clinic.rows[pfsel]; const c=calc(r,p);
+  $('pf_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[pfunit]} · ajustare ${(+$('pf_adjust').value||0)}%`;
+  const inf=[0,(+$('pf_inf27').value||0)/100,(+$('pf_inf28').value||0)/100,(+$('pf_inf29').value||0)/100];
+  const years=[2026,2027,2028,2029]; let factor=1, rows='';
+  for(let i=0;i<4;i++){
+    if(i>0) factor*=(1+inf[i]);
+    const pNou=c.X*factor, d=pNou-c.P;
+    rows+=`<tr${i===0?' class="pfbase"':''}>
+      <td class="pfyr">${years[i]}${i===0?' <span class="u">bază</span>':''}</td>
+      <td>${i===0?'—':(inf[i]*100).toLocaleString('ro-RO',{maximumFractionDigits:2})+'%'}</td>
+      <td>${lei(pNou)}</td>
+      <td class="${d>=0?'pos':'neg'}">${d>=0?'+':''}${lei(d)}<span class="pfp">${c.P?pct(pNou/c.P-1):''}</span></td></tr>`;
+  }
+  $('pfbody').innerHTML=rows;
+  $('pf_present').innerHTML=lei(c.P)+' <small>lei</small>';
+  $('pf_nou29').innerHTML=lei(c.X*factor)+' <small>lei</small>';
+  document.querySelectorAll('#pf_presetbar .preset').forEach(b=>b.classList.toggle('active', DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match)===pfsel));
+  const sv=$('pf_svechi').value, sn=$('pf_snou').value;
+  document.querySelectorAll('#pf_sporpresets .sppreset').forEach(b=>b.classList.toggle('active', b.dataset.sv===sv&&b.dataset.sn===sn));
+}
+function pfInit(){
+  pfApplyDefaults();
+  $('pf_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('pf_fnsel').value=0;
+  $('pf_fnsel').addEventListener('change',e=>{pfsel=+e.target.value;renderProg();});
+  $('pf_presetbar').innerHTML=PRESETS.map((pr,i)=>`<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
+  document.querySelectorAll('#pf_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
+    const idx=DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match); if(idx<0)return; pfsel=idx; $('pf_fnsel').value=idx; renderProg();
+  }));
+  document.querySelectorAll('#pf_sporpresets .sppreset').forEach(b=>b.addEventListener('click',()=>{$('pf_svechi').value=b.dataset.sv;$('pf_snou').value=b.dataset.sn;renderProg();}));
+  document.querySelectorAll('#pf_unit button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#pf_unit button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); pfunit=b.dataset.u; renderProg();
+  }));
+  $('pf_grad').addEventListener('input',()=>{pfUpdateGrad();renderProg();});
+  document.querySelectorAll('#pf_mode button').forEach(b=>b.addEventListener('click',()=>{pfSetMode(b.dataset.v);renderProg();}));
+  ['pf_hrana','pf_indemn'].forEach(id=>$(id).addEventListener('click',()=>{pfSetSw(id,!$(id).classList.contains('on'));renderProg();}));
+  ['pf_svechi','pf_snou','pf_adjust','pf_ore','pf_orenoapte','pf_oresdsl','pf_tarifsdsl','pf_hranav','pf_indemnv','pf_inf27','pf_inf28','pf_inf29'].forEach(id=>$(id).addEventListener('input',renderProg));
+  $('pf_reset').addEventListener('click',()=>{pfApplyDefaults();renderProg();});
+  renderProg();
+}
+
+// ===== Salarii de bază (2018 / 2022 / OUG 19 / proiect) =====
+let salUnit='clinic';
+function renderSal(){
+  const qy=($('sal_search').value||'').toLowerCase().trim();
+  const rows=DS[salUnit].rows.map((r,i)=>({i,r}))
+    .filter(x=>!qy||x.r.fn.toLowerCase().includes(qy)||String(x.r.studii||'').toLowerCase().includes(qy));
+  $('salbody').innerHTML=rows.map(({i,r})=>
+    `<tr><td class="num rn">${i+1}</td><td>${r.fn}</td><td>${r.studii||'—'}</td><td class="num">${lei(r.H)}</td><td class="num">${lei(r.G)}</td><td class="num">${lei(r.F)}</td><td class="num"><b>${lei(r.E)}</b></td></tr>`).join('');
+  $('salcount').textContent='· '+rows.length+' funcții · '+C3_UNITLBL[salUnit];
+}
+
+// ===== Comparație 3 cazuri =====
+let c3sel=0;
+function c3Mode(){return document.querySelector('#c3_mode button.active')?.dataset.v||'Nimic';}
+function c3SetMode(m){document.querySelectorAll('#c3_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));$('c3_wrap_orenoapte').style.display=(m==='Noapte')?'':'none';}
+function c3Sw(id){return $(id).classList.contains('on')?'Da':'Nu';}
+function c3SetSw(id,on){const el=$(id);el.classList.toggle('on',on);el.querySelector('.stxt').textContent=on?'Da':'Nu';}
+function c3UpdateGrad(){const v=+$('c3_grad').value;$('c3_grad_lbl').textContent=v;$('c3_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('c3_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function c3Shared(){return {
+  ore:+$('c3_ore').value||1, grad:+$('c3_grad').value,
+  svechi:(+$('c3_svechi').value||0)/100, snou:(+$('c3_snou').value||0)/100,
+  noapte:c3Mode()==='Noapte'?'Da':'Nu', orenoapte:+$('c3_orenoapte').value||0,
+  tura:c3Mode()==='Tura'?'Da':'Nu', oresdsl:+$('c3_oresdsl').value||0,
+  tarifsdsl:(+$('c3_tarifsdsl').value||0)/100,
+  hrana:c3Sw('c3_hrana'), hranav:+$('c3_hranav').value||0,
+  indemn:c3Sw('c3_indemn'), indemnv:+$('c3_indemnv').value||0
+};}
+const C3_UNITLBL={clinic:'Clinic',neclinic:'Neclinic',sju:'SAJ · ATI'};
+let c3units=['clinic','clinic','clinic','clinic','clinic'];
+let c3count=3; // cazuri vizibile (incl. Cazul 1 — prezent), max 5
+function c3SyncCols(){
+  const tab=document.querySelector('.c3tab');
+  tab.classList.toggle('on4',c3count>=4);
+  tab.classList.toggle('on5',c3count>=5);
+  $('c3_rm4').style.display=(c3count===4)?'':'none';
+  $('c3_rm5').style.display=(c3count===5)?'':'none';
+  $('c3_add').style.display=(c3count>=5)?'none':'';
+  document.querySelectorAll('.c3sec td').forEach(td=>td.colSpan=c3count+2);
+}
+const C3COMPROWS={sb:['c3_row_sb'],sc:['c3_row_sp','c3_row_sc'],st:['c3_row_st'],ss:['c3_row_ss'],ih:['c3_row_ih'],io:['c3_row_io'],pp:['c3_row_pp']};
+function c3SyncUnitAll(){
+  // butonul „toate cazurile" e activ doar când toate cazurile au același tip de unitate
+  const u=c3units.every(x=>x===c3units[0])?c3units[0]:null;
+  document.querySelectorAll('#c3_unitall button').forEach(b=>b.classList.toggle('active',b.dataset.u===u));
+}
+function c3SyncSpor(){
+  // valorile per caz preiau implicit sporul din Parametri comuni (caz 1 = actual, cazurile noi = nou)
+  $('c3_sp0').value=$('c3_svechi').value;
+  for(let i=1;i<5;i++) $('c3_sp'+i).value=$('c3_snou').value;
+}
+function c3ApplyDefaults(){
+  $('c3_ore').value=168; $('c3_grad').value=5; c3UpdateGrad();
+  $('c3_svechi').value=85; $('c3_snou').value=20; c3SyncSpor();
+  c3SetMode('Tura'); $('c3_orenoapte').value=0;
+  $('c3_oresdsl').value=48; $('c3_tarifsdsl').value=30;
+  c3SetSw('c3_hrana',true); $('c3_hranav').value=347;
+  c3SetSw('c3_indemn',true); $('c3_indemnv').value=800;
+  c3units=['clinic','clinic','clinic','clinic','clinic'];
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#c3_unit'+ci+' button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic')));
+  c3SyncUnitAll();
+  $('c3_adj1').value=0; $('c3_adj2').value=10; $('c3_adj3').value=0; $('c3_adj4').value=0;
+  document.querySelectorAll('.c3chk').forEach(b=>b.classList.add('on'));
+  Object.values(C3COMPROWS).flat().forEach(id=>$(id).classList.remove('compoff'));
+  // plată pe performanță: implicit 15%, dezactivată
+  document.querySelector('.c3chk[data-c="pp"]').classList.remove('on');
+  $('c3_row_pp').classList.add('compoff');
+  $('c3_ppct').value=15; $('c3_pp_pct').value=15;
+  c3SetSw('c3_pp_sw',false);
+  c3count=3; c3SyncCols();
+}
+function renderCmp3(){
+  const sh=c3Shared(); const meta=DS.clinic.rows[c3sel];
+  $('c3_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · An spor condiții: ${meta.an}`;
+  // Cazul 1 = PREZENT (ajustarea nu se aplică prezentului) — folosește tipul de unitate al Cazului 1
+  // sporul „actual" poate fi suprascris per caz (implicit din Parametri comuni)
+  const cp=calc(DS[c3units[0]].rows[c3sel],{...sh, svechi:(+$('c3_sp0').value||0)/100, adjust:0, indemnAll: sh.indemn==='Da'});
+  $('c3_sb0').textContent=lei(cp.J); $('c3_sc0').textContent=lei(cp.M);
+  $('c3_st0').textContent=lei(cp.N); $('c3_ss0').textContent=lei(cp.O);
+  $('c3_ih0').textContent=cp.hrana?lei(cp.hrana):'0'; $('c3_io0').textContent=cp.indemn?lei(cp.indemn):'0';
+  // totalurile includ doar componentele bifate
+  const en=k=>document.querySelector('.c3chk[data-c="'+k+'"]').classList.contains('on');
+  const totP=(en('sb')?cp.J:0)+(en('sc')?cp.M:0)+(en('st')?cp.N:0)+(en('ss')?cp.O:0)+(en('ih')?cp.hrana:0)+(en('io')?cp.indemn:0);
+  $('c3_tn0').textContent=lei(totP);
+  // Cazurile 2,3 = NOU 2026 — fiecare valoare cu diferența față de Cazul 1 (prezent)
+  const c3v=(id,val,base,elim)=>{const d=val-base,cls=d>1e-9?'pos':(d<-1e-9?'neg':'');
+    const top=elim?'<span class="elim">— eliminat</span>':lei(val);
+    let dl='';
+    if(!elim && !(base===0&&val===0)){
+      dl=`<span class="c3d ${cls}">${d>=0?'+':''}${lei(d)}</span>`;
+      if(base) dl+=`<span class="c3d ${cls}">${pct(val/base-1)}</span>`;
+    }
+    $(id).innerHTML=top+dl;};
+  for(let i=1;i<5;i++){
+    if(i>=c3count) continue; // cazul e ascuns
+    const adj=(+$('c3_adj'+i).value||0)/100;
+    const c=calc(DS[c3units[i]].rows[c3sel],{...sh, snou:(+$('c3_sp'+i).value||0)/100, adjust:adj, indemnAll: sh.indemn==='Da'});
+    c3v('c3_sb'+i,c.I,cp.J); c3v('c3_sc'+i,c.R,cp.M);
+    c3v('c3_st'+i,c.T,cp.N); c3v('c3_ss'+i,c.V,cp.O);
+    c3v('c3_ih'+i,0,cp.hrana,true); c3v('c3_io'+i,0,cp.indemn,true);
+    // plată pe performanță = % din salariul de bază nou (nu există în prezent)
+    const ppv=((+$('c3_ppct').value||0)/100)*c.I;
+    $('c3_pp'+i).textContent=lei(ppv);
+    const totN=(en('sb')?c.I:0)+(en('sc')?c.R:0)+(en('st')?c.T:0)+(en('ss')?c.V:0)+(en('pp')?ppv:0);
+    $('c3_tn'+i).textContent=lei(totN);
+    const d=totN-totP, pc=totP?totN/totP-1:0, dc=$('c3_df'+i);
+    dc.classList.add('c3diff'); dc.classList.remove('pos','neg'); dc.classList.add(d>=0?'pos':'neg');
+    dc.innerHTML=`${d>=0?'+':''}${lei(d)}<span class="dp">${pct(pc)}</span>`;
+    // evidențiază coloana dacă totalul e sub prezent
+    const warn=totN<totP;
+    ['sb','sc','st','ss','ih','io','pp','tn','df'].forEach(k=>$('c3_'+k+i).classList.toggle('c3warncell',warn));
+  }
+  c3UpdatePresets();
+}
+function c3UpdatePresets(){
+  document.querySelectorAll('#c3_presetbar .preset').forEach(b=>b.classList.toggle('active', DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match)===c3sel));
+  const sv=$('c3_svechi').value, sn=$('c3_snou').value;
+  document.querySelectorAll('#c3_sporpresets .sppreset').forEach(b=>b.classList.toggle('active', b.dataset.sv===sv&&b.dataset.sn===sn));
+}
+function c3Init(){
+  c3ApplyDefaults();
+  $('c3_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('c3_fnsel').value=0;
+  $('c3_fnsel').addEventListener('change',e=>{c3sel=+e.target.value;renderCmp3();});
+  $('c3_presetbar').innerHTML=PRESETS.map((pr,i)=>`<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
+  document.querySelectorAll('#c3_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
+    const idx=DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match); if(idx<0)return;
+    c3sel=idx; $('c3_fnsel').value=idx; renderCmp3();
+  }));
+  document.querySelectorAll('#c3_sporpresets .sppreset').forEach(b=>b.addEventListener('click',()=>{
+    $('c3_svechi').value=b.dataset.sv; $('c3_snou').value=b.dataset.sn; c3SyncSpor(); renderCmp3();
+  }));
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#c3_unit'+ci+' button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#c3_unit'+ci+' button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); c3units[ci]=b.dataset.u; c3SyncUnitAll(); renderCmp3();
+  })));
+  document.querySelectorAll('#c3_unitall button').forEach(b=>b.addEventListener('click',()=>{
+    const u=b.dataset.u; c3units=[u,u,u,u,u];
+    [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#c3_unit'+ci+' button').forEach(x=>x.classList.toggle('active',x.dataset.u===u)));
+    c3SyncUnitAll(); renderCmp3();
+  }));
+  document.querySelectorAll('.c3chk').forEach(b=>b.addEventListener('click',()=>{
+    b.classList.toggle('on');
+    C3COMPROWS[b.dataset.c].forEach(id=>$(id).classList.toggle('compoff',!b.classList.contains('on')));
+    if(b.dataset.c==='pp') c3SetSw('c3_pp_sw',b.classList.contains('on'));
+    renderCmp3();
+  }));
+  $('c3_pp_sw').addEventListener('click',()=>document.querySelector('.c3chk[data-c="pp"]').click());
+  $('c3_pp_pct').addEventListener('input',()=>{$('c3_ppct').value=$('c3_pp_pct').value;renderCmp3();});
+  $('c3_ppct').addEventListener('input',()=>{$('c3_pp_pct').value=$('c3_ppct').value;});
+  $('c3_toggleparams').addEventListener('click',()=>{
+    const v=$('cmp3view'); v.classList.toggle('noparams');
+    $('c3_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
+  });
+  $('c3_add').addEventListener('click',()=>{if(c3count<5){c3count++;c3SyncCols();renderCmp3();}});
+  $('c3_rm4').addEventListener('click',()=>{c3count=3;c3SyncCols();renderCmp3();});
+  $('c3_rm5').addEventListener('click',()=>{c3count=4;c3SyncCols();renderCmp3();});
+  document.querySelectorAll('#c3_mode button').forEach(b=>b.addEventListener('click',()=>{c3SetMode(b.dataset.v);renderCmp3();}));
+  $('c3_grad').addEventListener('input',()=>{c3UpdateGrad();renderCmp3();});
+  ['c3_hrana','c3_indemn'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
+  ['c3_svechi','c3_snou'].forEach(id=>$(id).addEventListener('input',()=>{c3SyncSpor();renderCmp3();}));
+  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct'].forEach(id=>$(id).addEventListener('input',renderCmp3));
+  $('c3_reset').addEventListener('click',()=>{c3ApplyDefaults();renderCmp3();});
+  renderCmp3();
+}
+
+// ===== Calculator Gărzi =====
+let gUnit='clinic', gSel=0;
+const GLBL={clinic:'Clinic',saj:'SAJ · ATI',neclinic:'Neclinic'};
+const lord=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:2,maximumFractionDigits:2});
+function gRows(){return GARZI.units[gUnit];}
+function gApplyDefaults(){const d=GARZI.defaults;$('g_ore').value=d.ore;$('g_dur').value=18;$('g_adjust').value=0;$('g_gz').value=Math.round(d.gz*100);$('g_gw').value=Math.round(d.gw*100);$('g_grad').value=5;gUpdateGrad();}
+function gTile(box,valId,prez,nou,unit,fmt){const d=nou-prez,pc=prez!==0?nou/prez-1:null;
+  $(box).className='tot diff '+(d>1e-9?'pos':(d<-1e-9?'neg':''));
+  $(valId).innerHTML=(d>=0?'+':'−')+fmt(Math.abs(d))+' <small>'+unit+'</small>'+(pc==null?'':' <span class="tdpct">'+pct(pc)+'</span>');}
+function gGetP(){return {ore:+$('g_ore').value||1, dur:+$('g_dur').value||0, adjust:(+$('g_adjust').value||0)/100, gz:(+$('g_gz').value||0)/100, gw:(+$('g_gw').value||0)/100, grad:+$('g_grad').value};}
+function gUpdateGrad(){const v=+$('g_grad').value; $('g_grad_lbl').textContent=v;
+  $('g_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';
+  const pc=v/5*100; $('g_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function gDiff(prez,nou){const d=nou-prez,pc=prez!==0?nou/prez-1:null,cls=d>1e-4?'pos':(d<-1e-4?'neg':'');
+  return `<td class="dcell ${cls}"><span class="dv">${d>0?'+':''}${lord(d)}</span>${pc==null?'':`<span class="dp">${pct(pc)}</span>`}</td>`;}
+function gRow(t,sub,prez,nou){return `<tr><td>${t}<span class="gsubname">${sub}</span></td><td>${lord(prez)}</td><td>${lord(nou)}</td>${gDiff(prez,nou)}</tr>`;}
+function renderGarzi(){
+  const p=gGetP(), r=gRows()[gSel]; if(!r) return;
+  const coeff=GRAD[p.grad]??1;
+  const M=r.E*coeff*(1+p.adjust)/p.ore, P=r.H*coeff/p.ore, Q=P*(1+p.gz), R=P*(1+p.gw);
+  $('g_meta').innerHTML=`<b>${r.fn}</b><br>Studii: ${r.studii||'—'} · unitate: ${GLBL[gUnit]} · gradația ${p.grad} · ajustare ${(+$('g_adjust').value||0)}%`;
+  // Tariful de gardă din prezent este Q (tarif orar Legea 250 + sporul de gardă), NU tariful brut P.
+  // Comparația corectă („mere cu mere") e Q vs M, adică exact primul rând din tabelul „Zi lucrătoare".
+  $('g_tp').innerHTML=lord(Q)+' <small>lei/oră</small>';
+  $('g_tn').innerHTML=lord(M)+' <small>lei/oră</small>';
+  gTile('g_tdbox','g_td',Q,M,'lei/oră',lord);
+  const dur=p.dur;
+  $('g_durlbl1').textContent=dur; $('g_durlbl2').textContent=dur;
+  $('g_g18p').innerHTML=lei(Q*dur)+' <small>lei</small>';
+  $('g_g18n').innerHTML=lei(M*dur)+' <small>lei</small>';
+  gTile('g_g18dbox','g_g18d',Q*dur,M*dur,'lei',lei);
+  $('g_tarifnote').innerHTML=`Valorile de mai sus sunt pentru <b>gardă în urgență, zi lucrătoare</b> (100%). „Prezent" = tarif orar Legea 250 <b>${lord(P)}</b> lei/oră + spor de gardă <b>${(+$('g_gz').value||0)}%</b> = <b>${lord(Q)}</b> lei/oră. „2026" = 100% din tariful orar nou = <b>${lord(M)}</b> lei/oră. Pentru weekend și celelalte tipuri de gardă, vezi tabelele de mai jos.`;
+  $('g_body_zi').innerHTML=
+    gRow('Gardă în urgență','100%',Q,M)+
+    gRow('Gardă de monitorizare','75%',Q,M*0.75)+
+    gRow('Gardă la domiciliu','40%',Q*0.4,M*0.4);
+  // Weekend: sporul de 20% se aplică uniform tuturor tipurilor de gardă din noul proiect.
+  // (În fișierul sursă, U4 scria „=M4+20%” — în Excel asta adună 0,2 lei, nu ×1,2 — iar
+  //  garda la domiciliu nu primea deloc sporul. Ambele corectate aici.)
+  const WE=1.2;
+  $('g_body_we').innerHTML=
+    gRow('Gardă în urgență','100%',R,M*WE)+
+    gRow('Gardă de monitorizare','75%',R,M*0.75*WE)+
+    gRow('Gardă la domiciliu','40%',R*0.4,M*0.4*WE);
+}
+function gLoad(){gSel=0;$('g_fnsel').innerHTML=gRows().map((r,i)=>`<option value="${i}">${shortName(r.fn)}</option>`).join('');$('g_fnsel').value=0;renderGarzi();}
+function gInit(){
+  gApplyDefaults();
+  document.querySelectorAll('#g_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u===gUnit));
+  document.querySelectorAll('#g_unit button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#g_unit button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); gUnit=b.dataset.u; gLoad();
+  }));
+  $('g_fnsel').addEventListener('change',e=>{gSel=+e.target.value;renderGarzi();});
+  ['g_ore','g_dur','g_adjust','g_gz','g_gw'].forEach(id=>$(id).addEventListener('input',renderGarzi));
+  $('g_grad').addEventListener('input',()=>{gUpdateGrad();renderGarzi();});
+  $('g_reset').addEventListener('click',()=>{gApplyDefaults();renderGarzi();});
+  gLoad();
+}
+
+function loadDS(){
+  applyDefaults(); selIdx=0;
+  $('grp_adjust').style.display = '';
+  // Grila MS e disponibilă pe Clinic, Neclinic și SAJ (ajustată cu „ajustare salariu nou")
+  $('msgrp').style.display = '';
+  $('dsnote').innerHTML=DSMETA[curDS].note;
+  $('fnsel').innerHTML=rowsNow().map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('fnsel').value=0;
+  renderAll();
+}
+function renderResult(){
+  const p=getP(), r=rowsNow()[selIdx], c=calc(r,p);
+  $('selmeta').innerHTML=`<b>${r.fn}</b><br>Studii: ${r.studii||'—'} · An spor condiții: ${r.an} · OUG 63/2023: ${r.oug63}`;
+  const pf=x=>(x*100).toLocaleString('ro-RO',{maximumFractionDigits:2})+'%';
+  const UNITLBL={clinic:'Clinic',neclinic:'Neclinic',sju:'SAJ - ATI - UPU / CPU'};
+  $('printparams').innerHTML=`<span class="pp">Unitate: <b>${UNITLBL[curDS]||curDS}</b></span><span class="pp">Gradația <b>${p.grad}</b></span><span class="pp">Spor condiții actual <b>${pf(p.svechi)}</b></span><span class="pp">Spor condiții nou <b>${pf(p.snou)}</b></span>${(p.msgrid&&r.ms!=null)?`<span class="pp">Grilă nouă: <b>MS — gradații noi</b></span>`:''}${p.perf==='Da'?`<span class="pp">Plată per performanță <b>${Math.round(p.perfv*100)}%</b></span>`:''}`;
+  $('tprez').innerHTML=lei(c.P)+' <small>lei</small>';
+  $('tnou').innerHTML=lei(c.X)+' <small>lei</small>';
+  const db=$('diffbar'); db.className='diffbar '+(c.diff>=0?'pos':'neg');
+  $('diffval').textContent=(c.diff>=0?'▲ +':'▼ ')+lei(c.diff)+' lei/lună';
+  $('diffpct').textContent=pct(c.pct);
+  const cf=coefFor(r,selIdx);
+  const msOn=p.msgrid && r.ms!=null;
+  if(cf||msOn){
+    const baseCoef = msOn ? r.ms : (cf?cf.iul:null);
+    const mpCoef = msOn ? (DS.clinic.rows[0].ms||COEF_MP) : COEF_MP;
+    const adjCoef = baseCoef==null?null:baseCoef*(1+p.adjust);
+    const ratio = (adjCoef!=null&&mpCoef)?adjCoef/mpCoef:null; const coefGrad=c.I/4100;
+    $('coefinfo').innerHTML=`
+      <div class="ci-item"><div class="ci-lbl">Coeficient salarizare <span class="u">${msOn?'MS · gradații noi':'iul. 2026'}</span></div><div class="ci-val">${cfmt(adjCoef)}</div></div>
+      <div class="ci-item"><div class="ci-lbl">Coeficient salarizare <span class="u">(+gradație)</span></div><div class="ci-val">${coefGrad.toLocaleString('ro-RO',{maximumFractionDigits:2})}</div></div>
+      <div class="ci-item"><div class="ci-lbl">Raport față de Medic primar <span class="u">(${cfmt(mpCoef)})</span></div><div class="ci-val">${ratio==null?'—':ratio.toLocaleString('ro-RO',{maximumFractionDigits:3})+'×'} <span class="ci-pct">${ratio==null?'':(ratio*100).toLocaleString('ro-RO',{maximumFractionDigits:1})+'%'}</span></div></div>`;
+  } else $('coefinfo').innerHTML='';
+  const na='<td class="elim">— eliminat</td>';
+  const dcell=(a,b)=>{const d=b-a,pc=a!==0?b/a-1:null,cls=d>0?'pos':(d<0?'neg':'');
+    return `<td class="dcell ${cls}"><span class="dv">${d>0?'+':''}${lei(d)}</span>${pc===null?'':`<span class="dp">${pct(pc)}</span>`}</td>`;};
+  const dna='<td class="na">—</td>';
+  const turaHrs=p.noapte==='Da' ? ` <span class="hrs">(${p.orenoapte} ore)</span>` : '';
+  $('bdbody').innerHTML=`
+    <tr><td>Salariu de bază</td><td>${lei(c.J)}</td><td>${lei(c.I)}</td>${dcell(c.J,c.I)}</tr>
+    <tr><td>Spor condiții deosebite</td><td>${lei(c.M)}</td><td>${lei(c.R)}</td>${dcell(c.M,c.R)}</tr>
+    <tr><td>Spor tură / noapte${turaHrs}</td><td>${lei(c.N)}</td><td>${lei(c.T)}</td>${dcell(c.N,c.T)}</tr>
+    <tr><td>Spor SDSL <span class="hrs">(${p.oresdsl} ore)</span></td><td>${lei(c.O)}</td><td>${lei(c.V)}</td>${dcell(c.O,c.V)}</tr>
+    <tr><td>Indemnizație de hrană</td><td>${c.hrana?lei(c.hrana):'<span class="na">0</span>'}</td>${na}${dna}</tr>
+    <tr><td>Indemnizație OUG 63/2023</td><td>${c.indemn?lei(c.indemn):'<span class="na">0</span>'}</td>${na}${dna}</tr>
+    ${p.perf==='Da'?`<tr><td>Plată per performanță <span class="hrs">(${Math.round(p.perfv*100)}%)</span></td><td><span class="na">nu există</span></td><td>${lei(c.perf)}</td>${dcell(0,c.perf)}</tr>`:''}
+    <tr class="total"><td>TOTAL brut / lună</td><td>${lei(c.P)}</td><td>${lei(c.X)}</td>${dcell(c.P,c.X)}</tr>`;
+}
+const ACT_BASE=2500;                       // coeficient actual = salariu de bază OUG 19 / 2500
+const coefAct=r=>r.F/ACT_BASE;             // salariul actual e real, nu se ajustează
+// Coeficienții noi (proiect / MS) sunt cei din grila Clinic; pe Neclinic și SAJ
+// se aplică „ajustare salariu nou", exact ca în calc(): ×(1+adjust).
+const coefNou=(r,p)=>(r.E/MS_BASE)*(1+(p?.adjust||0));
+const coefMS=(r,p)=>r.ms==null?null:r.ms*(1+(p?.adjust||0));
+let showCoef=false;
+function renderTable(){
+  const p=getP(), q=($('search').value||'').toLowerCase().trim();
+  const pMS=Object.assign({},p,{msgrid:true});
+  const tbl=document.querySelector('table.full');
+  tbl.classList.toggle('hasms', rowsNow().some(r=>r.ms!=null));
+  tbl.classList.toggle('showcoef', showCoef);
+  let list=rowsNow().map((r,i)=>({i,r,c:calc(r,p),cms:(r.ms!=null?calc(r,pMS):null)}));
+  if(q) list=list.filter(x=>x.r.fn.toLowerCase().includes(q));
+  list.sort((a,b)=>{
+    if(sortK==='idx') return sortDir*(a.i-b.i);
+    if(sortK==='fn') return sortDir*a.r.fn.localeCompare(b.r.fn,'ro');
+    if(sortK==='studii') return sortDir*(a.r.studii||'').localeCompare(b.r.studii||'','ro');
+    if(sortK==='ms') return sortDir*((a.cms?a.cms.X:0)-(b.cms?b.cms.X:0));
+    if(sortK==='cfact') return sortDir*(coefAct(a.r)-coefAct(b.r));
+    if(sortK==='cfnou') return sortDir*(coefNou(a.r,p)-coefNou(b.r,p));
+    if(sortK==='cfms') return sortDir*((coefMS(a.r,p)||0)-(coefMS(b.r,p)||0));
+    const map={prez:'P',nou:'X',diff:'diff',pct:'pct'}[sortK];
+    if(!map) return 0;
+    return sortDir*(a.c[map]-b.c[map]);
+  });
+  $('rowcount').textContent=list.length;
+  $('fullbody').innerHTML=list.map(x=>{
+    const c=x.c, cls=c.diff>=0?'pos':'neg';
+    return `<tr data-i="${x.i}" class="${x.i===selIdx?'sel':''}">
+      <td class="rnr">${x.i+1}</td>
+      <td class="fnname" title="${x.r.fn.replace(/"/g,'&quot;')}">${shortName(x.r.fn)}</td>
+      <td class="stud">${x.r.studii||'—'}</td>
+      <td class="num">${lei(c.P)}</td>
+      <td class="num cfcol">${cfmt(coefAct(x.r))}</td>
+      <td class="num">${lei(c.X)}</td>
+      <td class="num cfcol">${cfmt(coefNou(x.r,p))}</td>
+      <td class="num mscol msval">${x.cms?lei(x.cms.X):'—'}</td>
+      <td class="num cfcol mscol">${x.r.ms!=null?cfmt(coefMS(x.r,p)):'—'}</td>
+      <td class="num ${cls}">${c.diff>=0?'+':''}${lei(c.diff)}</td>
+      <td class="num"><span class="pill ${cls}">${pct(c.pct)}</span></td></tr>`;
+  }).join('');
+  document.querySelectorAll('#fullbody tr').forEach(tr=>tr.onclick=()=>{
+    selIdx=+tr.dataset.i; $('fnsel').value=selIdx; renderResult(); renderTable();
+    document.querySelector('.card:nth-child(2)')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+  document.querySelectorAll('table.full thead th').forEach(th=>{
+    const a=th.querySelector('.arrow'); if(!a)return;
+    a.textContent = th.dataset.k===sortK ? (sortDir>0?'▲':'▼') : '';
+  });
+}
+function updateSporActive(){const sv=$('p_svechi').value,sn=$('p_snou').value;
+  document.querySelectorAll('#sporpresets .sppreset').forEach(b=>b.classList.toggle('active',b.dataset.sv===sv&&b.dataset.sn===sn));}
+const CHART_COMP=[
+  {k:'Salariu de bază',c:'#c0392b'},
+  {k:'Spor condiții deosebite',c:'#e08e0b'},
+  {k:'Spor tură / noapte',c:'#2e7fb8'},
+  {k:'Spor SDSL',c:'#16a085'},
+  {k:'Indemnizație de hrană',c:'#8e5bd0'},
+  {k:'Indemnizație OUG 63/2023',c:'#7f8c8d'},
+  {k:'Plată per performanță',c:'#2ca25f'}
+];
+const UNIT_LBL_MAIN={clinic:'Clinic',neclinic:'Neclinic',sju:'SAJ · ATI · UPU/CPU'};
+function renderChart(){
+  const p=getP(), r=rowsNow()[selIdx], c=calc(r,p);
+  const pf=x=>(x*100).toLocaleString('ro-RO',{maximumFractionDigits:2})+'%';
+  const modeLbl=p.noapte==='Da'?`Noapte (${p.orenoapte} ore)`:(p.tura==='Da'?'Tură':'Fără');
+  const sporDiff=((p.snou-p.svechi)*100).toLocaleString('ro-RO',{maximumFractionDigits:1});
+  $('chart_title').innerHTML=`
+    <div class="ct-fn">${r.fn}</div>
+    <div class="ct-meta">${UNIT_LBL_MAIN[curDS]||curDS} · Studii ${r.studii||'—'}</div>
+    <div class="ct-params">
+      ${(p.msgrid&&r.ms!=null)?`<span class="cp spor">Grilă nouă: <b>MS — gradații noi</b> (coef. ${cfmt(r.ms)})</span>`:''}
+      <span class="cp">Gradația <b>${p.grad}</b> · coef. ${(+(GRAD[p.grad]??1).toFixed(2))}×</span>
+      <span class="cp spor">Spor condiții: <b>${pf(p.svechi)}</b> → <b>${pf(p.snou)}</b> (${(+sporDiff)>0?'+':''}${sporDiff} pp)</span>
+      <span class="cp">Spor tură/noapte: <b>${modeLbl}</b></span>
+      <span class="cp">SDSL <b>${p.oresdsl}h</b> · tarif <b>${pf(p.tarifsdsl)}</b></span>
+      <span class="cp">Hrană: <b>${p.hrana==='Da'?lei(p.hranav)+' lei':'Nu'}</b></span>
+      <span class="cp">Indemniz. OUG 63: <b>${p.indemn==='Da'?lei(p.indemnv)+' lei':'Nu'}</b></span>
+      ${p.perf==='Da'?`<span class="cp spor">Plată per performanță: <b>${Math.round(p.perfv*100)}%</b> (${lei(c.perf)} lei)</span>`:''}
+      ${(curDS==='neclinic'||curDS==='sju')?`<span class="cp">Ajustare salariu nou: <b>${(p.adjust*100).toLocaleString('ro-RO',{maximumFractionDigits:2})}%</b></span>`:''}
+    </div>`;
+  $('chart_legend').innerHTML=CHART_COMP.map((x,i)=> (i===6 && c.perf<=0) ? '' : `<span class="lg"><i class="lgsw" style="background:${x.c}"></i>${x.k}</span>`).join('');
+  const H=372, maxT=Math.max(c.P,c.X)||1, INMIN=20;
+  function buildCol(comps,total,side){
+    let acc=0;
+    const pos=comps.filter(x=>x.val>0).map(x=>{const h=x.val/maxT*H; const o={ci:x.ci,val:x.val,h,center:acc+h/2}; acc+=h; return o;});
+    const inner=pos.map(x=>`<div class="cseg" style="height:${x.h}px;background:${CHART_COMP[x.ci].c}" title="${CHART_COMP[x.ci].k}: ${lei(x.val)}">${x.h>=INMIN?lei(x.val):''}</div>`).join('');
+    const smalls=pos.filter(x=>x.h<INMIN).sort((a,b)=>a.center-b.center);
+    let lastY=-1e9; const MIN=19;
+    const out=smalls.map(x=>{let y=x.center; if(y-lastY<MIN)y=lastY+MIN; lastY=y;
+      return `<span class="cseg-out ${side}" style="bottom:${y}px"><i style="background:${CHART_COMP[x.ci].c}"></i>${lei(x.val)}</span>`;}).join('');
+    return `<div class="cbar-col"><div class="cbar-total">${lei(total)} lei</div><div class="cbar-plot" style="height:${total/maxT*H}px"><div class="cbar">${inner}</div>${out}</div></div>`;
+  }
+  const colA=buildCol([{ci:0,val:c.J},{ci:1,val:c.M},{ci:2,val:c.N},{ci:3,val:c.O},{ci:4,val:c.hrana},{ci:5,val:c.indemn}],c.P,'left');
+  const colN=buildCol([{ci:0,val:c.I},{ci:1,val:c.R},{ci:2,val:c.T},{ci:3,val:c.V},{ci:6,val:c.perf}],c.X,'right');
+  const up=c.diff>=0, sgn=up?'+':'−', pctTxt=Math.abs(c.pct*100).toLocaleString('ro-RO',{maximumFractionDigits:1});
+  const arrow=`<div class="chart-arrow ${up?'up':'down'}"><div class="ca-val">${sgn}${lei(Math.abs(c.diff))} lei</div><div class="ca-ico">${up?'↗':'↘'}</div><div class="ca-pct">${sgn}${pctTxt}%</div></div>`;
+  $('chart_bars').innerHTML=colA+arrow+colN;
+}
+function renderAll(){renderResult();renderTable();updatePresetActive();updateSporActive();renderChart();}
+
+Object.values(IDS).forEach(id=>{ $(id).addEventListener('input',renderAll); $(id).addEventListener('change',renderAll); });
+['p_hrana','p_indemn','p_perf'].forEach(id=>$(id).addEventListener('click',()=>{ setSwitch(id, !$(id).classList.contains('on')); if(id==='p_indemn') $('p_indemnall').checked=$(id).classList.contains('on'); renderAll(); }));
+$('p_perfv').addEventListener('change',()=>{ $('p_perfv').value=Math.min(20,Math.max(10,+$('p_perfv').value||15)); renderAll(); });
+document.querySelectorAll('#p_mode button').forEach(b=>b.addEventListener('click',()=>{ setMode(b.dataset.v); renderAll(); }));
+document.querySelectorAll('#p_msgrid button').forEach(b=>b.addEventListener('click',()=>{ setMsGrid(b.dataset.v); renderAll(); }));
+$('p_grad').addEventListener('input',updateGrad);
+document.querySelectorAll('#sporpresets .sppreset').forEach(b=>b.addEventListener('click',()=>{
+  $('p_svechi').value=b.dataset.sv; $('p_snou').value=b.dataset.sn; renderAll();
+}));
+window.addEventListener('afterprint',()=>document.body.classList.remove('pr-cmp','pr-chart'));
+$('printcmp').addEventListener('click',()=>{document.body.classList.remove('pr-chart');document.body.classList.add('pr-cmp');window.print();});
+$('printchart').addEventListener('click',()=>{document.body.classList.remove('pr-cmp');document.body.classList.add('pr-chart');window.print();});
+// ---- Download grafic ca PNG (self-contained: DOM -> SVG foreignObject -> canvas) ----
+function chartRootVars(){
+  const names=new Set();
+  for(const ss of document.styleSheets){let rules;try{rules=ss.cssRules}catch(e){continue;}
+    for(const r of rules){ if(r.style){for(let i=0;i<r.style.length;i++){const p=r.style[i];if(p.indexOf('--')===0)names.add(p);}} }}
+  const cs=getComputedStyle(document.documentElement);
+  return [...names].map(n=>`${n}:${cs.getPropertyValue(n).trim()}`).join(';');
+}
+function chartAllCss(){
+  let out='';
+  for(const ss of document.styleSheets){let rules;try{rules=ss.cssRules}catch(e){continue;}
+    for(const r of rules){ out+=r.cssText+'\n'; }}
+  return out;
+}
+function downloadChartPNG(){
+  const src=$('chartcard').querySelector('.body');
+  const clone=src.cloneNode(true);
+  const hdr=clone.querySelector('#chart_printhdr'); if(hdr) hdr.setAttribute('style','display:flex');
+  clone.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+  const W=Math.max(Math.round(src.getBoundingClientRect().width),780);
+  const stage=document.createElement('div');
+  stage.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+  stage.setAttribute('style',chartRootVars()+`;box-sizing:border-box;width:${W}px;background:#fff;padding:24px;font-family:${getComputedStyle(document.body).fontFamily}`);
+  const styleEl=document.createElement('style'); styleEl.textContent=chartAllCss()+'\n*{box-shadow:none !important}';
+  stage.appendChild(styleEl); stage.appendChild(clone);
+  const meas=stage.cloneNode(true);
+  meas.setAttribute('style',meas.getAttribute('style')+';position:fixed;left:-99999px;top:0');
+  document.body.appendChild(meas);
+  const H=Math.max(Math.round(meas.getBoundingClientRect().height),320);
+  document.body.removeChild(meas);
+  const xml=new XMLSerializer().serializeToString(stage);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><foreignObject x="0" y="0" width="${W}" height="${H}">${xml}</foreignObject></svg>`;
+  const img=new Image();
+  img.onload=()=>{
+    const scale=2, cv=document.createElement('canvas');
+    cv.width=W*scale; cv.height=H*scale;
+    const ctx=cv.getContext('2d');
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.drawImage(img,0,0);
+    cv.toBlob(b=>{
+      if(!b){alert('Nu am putut genera imaginea PNG.');return;}
+      const fn=((rowsNow()[selIdx]||{}).fn||'grafic').replace(/[^\wăâîșțĂÂÎȘȚ]+/g,'_');
+      const a=document.createElement('a');
+      a.download=`Grafic_${curDS}_${fn}.png`; a.href=URL.createObjectURL(b);
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    },'image/png');
+  };
+  img.onerror=()=>alert('Nu am putut genera imaginea PNG (browserul a blocat conversia).');
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+$('pngchart').addEventListener('click',downloadChartPNG);
+$('fnsel').addEventListener('change',e=>{selIdx=+e.target.value;renderAll();});
+$('search').addEventListener('input',renderTable);
+$('tblcoef').addEventListener('click',()=>{
+  showCoef=!showCoef;
+  $('tblcoef').setAttribute('aria-pressed',showCoef?'true':'false');
+  renderTable();
+});
+$('reset').addEventListener('click',()=>{applyDefaults();renderAll();});
+document.querySelectorAll('table.full thead th').forEach(th=>{
+  if(!th.dataset.k)return;
+  th.addEventListener('click',()=>{
+    if(sortK===th.dataset.k) sortDir*=-1; else {sortK=th.dataset.k; sortDir=(sortK==='fn'||sortK==='studii'||sortK==='idx')?1:-1;}
+    renderTable();
+  });
+});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); showView(t.dataset.ds);
+}));
+
+$('printheader').innerHTML=`<span class="pht">Calculator salarizare — Sănătate<small>Anexa II · Comparație pe funcție · proiect lege salarizare 2026</small></span>`;
+$('chart_printhdr').innerHTML=`<span class="pht">Calculator salarizare — Sănătate<small>Anexa II · Grafic Actual vs Noua lege · proiect lege salarizare 2026</small></span>`;
+buildPresets();
+gInit();
+c3Init();
+pfInit();
+loadDS();
+$('sal_search').addEventListener('input',renderSal);
+document.querySelectorAll('#sal_unit button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#sal_unit button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); salUnit=b.dataset.u; renderSal();
+}));
+showView('cmp3');
+</script>
+</body></html>
