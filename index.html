@@ -391,6 +391,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   <h1>Calculator salarizare — Sănătate</h1>
   <div class="tabs" id="tabs">
     <button class="tab active" data-ds="cmp3">Comparație cazuri</button>
+    <button class="tab" data-ds="gcmp">Comparație gărzi</button>
     <button class="tab" data-ds="sal">Salarii de bază</button>
   </div>
 </div></header>
@@ -778,6 +779,68 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   </section>
 </div>
 
+<div class="grid cmp3view" id="gcmpview" style="display:none">
+  <section class="card c3params">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
+    <div class="body">
+      <div class="pgroup"><div class="pgroup-title">Tip unitate <span class="u">(setează toate cazurile)</span></div>
+        <div class="seg" id="g4_unitall">
+          <button type="button" data-u="clinic">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="saj">SAJ · ATI</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="g4_fnsel"></select></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="g4_grad_lbl">5</b></span><span class="gradcoef" id="g4_grad_coef">coef. 1×</span></div>
+        <input type="range" id="g4_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="g4_ore" step="1"></div>
+      <div class="pgroup"><div class="pgroup-title">Durata gărzii <span class="u">(ore)</span></div><input type="number" id="g4_dur" step="1"></div>
+      <div class="pgroup"><div class="pgroup-title">Spor gardă zi lucrătoare <span class="u">(%, prezent)</span></div><input type="number" id="g4_gz" step="1"></div>
+      <div class="pgroup"><div class="pgroup-title">Spor gardă weekend / sărbători <span class="u">(%, prezent)</span></div><input type="number" id="g4_gw" step="1"></div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="g4_reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație gărzi<button class="printbtn" id="g4_add" title="Adaugă un caz nou (max. 5)">+ Adaugă caz</button><button class="printbtn" id="g4_toggleparams" title="Arată / ascunde panoul Parametri comuni">⚙ Ascunde parametrii</button></h2>
+    <div class="body">
+      <p class="selfn" id="g4_meta"></p>
+      <div class="fwrap">
+        <table class="c3tab g4tab">
+          <thead><tr><th class="c3lbl"></th>
+            <th>Cazul 1<span class="c3sub">Prezent</span><div class="seg c3useg" id="g4_unit0"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="saj">SAJ · ATI</button></div></th>
+            <th>Cazul 2<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="g4_unit1"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="saj">SAJ · ATI</button></div></th>
+            <th>Cazul 3<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="g4_unit2"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="saj">SAJ · ATI</button></div></th>
+            <th class="cc4"><button type="button" class="c3rm" id="g4_rm4" title="Elimină cazul">×</button>Cazul 4<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="g4_unit3"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="saj">SAJ · ATI</button></div></th>
+            <th class="cc5"><button type="button" class="c3rm" id="g4_rm5" title="Elimină cazul">×</button>Cazul 5<span class="c3sub">Nou 2026</span><div class="seg c3useg" id="g4_unit4"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="saj">SAJ · ATI</button></div></th></tr></thead>
+          <tbody>
+            <tr class="c3ctrl"><td class="c3lbl">Ajustare salariu nou <span class="u">(%)</span></td>
+              <td class="c3na">—</td>
+              <td><input type="number" id="g4_adj1" step="1"></td>
+              <td><input type="number" id="g4_adj2" step="1"></td>
+              <td class="cc4"><input type="number" id="g4_adj3" step="1"></td>
+              <td class="cc5"><input type="number" id="g4_adj4" step="1"></td></tr>
+            <tr class="c3sec g4sec"><td colspan="4">Tarif orar — zi lucrătoare <span class="u">(lei/oră)</span></td></tr>
+            <tr><td class="c3lbl">Gardă în urgență <span class="u">100%</span></td><td id="g4_uz0"></td><td id="g4_uz1"></td><td id="g4_uz2"></td><td class="cc4" id="g4_uz3"></td><td class="cc5" id="g4_uz4"></td></tr>
+            <tr><td class="c3lbl">Gardă de monitorizare <span class="u">75%</span></td><td id="g4_mz0"></td><td id="g4_mz1"></td><td id="g4_mz2"></td><td class="cc4" id="g4_mz3"></td><td class="cc5" id="g4_mz4"></td></tr>
+            <tr><td class="c3lbl">Gardă la domiciliu <span class="u">40%</span></td><td id="g4_dz0"></td><td id="g4_dz1"></td><td id="g4_dz2"></td><td class="cc4" id="g4_dz3"></td><td class="cc5" id="g4_dz4"></td></tr>
+            <tr class="c3sec g4sec"><td colspan="4">Tarif orar — weekend / sărbători <span class="u">(lei/oră)</span></td></tr>
+            <tr><td class="c3lbl">Gardă în urgență <span class="u">100%</span></td><td id="g4_uw0"></td><td id="g4_uw1"></td><td id="g4_uw2"></td><td class="cc4" id="g4_uw3"></td><td class="cc5" id="g4_uw4"></td></tr>
+            <tr><td class="c3lbl">Gardă de monitorizare <span class="u">75%</span></td><td id="g4_mw0"></td><td id="g4_mw1"></td><td id="g4_mw2"></td><td class="cc4" id="g4_mw3"></td><td class="cc5" id="g4_mw4"></td></tr>
+            <tr><td class="c3lbl">Gardă la domiciliu <span class="u">40%</span></td><td id="g4_dw0"></td><td id="g4_dw1"></td><td id="g4_dw2"></td><td class="cc4" id="g4_dw3"></td><td class="cc5" id="g4_dw4"></td></tr>
+            <tr class="c3total"><td class="c3lbl">Plată pe gardă <span class="u" id="g4_durlbl"></span></td><td id="g4_pg0"></td><td id="g4_pg1"></td><td id="g4_pg2"></td><td class="cc4" id="g4_pg3"></td><td class="cc5" id="g4_pg4"></td></tr>
+            <tr><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="g4_df1"></td><td id="g4_df2"></td><td class="cc4" id="g4_df3"></td><td class="cc5" id="g4_df4"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">„Prezent” = tarif orar Legea 250 + sporul de gardă (zi / weekend); „Nou 2026” = tariful orar din proiect (salariul de bază nou ÷ ore lucrătoare), cu <b>+20%</b> în weekend. <b>Plata pe gardă</b> folosește tariful de gardă în urgență, zi lucrătoare. Funcțiile care nu există pentru un tip de unitate apar cu „—”. Poți adăuga până la <b>5 cazuri</b>.</div>
+    </div>
+  </section>
+</div>
+
 <div id="salview" style="display:none">
   <section class="card">
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="5" width="3" height="12"/><rect x="17" y="13" width="3" height="4"/></svg>Salarii de bază — proiect <span class="u" id="salcount" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h2>
@@ -1093,10 +1156,12 @@ function renderCoef(){
   $('coefnotes').innerHTML=COEF.notes.map(n=>`<div class="nt${/^NOT/i.test(n)?' hd':''}">${n}</div>`).join('');
 }
 function showView(ds){
-  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal';
-  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal;
+  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp';
+  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp;
   $('salview').style.display=isSal?'':'none';
   if(isSal) renderSal();
+  $('gcmpview').style.display=isGcmp?'':'none';
+  if(isGcmp) renderG4();
   document.querySelector('.presetcard').style.display=isCalc?'':'none';
   document.querySelector('.grid:not(.garziview):not(.cmp3view):not(.progview):not(.prog-top)').style.display=isCalc?'':'none';
   document.querySelector('.fullsec').style.display=isCalc?'':'none';
@@ -1211,13 +1276,13 @@ const C3_UNITLBL={clinic:'Clinic',neclinic:'Neclinic',sju:'SAJ · ATI'};
 let c3units=['clinic','clinic','clinic','clinic','clinic'];
 let c3count=3; // cazuri vizibile (incl. Cazul 1 — prezent), max 5
 function c3SyncCols(){
-  const tab=document.querySelector('.c3tab');
+  const tab=document.querySelector('#cmp3view .c3tab');
   tab.classList.toggle('on4',c3count>=4);
   tab.classList.toggle('on5',c3count>=5);
   $('c3_rm4').style.display=(c3count===4)?'':'none';
   $('c3_rm5').style.display=(c3count===5)?'':'none';
   $('c3_add').style.display=(c3count>=5)?'none':'';
-  document.querySelectorAll('.c3sec td').forEach(td=>td.colSpan=c3count+2);
+  document.querySelectorAll('#cmp3view .c3sec td').forEach(td=>td.colSpan=c3count+2);
 }
 const C3COMPROWS={sb:['c3_row_sb'],sc:['c3_row_sp','c3_row_sc'],st:['c3_row_st'],ss:['c3_row_ss'],ih:['c3_row_ih'],io:['c3_row_io'],pp:['c3_row_pp']};
 function c3SyncUnitAll(){
@@ -1343,6 +1408,108 @@ function c3Init(){
   ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct'].forEach(id=>$(id).addEventListener('input',renderCmp3));
   $('c3_reset').addEventListener('click',()=>{c3ApplyDefaults();renderCmp3();});
   renderCmp3();
+}
+
+// ===== Comparație gărzi (stil Comparație cazuri) =====
+let g4sel=0, g4units=['clinic','clinic','clinic','clinic','clinic'], g4count=3;
+const G4LBL={clinic:'Clinic',neclinic:'Neclinic',saj:'SAJ · ATI'};
+const G4CELLS=['uz','mz','dz','uw','mw','dw','pg'];
+function g4Row(unit){
+  const fn=GARZI.units.clinic[g4sel]?.fn;
+  return GARZI.units[unit].find(r=>r.fn===fn)||null;
+}
+function g4UpdateGrad(){const v=+$('g4_grad').value;$('g4_grad_lbl').textContent=v;$('g4_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('g4_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function g4SyncCols(){
+  const tab=document.querySelector('#gcmpview .g4tab');
+  tab.classList.toggle('on4',g4count>=4);
+  tab.classList.toggle('on5',g4count>=5);
+  $('g4_rm4').style.display=(g4count===4)?'':'none';
+  $('g4_rm5').style.display=(g4count===5)?'':'none';
+  $('g4_add').style.display=(g4count>=5)?'none':'';
+  document.querySelectorAll('#gcmpview .g4sec td').forEach(td=>td.colSpan=g4count+1);
+}
+function g4SyncUnitAll(){
+  const u=g4units.every(x=>x===g4units[0])?g4units[0]:null;
+  document.querySelectorAll('#g4_unitall button').forEach(b=>b.classList.toggle('active',b.dataset.u===u));
+}
+function g4ApplyDefaults(){
+  const d=GARZI.defaults;
+  $('g4_ore').value=d.ore; $('g4_dur').value=18;
+  $('g4_gz').value=Math.round(d.gz*100); $('g4_gw').value=Math.round(d.gw*100);
+  $('g4_grad').value=5; g4UpdateGrad();
+  $('g4_adj1').value=0; $('g4_adj2').value=10; $('g4_adj3').value=0; $('g4_adj4').value=0;
+  g4units=['clinic','clinic','clinic','clinic','clinic'];
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#g4_unit'+ci+' button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic')));
+  g4SyncUnitAll();
+  g4count=3; g4SyncCols();
+}
+function renderG4(){
+  const grad=+$('g4_grad').value, coeff=GRAD[grad]??1, ore=+$('g4_ore').value||1, dur=+$('g4_dur').value||0;
+  const gz=(+$('g4_gz').value||0)/100, gw=(+$('g4_gw').value||0)/100, WE=1.2;
+  const meta=GARZI.units.clinic[g4sel];
+  $('g4_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · gradația ${grad} · gardă de ${dur} ore`;
+  $('g4_durlbl').textContent=`(${dur} ore · urgență, zi)`;
+  const na=i=>{G4CELLS.forEach(k=>{const el=$('g4_'+k+i); el.innerHTML='<span class="c3na">—</span>'; el.classList.remove('c3warncell');});
+    if(i>0){const dc=$('g4_df'+i); dc.innerHTML='—'; dc.className=dc.className.replace(/\b(pos|neg|c3diff|c3warncell)\b/g,'').trim();}};
+  // Cazul 1 = PREZENT (tarif orar Legea 250 + spor gardă), pe unitatea Cazului 1
+  const r0=g4Row(g4units[0]);
+  let Q=null,R=null;
+  if(r0){
+    const P=r0.H*coeff/ore; Q=P*(1+gz); R=P*(1+gw);
+    $('g4_uz0').textContent=lord(Q); $('g4_mz0').textContent=lord(Q); $('g4_dz0').textContent=lord(Q*0.4);
+    $('g4_uw0').textContent=lord(R); $('g4_mw0').textContent=lord(R); $('g4_dw0').textContent=lord(R*0.4);
+    $('g4_pg0').textContent=lei(Q*dur);
+  } else na(0);
+  const cell=(id,val,base)=>{const d=base==null?null:val-base, cls=d==null?'':(d>1e-9?'pos':(d<-1e-9?'neg':''));
+    let dl='';
+    if(d!=null){dl=`<span class="c3d ${cls}">${d>=0?'+':''}${lord(d)}</span>`; if(base) dl+=`<span class="c3d ${cls}">${pct(val/base-1)}</span>`;}
+    $(id).innerHTML=lord(val)+dl;};
+  for(let i=1;i<5;i++){
+    if(i>=g4count) continue; // cazul e ascuns
+    const r=g4Row(g4units[i]);
+    if(!r){na(i);continue;}
+    const adj=(+$('g4_adj'+i).value||0)/100;
+    const M=r.E*coeff*(1+adj)/ore;
+    cell('g4_uz'+i,M,Q); cell('g4_mz'+i,M*0.75,Q); cell('g4_dz'+i,M*0.4,Q==null?null:Q*0.4);
+    cell('g4_uw'+i,M*WE,R); cell('g4_mw'+i,M*0.75*WE,R); cell('g4_dw'+i,M*0.4*WE,R==null?null:R*0.4);
+    const pg=M*dur, pgP=Q==null?null:Q*dur;
+    $('g4_pg'+i).textContent=lei(pg);
+    const dc=$('g4_df'+i);
+    if(pgP==null){dc.innerHTML='—'; dc.classList.remove('pos','neg');}
+    else{
+      const d=pg-pgP;
+      dc.classList.add('c3diff'); dc.classList.remove('pos','neg'); dc.classList.add(d>=0?'pos':'neg');
+      dc.innerHTML=`${d>=0?'+':''}${lei(d)}<span class="dp">${pgP?pct(pg/pgP-1):''}</span>`;
+    }
+    const warn=pgP!=null&&pg<pgP;
+    [...G4CELLS,'df'].forEach(k=>$('g4_'+k+i).classList.toggle('c3warncell',warn));
+  }
+}
+function g4Init(){
+  $('g4_fnsel').innerHTML=GARZI.units.clinic.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('g4_fnsel').value=0;
+  g4ApplyDefaults();
+  $('g4_fnsel').addEventListener('change',e=>{g4sel=+e.target.value;renderG4();});
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#g4_unit'+ci+' button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#g4_unit'+ci+' button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); g4units[ci]=b.dataset.u; g4SyncUnitAll(); renderG4();
+  })));
+  document.querySelectorAll('#g4_unitall button').forEach(b=>b.addEventListener('click',()=>{
+    const u=b.dataset.u; g4units=[u,u,u,u,u];
+    [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#g4_unit'+ci+' button').forEach(x=>x.classList.toggle('active',x.dataset.u===u)));
+    g4SyncUnitAll(); renderG4();
+  }));
+  $('g4_add').addEventListener('click',()=>{if(g4count<5){g4count++;g4SyncCols();renderG4();}});
+  $('g4_rm4').addEventListener('click',()=>{g4count=3;g4SyncCols();renderG4();});
+  $('g4_rm5').addEventListener('click',()=>{g4count=4;g4SyncCols();renderG4();});
+  $('g4_toggleparams').addEventListener('click',()=>{
+    const v=$('gcmpview'); v.classList.toggle('noparams');
+    $('g4_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
+  });
+  $('g4_grad').addEventListener('input',()=>{g4UpdateGrad();renderG4();});
+  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
+  $('g4_reset').addEventListener('click',()=>{g4ApplyDefaults();renderG4();});
+  renderG4();
 }
 
 // ===== Calculator Gărzi =====
@@ -1646,6 +1813,7 @@ $('chart_printhdr').innerHTML=`<span class="pht">Calculator salarizare — Săn�
 buildPresets();
 gInit();
 c3Init();
+g4Init();
 pfInit();
 loadDS();
 $('sal_search').addEventListener('input',renderSal);
