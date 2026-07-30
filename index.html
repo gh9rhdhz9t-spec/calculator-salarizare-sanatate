@@ -801,6 +801,15 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="pgroup"><div class="pgroup-title">Durata gărzii <span class="u">(ore)</span></div><input type="number" id="g4_dur" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă zi lucrătoare <span class="u">(%, prezent)</span></div><input type="number" id="g4_gz" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă weekend / sărbători <span class="u">(%, prezent)</span></div><input type="number" id="g4_gw" step="1"></div>
+      <div class="pgroup"><div class="pgroup-title">Tarif nou pe tip de gardă <span class="u">(% din tariful orar nou)</span>
+        </div>
+        <div class="params">
+          <div class="field"><label>Gardă în urgență <span class="u">(%)</span></label><input type="number" id="g4_pu" step="1"></div>
+          <div class="field"><label>Gardă de monitorizare <span class="u">(%)</span></label><input type="number" id="g4_pm" step="1"></div>
+          <div class="field"><label>Gardă la domiciliu <span class="u">(%)</span></label><input type="number" id="g4_pd" step="1"></div>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Spor nou weekend / sărbători <span class="u">(%)</span></div><input type="number" id="g4_pwe" step="1"></div>
       <div style="margin-top:14px;text-align:right"><button class="btn" id="g4_reset">↺ Resetează parametrii</button></div>
     </div>
   </section>
@@ -824,13 +833,13 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
               <td class="cc4"><input type="number" id="g4_adj3" step="1"></td>
               <td class="cc5"><input type="number" id="g4_adj4" step="1"></td></tr>
             <tr class="c3sec g4sec"><td colspan="4">Tarif orar — zi lucrătoare <span class="u">(lei/oră)</span></td></tr>
-            <tr><td class="c3lbl">Gardă în urgență <span class="u">100%</span></td><td id="g4_uz0"></td><td id="g4_uz1"></td><td id="g4_uz2"></td><td class="cc4" id="g4_uz3"></td><td class="cc5" id="g4_uz4"></td></tr>
-            <tr><td class="c3lbl">Gardă de monitorizare <span class="u">75%</span></td><td id="g4_mz0"></td><td id="g4_mz1"></td><td id="g4_mz2"></td><td class="cc4" id="g4_mz3"></td><td class="cc5" id="g4_mz4"></td></tr>
-            <tr><td class="c3lbl">Gardă la domiciliu <span class="u">40%</span></td><td id="g4_dz0"></td><td id="g4_dz1"></td><td id="g4_dz2"></td><td class="cc4" id="g4_dz3"></td><td class="cc5" id="g4_dz4"></td></tr>
-            <tr class="c3sec g4sec"><td colspan="4">Tarif orar — weekend / sărbători <span class="u">(lei/oră)</span></td></tr>
-            <tr><td class="c3lbl">Gardă în urgență <span class="u">100%</span></td><td id="g4_uw0"></td><td id="g4_uw1"></td><td id="g4_uw2"></td><td class="cc4" id="g4_uw3"></td><td class="cc5" id="g4_uw4"></td></tr>
-            <tr><td class="c3lbl">Gardă de monitorizare <span class="u">75%</span></td><td id="g4_mw0"></td><td id="g4_mw1"></td><td id="g4_mw2"></td><td class="cc4" id="g4_mw3"></td><td class="cc5" id="g4_mw4"></td></tr>
-            <tr><td class="c3lbl">Gardă la domiciliu <span class="u">40%</span></td><td id="g4_dw0"></td><td id="g4_dw1"></td><td id="g4_dw2"></td><td class="cc4" id="g4_dw3"></td><td class="cc5" id="g4_dw4"></td></tr>
+            <tr><td class="c3lbl">Gardă în urgență <span class="u" id="g4_bu"></span></td><td id="g4_uz0"></td><td id="g4_uz1"></td><td id="g4_uz2"></td><td class="cc4" id="g4_uz3"></td><td class="cc5" id="g4_uz4"></td></tr>
+            <tr><td class="c3lbl">Gardă de monitorizare <span class="u" id="g4_bm"></span></td><td id="g4_mz0"></td><td id="g4_mz1"></td><td id="g4_mz2"></td><td class="cc4" id="g4_mz3"></td><td class="cc5" id="g4_mz4"></td></tr>
+            <tr><td class="c3lbl">Gardă la domiciliu <span class="u" id="g4_bd"></span></td><td id="g4_dz0"></td><td id="g4_dz1"></td><td id="g4_dz2"></td><td class="cc4" id="g4_dz3"></td><td class="cc5" id="g4_dz4"></td></tr>
+            <tr class="c3sec g4sec"><td colspan="4">Tarif orar — weekend / sărbători <span class="u" id="g4_bwe"></span></td></tr>
+            <tr><td class="c3lbl">Gardă în urgență <span class="u" id="g4_bwu"></span></td><td id="g4_uw0"></td><td id="g4_uw1"></td><td id="g4_uw2"></td><td class="cc4" id="g4_uw3"></td><td class="cc5" id="g4_uw4"></td></tr>
+            <tr><td class="c3lbl">Gardă de monitorizare <span class="u" id="g4_bwm"></span></td><td id="g4_mw0"></td><td id="g4_mw1"></td><td id="g4_mw2"></td><td class="cc4" id="g4_mw3"></td><td class="cc5" id="g4_mw4"></td></tr>
+            <tr><td class="c3lbl">Gardă la domiciliu <span class="u" id="g4_bwd"></span></td><td id="g4_dw0"></td><td id="g4_dw1"></td><td id="g4_dw2"></td><td class="cc4" id="g4_dw3"></td><td class="cc5" id="g4_dw4"></td></tr>
             <tr class="c3total"><td class="c3lbl">Plată pe gardă <span class="u" id="g4_durlbl"></span></td><td id="g4_pg0"></td><td id="g4_pg1"></td><td id="g4_pg2"></td><td class="cc4" id="g4_pg3"></td><td class="cc5" id="g4_pg4"></td></tr>
             <tr><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="g4_df1"></td><td id="g4_df2"></td><td class="cc4" id="g4_df3"></td><td class="cc5" id="g4_df4"></td></tr>
           </tbody>
@@ -1436,6 +1445,7 @@ function g4ApplyDefaults(){
   const d=GARZI.defaults;
   $('g4_ore').value=d.ore; $('g4_dur').value=18;
   $('g4_gz').value=Math.round(d.gz*100); $('g4_gw').value=Math.round(d.gw*100);
+  $('g4_pu').value=100; $('g4_pm').value=75; $('g4_pd').value=40; $('g4_pwe').value=20;
   $('g4_grad').value=5; g4UpdateGrad();
   $('g4_adj1').value=0; $('g4_adj2').value=10; $('g4_adj3').value=0; $('g4_adj4').value=0;
   g4units=['clinic','clinic','clinic','clinic','clinic'];
@@ -1445,7 +1455,13 @@ function g4ApplyDefaults(){
 }
 function renderG4(){
   const grad=+$('g4_grad').value, coeff=GRAD[grad]??1, ore=+$('g4_ore').value||1, dur=+$('g4_dur').value||0;
-  const gz=(+$('g4_gz').value||0)/100, gw=(+$('g4_gw').value||0)/100, WE=1.2;
+  const gz=(+$('g4_gz').value||0)/100, gw=(+$('g4_gw').value||0)/100;
+  // procente noi alese din Parametri comuni (implicit 100 / 75 / 40, weekend +20%)
+  const pu=(+$('g4_pu').value||0)/100, pm=(+$('g4_pm').value||0)/100, pd=(+$('g4_pd').value||0)/100;
+  const WE=1+(+$('g4_pwe').value||0)/100;
+  $('g4_bu').textContent=(+$('g4_pu').value||0)+'%'; $('g4_bm').textContent=(+$('g4_pm').value||0)+'%'; $('g4_bd').textContent=(+$('g4_pd').value||0)+'%';
+  $('g4_bwe').textContent='(lei/oră · nou +'+(+$('g4_pwe').value||0)+'%)';
+  $('g4_bwu').textContent=(+$('g4_pu').value||0)+'%'; $('g4_bwm').textContent=(+$('g4_pm').value||0)+'%'; $('g4_bwd').textContent=(+$('g4_pd').value||0)+'%';
   const meta=GARZI.units.clinic[g4sel];
   $('g4_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · gradația ${grad} · gardă de ${dur} ore`;
   $('g4_durlbl').textContent=`(${dur} ore · urgență, zi)`;
@@ -1470,9 +1486,9 @@ function renderG4(){
     if(!r){na(i);continue;}
     const adj=(+$('g4_adj'+i).value||0)/100;
     const M=r.E*coeff*(1+adj)/ore;
-    cell('g4_uz'+i,M,Q); cell('g4_mz'+i,M*0.75,Q); cell('g4_dz'+i,M*0.4,Q==null?null:Q*0.4);
-    cell('g4_uw'+i,M*WE,R); cell('g4_mw'+i,M*0.75*WE,R); cell('g4_dw'+i,M*0.4*WE,R==null?null:R*0.4);
-    const pg=M*dur, pgP=Q==null?null:Q*dur;
+    cell('g4_uz'+i,M*pu,Q); cell('g4_mz'+i,M*pm,Q); cell('g4_dz'+i,M*pd,Q==null?null:Q*0.4);
+    cell('g4_uw'+i,M*pu*WE,R); cell('g4_mw'+i,M*pm*WE,R); cell('g4_dw'+i,M*pd*WE,R==null?null:R*0.4);
+    const pg=M*pu*dur, pgP=Q==null?null:Q*dur;
     $('g4_pg'+i).textContent=lei(pg);
     const dc=$('g4_df'+i);
     if(pgP==null){dc.innerHTML='—'; dc.classList.remove('pos','neg');}
@@ -1507,7 +1523,7 @@ function g4Init(){
     $('g4_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
   });
   $('g4_grad').addEventListener('input',()=>{g4UpdateGrad();renderG4();});
-  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
+  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_pu','g4_pm','g4_pd','g4_pwe','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
   $('g4_reset').addEventListener('click',()=>{g4ApplyDefaults();renderG4();});
   renderG4();
 }
