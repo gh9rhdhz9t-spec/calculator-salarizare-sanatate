@@ -804,6 +804,13 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
         <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
       </div>
       <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="g4_ore" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Indemnizație OUG 63/2023 <span class="u">(pe gardă, prezent)</span></div>
+        <div class="switchrow">
+          <button type="button" class="switch on" id="g4_oug"><span class="knob"></span><span class="stxt">Da</span></button>
+          <input type="number" id="g4_ougv" class="vinput" step="1"><span class="unit">lei</span>
+        </div>
+      </div>
       <div class="pgroup"><div class="pgroup-title">Durata gărzii <span class="u">(ore)</span></div><input type="number" id="g4_dur" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă zi lucrătoare <span class="u">(%, prezent)</span></div><input type="number" id="g4_gz" step="1"></div>
       <div class="pgroup"><div class="pgroup-title">Spor gardă weekend / sărbători <span class="u">(%, prezent)</span></div><input type="number" id="g4_gw" step="1"></div>
@@ -1452,6 +1459,7 @@ function g4ApplyDefaults(){
   $('g4_ore').value=d.ore; $('g4_dur').value=18;
   $('g4_gz').value=Math.round(d.gz*100); $('g4_gw').value=Math.round(d.gw*100);
   $('g4_pu').value=100; $('g4_pm').value=75; $('g4_pd').value=40; $('g4_pwe').value=20;
+  c3SetSw('g4_oug',true); $('g4_ougv').value=1000;
   $('g4_grad').value=5; g4UpdateGrad();
   $('g4_adj1').value=0; $('g4_adj2').value=10; $('g4_adj3').value=0; $('g4_adj4').value=0;
   g4units=['clinic','clinic','clinic','clinic','clinic'];
@@ -1476,8 +1484,10 @@ function renderG4(){
   // Cazul 1 = PREZENT (tarif orar Legea 250 + spor gardă), pe unitatea Cazului 1
   const r0=g4Row(g4units[0]);
   let Q=null,R=null;
+  // OUG 63/2023: indemnizația pe gardă, transformată în lei/oră (valoare ÷ durata gărzii), se adaugă la tariful orar prezent
+  const oug=(c3Sw('g4_oug')==='Da'&&dur>0)?(+$('g4_ougv').value||0)/dur:0;
   if(r0){
-    const P=r0.H*coeff/ore; Q=P*(1+gz); R=P*(1+gw);
+    const P=r0.H*coeff/ore; Q=P*(1+gz)+oug; R=P*(1+gw)+oug;
     $('g4_uz0').textContent=lord(Q); $('g4_mz0').textContent=lord(Q); $('g4_dz0').textContent=lord(Q*0.4);
     $('g4_uw0').textContent=lord(R); $('g4_mw0').textContent=lord(R); $('g4_dw0').textContent=lord(R*0.4);
     $('g4_pg0').textContent=lei(Q*dur);
@@ -1529,7 +1539,8 @@ function g4Init(){
     $('g4_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
   });
   $('g4_grad').addEventListener('input',()=>{g4UpdateGrad();renderG4();});
-  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_pu','g4_pm','g4_pd','g4_pwe','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
+  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_pu','g4_pm','g4_pd','g4_pwe','g4_ougv','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
+  $('g4_oug').addEventListener('click',()=>{c3SetSw('g4_oug',!$('g4_oug').classList.contains('on'));renderG4();});
   $('g4_reset').addEventListener('click',()=>{g4ApplyDefaults();renderG4();});
   renderG4();
 }
