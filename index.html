@@ -992,6 +992,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
           <button type="button" data-v="v1" class="active" title="Rânduri −3% … +12% · coloane 0% … +10%">Varianta 1</button>
           <button type="button" data-v="v2" title="Rânduri −10% … +10% · coloane 0% … +5%">Varianta 2</button>
           <button type="button" data-v="v3" title="Rânduri +10% … −10% (descrescător) · coloane 0% … +5%">Varianta 3</button>
+          <button type="button" data-v="v4" title="Rânduri −3% … +12% · coloane 0% / 2% / 4% / 6% / 15%">Varianta 4</button>
         </div>
         <div class="fwrap">
           <table class="saltab mtxtab" id="mtxtab"></table>
@@ -1439,7 +1440,8 @@ function renderSal(){
 const MTXVAR={
   v1:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
   v2:{rows:[-10,-5,0,5,8,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
-  v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]}
+  v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
+  v4:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]}
 };
 let MTXROWS=MTXVAR.v1.rows, MTXCOLS=MTXVAR.v1.cols;
 // culori pe specialitate (paletă Okabe–Ito, sigură pentru daltonism): 3 ani, 4 ani, 5 ani, Chirurgie, ATI UPU
