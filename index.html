@@ -741,6 +741,9 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       </div>
       <div class="pgroup">
         <div class="pgroup-title">Spor SDSL</div>
+        <div class="switchrow" style="margin-bottom:10px">
+          <button type="button" class="switch on" id="c3_sdsl_sw"><span class="knob"></span><span class="stxt">Da</span></button>
+        </div>
         <div class="params two">
           <div class="field"><label>Ore SDSL / lună</label><input type="number" id="c3_oresdsl" step="1"></div>
           <div class="field"><label>Tarif SDSL <span class="u">(%)</span></label><input type="number" id="c3_tarifsdsl" step="1"></div>
@@ -1317,6 +1320,7 @@ function rowsNow(){return DS[curDS].rows;}
 
 const PRESETS=[
   {label:'Medic primar', studii:'S', match:r=>r.fn==='Medic primar'},
+  {label:'Medic specialist', studii:'S', match:r=>r.fn==='Medic specialist'},
   {label:'Asistent medical principal', studii:'PL', match:r=>r.studii==='PL' && /principal/i.test(r.fn)},
   {label:'Farmacist primar', studii:'S', match:r=>/^Farmacist primar/i.test(r.fn)},
   {label:'Asistent medical principal', studii:'S', match:r=>r.studii==='S' && /^Asistent/i.test(r.fn) && /principal/i.test(r.fn)},
@@ -1669,7 +1673,7 @@ function c3Shared(){return {
   ore:+$('c3_ore').value||1, grad:+$('c3_grad').value,
   svechi:(+$('c3_svechi').value||0)/100, snou:(+$('c3_snou').value||0)/100,
   noapte:c3Mode()==='Noapte'?'Da':'Nu', orenoapte:+$('c3_orenoapte').value||0,
-  tura:c3Mode()==='Tura'?'Da':'Nu', oresdsl:+$('c3_oresdsl').value||0,
+  tura:c3Mode()==='Tura'?'Da':'Nu', oresdsl:c3Sw('c3_sdsl_sw')==='Da'?(+$('c3_oresdsl').value||0):0,
   tarifsdsl:(+$('c3_tarifsdsl').value||0)/100,
   hrana:c3Sw('c3_hrana'), hranav:+$('c3_hranav').value||0,
   indemn:c3Sw('c3_indemn'), indemnv:+$('c3_indemnv').value||0
@@ -1701,7 +1705,7 @@ function c3ApplyDefaults(){
   $('c3_ore').value=168; $('c3_grad').value=5; c3UpdateGrad();
   $('c3_svechi').value=85; $('c3_snou').value=20; c3SyncSpor();
   c3SetMode('Tura'); $('c3_orenoapte').value=0;
-  $('c3_oresdsl').value=48; $('c3_tarifsdsl').value=30;
+  $('c3_oresdsl').value=48; $('c3_tarifsdsl').value=30; c3SetSw('c3_sdsl_sw',true);
   c3SetSw('c3_hrana',true); $('c3_hranav').value=347;
   c3SetSw('c3_indemn',true); $('c3_indemnv').value=800;
   c3units=['clinic','clinic','clinic','clinic','clinic'];
@@ -1833,8 +1837,17 @@ function c3Init(){
   $('c3_fnsel').addEventListener('change',e=>{c3sel=+e.target.value;renderCmp3();});
   $('c3_presetbar').innerHTML=PRESETS.map((pr,i)=>`<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
   document.querySelectorAll('#c3_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
-    const idx=DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match); if(idx<0)return;
-    c3sel=idx; $('c3_fnsel').value=idx; renderCmp3();
+    const pr=PRESETS[+b.dataset.p];
+    const idx=DS.clinic.rows.findIndex(pr.match); if(idx<0)return;
+    c3sel=idx; $('c3_fnsel').value=idx;
+    // profil medic: spor 85/20, fără tură/noapte, fără SDSL, fără hrană, fără OUG 63
+    if(/^Medic (primar|specialist)$/.test(pr.label)){
+      $('c3_svechi').value=85; $('c3_snou').value=20; c3SyncSpor();
+      c3SetMode('Nimic');
+      $('c3_oresdsl').value=0; c3SetSw('c3_sdsl_sw',false);
+      c3SetSw('c3_hrana',false); c3SetSw('c3_indemn',false);
+    }
+    renderCmp3();
   }));
   document.querySelectorAll('#c3_sporpresets .sppreset').forEach(b=>b.addEventListener('click',()=>{
     $('c3_svechi').value=b.dataset.sv; $('c3_snou').value=b.dataset.sn; c3SyncSpor(); renderCmp3();
@@ -1866,7 +1879,7 @@ function c3Init(){
   $('c3_rm5').addEventListener('click',()=>{c3count=4;c3SyncCols();renderCmp3();});
   document.querySelectorAll('#c3_mode button').forEach(b=>b.addEventListener('click',()=>{c3SetMode(b.dataset.v);renderCmp3();}));
   $('c3_grad').addEventListener('input',()=>{c3UpdateGrad();renderCmp3();});
-  ['c3_hrana','c3_indemn'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
+  ['c3_hrana','c3_indemn','c3_sdsl_sw'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
   ['c3_svechi','c3_snou'].forEach(id=>$(id).addEventListener('input',()=>{c3SyncSpor();renderCmp3();}));
   ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct','c3_ps0','c3_ps1','c3_pa0','c3_pa1'].forEach(id=>$(id).addEventListener('input',renderCmp3));
   // tooltip pe graficul spor × ajustare
