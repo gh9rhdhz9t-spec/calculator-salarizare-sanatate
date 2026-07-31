@@ -822,6 +822,17 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <div class="body">
       <div class="c3chdesc" id="c3_chdesc"></div>
       <div class="g4newrates">
+        <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(%, sincronizat cu Parametri comuni)</span></div>
+        <div class="g4nr">
+          <div class="field"><label>Spor actual <span class="u">(%)</span></label><input type="number" id="c3_chsv" step="1"></div>
+          <div class="field"><label>Interval — minim <span class="u">(%)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
+          <div class="field"><label>Interval — maxim <span class="u">(%)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
+          <div class="field"><label>Folosește intervalul</label>
+            <div class="switchrow"><button type="button" class="switch" id="c3_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
+          </div>
+        </div>
+      </div>
+      <div class="g4newrates">
         <div class="pgroup-title">Intervale explorate <span class="u">(pas de 2,5 puncte procentuale)</span></div>
         <div class="g4nr">
           <div class="field"><label>Spor nou — de la <span class="u">(%)</span></label><input type="number" id="c3_ps0" step="1" value="10"></div>
@@ -1700,6 +1711,7 @@ function c3SyncSpor(){
   // valorile per caz preiau implicit sporul din Parametri comuni (caz 1 = actual, cazurile noi = nou)
   $('c3_sp0').value=$('c3_svechi').value;
   for(let i=1;i<5;i++) $('c3_sp'+i).value=$('c3_snou').value;
+  $('c3_chsv').value=$('c3_svechi').value; // oglinda din cardul graficului
 }
 function c3ApplyDefaults(){
   $('c3_ore').value=168; $('c3_grad').value=5; c3UpdateGrad();
@@ -1720,6 +1732,7 @@ function c3ApplyDefaults(){
   $('c3_ppct').value=15; $('c3_pp_pct').value=15;
   c3SetSw('c3_pp_sw',false);
   $('c3_ps0').value=10; $('c3_ps1').value=30; $('c3_pa0').value=0; $('c3_pa1').value=20;
+  $('c3_sa0').value=55; $('c3_sa1').value=85; c3SetSw('c3_sa_sw',false);
   c3count=3; c3SyncCols();
 }
 function renderCmp3(){
@@ -1788,22 +1801,39 @@ function renderC3Chart(sh,totP,en){
     `Spor condiții deosebite în prezent: <b>${Math.round(sh.svechi*100)}%</b> · Spor tură/noapte: <b>${dmode}</b> · SDSL: <b>${sh.oresdsl} ore/lună</b> la tarif <b>${Math.round(sh.tarifsdsl*100)}%</b> · `+
     `Indemnizație de hrană: <b>${sh.hrana==='Da'?lei(sh.hranav)+' lei':'nu'}</b> <span class="u">(doar în prezent)</span> · Indemnizație OUG 63/2023: <b>${sh.indemn==='Da'?lei(sh.indemnv)+' lei':'nu'}</b> <span class="u">(doar în prezent)</span> · `+
     `Plată pe performanță: <b>${en('pp')?((+$('c3_ppct').value||0)+'% din salariul de bază nou'):'dezactivată'}</b>`;
-  const STEP=2.5, pts=[];
+  const STEP=2.5;
+  // interval opțional pentru sporul actual (schimbă baza „prezent")
+  const useSA=c3Sw('c3_sa_sw')==='Da';
+  let sa0=Math.round(+$('c3_sa0').value||0), sa1=Math.round(+$('c3_sa1').value||0);
+  if(sa1<sa0)[sa0,sa1]=[sa1,sa0];
+  if(sa1-sa0>60)sa1=sa0+60;
+  const r0=DS[c3units[0]].rows[c3sel];
+  const totPAt=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});
+    return (en('sb')?c.J:0)+(en('sc')?c.M:0)+(en('st')?c.N:0)+(en('ss')?c.O:0)+(en('ih')?c.hrana:0)+(en('io')?c.indemn:0);};
+  const saVals=[]; if(useSA){for(let v=sa0;v<=sa1+1e-9;v+=STEP) saVals.push(v);} else saVals.push(null);
+  const tpOf=sa=>sa==null?totP:totPAt(sa);
+  const pts=[];
   for(let a=a0;a<=a1+1e-9;a+=STEP)for(let sp=s0;sp<=s1+1e-9;sp+=STEP){
     const tot=totAt(sp,a);
-    pts.push({sp,a,tot,diff:tot-totP});
+    saVals.forEach(sa=>pts.push({sp,a,sa,tot,diff:tot-tpOf(sa)}));
   }
-  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor ${s0}–${s1}% × ajustare ${a0}–${a1}%, pas 2,5)`;
+  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor nou ${s0}–${s1}% × ajustare ${a0}–${a1}%${useSA?` × spor actual ${sa0}–${sa1}%`:''}, pas 2,5)`;
   // praguri de egalitate cu prezentul (totalul nou e liniar în spor și în ajustare → rezolvare exactă)
   const fbk=n=>n==null?'—':(n>=0?'+':'')+n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
   const fpc=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
-  const solveA=sp=>{const t0=totAt(sp,0),t100=totAt(sp,100);return Math.abs(t100-t0)<1e-9?null:(totP-t0)/(t100-t0)*100;};
-  const solveS=a=>{const t0=totAt(0,a),t100=totAt(100,a);return Math.abs(t100-t0)<1e-9?null:(totP-t0)/(t100-t0)*100;};
+  const solveA=(sp,tp)=>{const t0=totAt(sp,0),t100=totAt(sp,100);return Math.abs(t100-t0)<1e-9?null:(tp-t0)/(t100-t0)*100;};
+  const solveS=(a,tp)=>{const t0=totAt(0,a),t100=totAt(100,a);return Math.abs(t100-t0)<1e-9?null:(tp-t0)/(t100-t0)*100;};
+  const bk=f=>{
+    if(!useSA) return fbk(f(totP));
+    const v1=f(totPAt(sa0)), v2=f(totPAt(sa1));
+    if(v1==null||v2==null) return '—';
+    return fbk(Math.min(v1,v2))+' … '+fbk(Math.max(v1,v2));
+  };
   $('c3_bkls0').textContent=fpc(s0); $('c3_bkls1').textContent=fpc(s1);
   $('c3_bkla0').textContent=fpc(a0); $('c3_bkla1').textContent=fpc(a1);
-  $('c3_bk1').textContent=fbk(solveA(s0)); $('c3_bk2').textContent=fbk(solveA(s1));
-  $('c3_bk3').textContent=fbk(solveS(a0)); $('c3_bk4').textContent=fbk(solveS(a1));
-  const xs=[totP,...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
+  $('c3_bk1').textContent=bk(tp=>solveA(s0,tp)); $('c3_bk2').textContent=bk(tp=>solveA(s1,tp));
+  $('c3_bk3').textContent=bk(tp=>solveS(a0,tp)); $('c3_bk4').textContent=bk(tp=>solveS(a1,tp));
+  const xs=[...saVals.map(tpOf),...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
   const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
   const xpad=(xmax-xmin)*0.06||1000, ypad=(ymaxR-yminR)*0.08||500;
   const x0=xmin-xpad, x1=xmax+xpad, y0=yminR-ypad, y1=ymaxR+ypad;
@@ -1818,9 +1848,13 @@ function renderC3Chart(sh,totP,en){
   // culoare secvențială după ajustare (deschis → închis)
   pts.forEach(p=>{
     const t=(p.a-a0)/Math.max(1,a1-a0), L=75-45*t;
-    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="4" fill="hsl(210 65% ${L}%)" stroke="#fff" stroke-width="1" data-sp="${p.sp}" data-a="${p.a}" data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}" data-dpct="${totP?pct(p.tot/totP-1):''}"/>`;
+    const tp=tpOf(p.sa);
+    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="4" fill="hsl(210 65% ${L}%)" stroke="#fff" stroke-width="1" data-sp="${p.sp}" data-a="${p.a}"${p.sa==null?'':` data-sa="${p.sa}"`} data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}" data-dpct="${tp?pct(p.tot/tp-1):''}"/>`;
   });
-  s+=`<path d="M ${X(totP)} ${Y(0)-8} l 8 8 l -8 8 l -8 -8 Z" fill="#0f172a" stroke="#fff" stroke-width="2" data-prez="1" data-tot="${lei(totP)}"/>`;
+  saVals.forEach(sa=>{
+    const tp=tpOf(sa), sz=useSA?6:8;
+    s+=`<path d="M ${X(tp)} ${Y(0)-sz} l ${sz} ${sz} l -${sz} ${sz} l -${sz} -${sz} Z" fill="#0f172a" stroke="#fff" stroke-width="1.5" data-prez="1"${sa==null?'':` data-sa="${sa}"`} data-tot="${lei(tp)}"/>`;
+  });
   s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
   s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență nou − prezent (lei)</text>`;
   $('c3_chart').innerHTML=s+'</svg>';
@@ -1879,18 +1913,20 @@ function c3Init(){
   $('c3_rm5').addEventListener('click',()=>{c3count=4;c3SyncCols();renderCmp3();});
   document.querySelectorAll('#c3_mode button').forEach(b=>b.addEventListener('click',()=>{c3SetMode(b.dataset.v);renderCmp3();}));
   $('c3_grad').addEventListener('input',()=>{c3UpdateGrad();renderCmp3();});
-  ['c3_hrana','c3_indemn','c3_sdsl_sw'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
+  ['c3_hrana','c3_indemn','c3_sdsl_sw','c3_sa_sw'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
   ['c3_svechi','c3_snou'].forEach(id=>$(id).addEventListener('input',()=>{c3SyncSpor();renderCmp3();}));
-  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct','c3_ps0','c3_ps1','c3_pa0','c3_pa1'].forEach(id=>$(id).addEventListener('input',renderCmp3));
+  $('c3_chsv').addEventListener('input',()=>{$('c3_svechi').value=$('c3_chsv').value;c3SyncSpor();renderCmp3();});
+  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct','c3_ps0','c3_ps1','c3_pa0','c3_pa1','c3_sa0','c3_sa1'].forEach(id=>$(id).addEventListener('input',renderCmp3));
   // tooltip pe graficul spor × ajustare
   const ctip=$('c3_ctip'), cwrap=$('c3_chartwrap');
   cwrap.addEventListener('mousemove',e=>{
     const el=e.target.closest('circle[data-tot],path[data-prez]');
     if(!el){ctip.style.display='none';return;}
+    const saLine=el.dataset.sa!=null?`Spor actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>`:'';
     if(el.dataset.prez){
-      ctip.innerHTML=`<b>◆ Calcul prezent</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
+      ctip.innerHTML=`<b>◆ Calcul prezent</b><br>${saLine}Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
     }else{
-      ctip.innerHTML=`Spor nou: <b>${(+el.dataset.sp).toLocaleString('ro-RO')}%</b><br>Ajustare: <b>${el.dataset.a>0?'+':''}${(+el.dataset.a).toLocaleString('ro-RO')}%</b><br>`+
+      ctip.innerHTML=`Spor nou: <b>${(+el.dataset.sp).toLocaleString('ro-RO')}%</b><br>Ajustare: <b>${el.dataset.a>0?'+':''}${(+el.dataset.a).toLocaleString('ro-RO')}%</b><br>`+saLine+
         `Total: <b>${el.dataset.tot} lei</b><br>Diferență: <b>${el.dataset.diff} lei</b>${el.dataset.dpct?' ('+el.dataset.dpct+')':''}`;
     }
     ctip.style.display='block';
