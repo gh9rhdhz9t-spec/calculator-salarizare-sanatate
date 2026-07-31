@@ -379,8 +379,9 @@ table.mtxtab .mtxhd.mtxoff{text-decoration:line-through}
 .mxlegend span{display:inline-flex;align-items:center;gap:7px}
 .mxlegend .lg-dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff}
 .mxlegend .lg-diamond{width:10px;height:10px;background:#0f172a;display:inline-block;transform:rotate(45deg)}
-#mx_tip{position:absolute;display:none;background:#0f172a;color:#fff;font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:9px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:5;max-width:250px;white-space:nowrap}
-#mx_chart circle{cursor:pointer}
+#mx_tip,#c3_ctip{position:absolute;display:none;background:#0f172a;color:#fff;font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:9px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:5;max-width:250px;white-space:nowrap}
+#mx_chart circle,#c3_chart circle{cursor:pointer}
+.mxlegend .lg-grad{width:56px;height:11px;border-radius:6px;display:inline-block;background:linear-gradient(90deg,hsl(210 65% 75%),hsl(210 65% 30%))}
 .c3rm{position:absolute;top:4px;right:5px;appearance:none;border:none;background:rgba(255,255,255,.25);color:#fff;width:18px;height:18px;line-height:16px;border-radius:50%;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .c3rm:hover{background:rgba(255,255,255,.5)}
 table.c3tab td.c3warncell{background:#fdeaee}
@@ -766,6 +767,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div style="margin-top:14px;text-align:right"><button class="btn" id="c3_reset">↺ Resetează parametrii</button></div>
     </div>
   </section>
+  <div class="mxright">
   <section class="card">
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Comparație cazuri<button class="printbtn" id="c3_add" title="Adaugă un caz nou (max. 5)">+ Adaugă caz</button><button class="printbtn" id="c3_toggleparams" title="Arată / ascunde panoul Parametri comuni">⚙ Ascunde parametrii</button></h2>
     <div class="body">
@@ -807,6 +809,30 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="note">Toate cazurile folosesc <b>aceeași funcție și aceiași parametri comuni</b>; diferă doar prin <b>tipul de unitate</b> (bazele salariale) și <b>ajustarea salariului nou</b>. Poți adăuga până la <b>5 cazuri</b> cu butonul „+ Adaugă caz”. Valori brute lunare, în lei.</div>
     </div>
   </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — spor nou × ajustare <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="c3_ptscount"></span></h2>
+    <div class="body">
+      <div class="g4newrates">
+        <div class="pgroup-title">Intervale explorate <span class="u">(pas de 1 punct procentual)</span></div>
+        <div class="g4nr">
+          <div class="field"><label>Spor nou — de la <span class="u">(%)</span></label><input type="number" id="c3_ps0" step="1" value="10"></div>
+          <div class="field"><label>Spor nou — până la <span class="u">(%)</span></label><input type="number" id="c3_ps1" step="1" value="30"></div>
+          <div class="field"><label>Ajustare — de la <span class="u">(%)</span></label><input type="number" id="c3_pa0" step="1" value="0"></div>
+          <div class="field"><label>Ajustare — până la <span class="u">(%)</span></label><input type="number" id="c3_pa1" step="1" value="20"></div>
+        </div>
+      </div>
+      <div id="c3_chartwrap" style="position:relative">
+        <div id="c3_chart"></div>
+        <div id="c3_ctip"></div>
+      </div>
+      <div class="mxlegend">
+        <span><i class="lg-diamond"></i>Calcul prezent</span>
+        <span><i class="lg-grad"></i>Ajustare: deschis = minim, închis = maxim</span>
+      </div>
+      <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou × ajustare salariu nou</b> din intervalele de mai sus (pas 1%), folosind funcția, parametrii comuni și tipul de unitate al <b>Cazului 2</b>. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b> (Cazul 1); zona roșiatică = sub prezent. Ține cursorul pe un punct pentru detalii.</div>
+    </div>
+  </section>
+  </div>
 </div>
 
 <div class="grid cmp3view" id="gcmpview" style="display:none">
@@ -1677,6 +1703,7 @@ function c3ApplyDefaults(){
   $('c3_row_pp').classList.add('compoff');
   $('c3_ppct').value=15; $('c3_pp_pct').value=15;
   c3SetSw('c3_pp_sw',false);
+  $('c3_ps0').value=10; $('c3_ps1').value=30; $('c3_pa0').value=0; $('c3_pa1').value=20;
   c3count=3; c3SyncCols();
 }
 function renderCmp3(){
@@ -1720,7 +1747,47 @@ function renderCmp3(){
     const warn=totN<totP;
     ['sb','sc','st','ss','ih','io','pp','tn','df'].forEach(k=>$('c3_'+k+i).classList.toggle('c3warncell',warn));
   }
+  renderC3Chart(sh,totP,en);
   c3UpdatePresets();
+}
+// grafic: toate combinațiile spor nou × ajustare (pas 1%) vs. calculul prezent
+function renderC3Chart(sh,totP,en){
+  const cl=v=>Math.round(+v||0);
+  let s0=cl($('c3_ps0').value), s1=cl($('c3_ps1').value);
+  let a0=cl($('c3_pa0').value), a1=cl($('c3_pa1').value);
+  if(s1<s0)[s0,s1]=[s1,s0]; if(a1<a0)[a0,a1]=[a1,a0];
+  if(s1-s0>60)s1=s0+60; if(a1-a0>60)a1=a0+60; // limită de siguranță
+  const r=DS[c3units[1]].rows[c3sel];
+  const ppct=(+$('c3_ppct').value||0)/100;
+  const pts=[];
+  for(let a=a0;a<=a1;a++)for(let sp=s0;sp<=s1;sp++){
+    const c=calc(r,{...sh, snou:sp/100, adjust:a/100, indemnAll: sh.indemn==='Da'});
+    const ppv=en('pp')?ppct*c.I:0;
+    const tot=(en('sb')?c.I:0)+(en('sc')?c.R:0)+(en('st')?c.T:0)+(en('ss')?c.V:0)+(en('pp')?ppv:0);
+    pts.push({sp,a,tot,diff:tot-totP});
+  }
+  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor ${s0}–${s1}% × ajustare ${a0}–${a1}%)`;
+  const xs=[totP,...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
+  const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
+  const xpad=(xmax-xmin)*0.06||1000, ypad=(ymaxR-yminR)*0.08||500;
+  const x0=xmin-xpad, x1=xmax+xpad, y0=yminR-ypad, y1=ymaxR+ypad;
+  const W=760,H=420,ML=86,MR=16,MT=14,MB=44;
+  const X=v=>ML+(v-x0)/(x1-x0)*(W-ML-MR), Y=v=>MT+(y1-v)/(y1-y0)*(H-MT-MB);
+  const ticks=(a,b,n)=>{const st0=(b-a)/n;const m=Math.pow(10,Math.floor(Math.log10(st0)));const st=Math.ceil(st0/m)*m;const t=[];for(let v=Math.ceil(a/st)*st;v<=b;v+=st)t.push(v);return t;};
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font:12px system-ui">`;
+  if(y0<0) s+=`<rect x="${ML}" y="${Y(Math.min(0,y1))}" width="${W-ML-MR}" height="${Y(y0)-Y(Math.min(0,y1))}" fill="#e11d48" opacity="0.06"/>`;
+  ticks(y0,y1,6).forEach(v=>{s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e2e8f0" stroke-width="1"/><text x="${ML-8}" y="${Y(v)+4}" text-anchor="end" fill="#64748b">${v>0?'+':''}${lei(v)}</text>`;});
+  ticks(x0,x1,6).forEach(v=>{s+=`<text x="${X(v)}" y="${H-MB+18}" text-anchor="middle" fill="#64748b">${lei(v)}</text>`;});
+  if(0>=y0&&0<=y1) s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(0)}" y2="${Y(0)}" stroke="#0f172a" stroke-width="1.5"/><text x="${W-MR-4}" y="${Y(0)-6}" text-anchor="end" fill="#0f172a" font-weight="600">prezent (dif. 0)</text>`;
+  // culoare secvențială după ajustare (deschis → închis)
+  pts.forEach(p=>{
+    const t=(p.a-a0)/Math.max(1,a1-a0), L=75-45*t;
+    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="4" fill="hsl(210 65% ${L}%)" stroke="#fff" stroke-width="1" data-sp="${p.sp}" data-a="${p.a}" data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}" data-dpct="${totP?pct(p.tot/totP-1):''}"/>`;
+  });
+  s+=`<path d="M ${X(totP)} ${Y(0)-8} l 8 8 l -8 8 l -8 -8 Z" fill="#0f172a" stroke="#fff" stroke-width="2" data-prez="1" data-tot="${lei(totP)}"/>`;
+  s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
+  s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență nou − prezent (lei)</text>`;
+  $('c3_chart').innerHTML=s+'</svg>';
 }
 function c3UpdatePresets(){
   document.querySelectorAll('#c3_presetbar .preset').forEach(b=>b.classList.toggle('active', DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match)===c3sel));
@@ -1769,7 +1836,26 @@ function c3Init(){
   $('c3_grad').addEventListener('input',()=>{c3UpdateGrad();renderCmp3();});
   ['c3_hrana','c3_indemn'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
   ['c3_svechi','c3_snou'].forEach(id=>$(id).addEventListener('input',()=>{c3SyncSpor();renderCmp3();}));
-  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct'].forEach(id=>$(id).addEventListener('input',renderCmp3));
+  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct','c3_ps0','c3_ps1','c3_pa0','c3_pa1'].forEach(id=>$(id).addEventListener('input',renderCmp3));
+  // tooltip pe graficul spor × ajustare
+  const ctip=$('c3_ctip'), cwrap=$('c3_chartwrap');
+  cwrap.addEventListener('mousemove',e=>{
+    const el=e.target.closest('circle[data-tot],path[data-prez]');
+    if(!el){ctip.style.display='none';return;}
+    if(el.dataset.prez){
+      ctip.innerHTML=`<b>◆ Calcul prezent</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
+    }else{
+      ctip.innerHTML=`Spor nou: <b>${el.dataset.sp}%</b><br>Ajustare: <b>${el.dataset.a>0?'+':''}${el.dataset.a}%</b><br>`+
+        `Total: <b>${el.dataset.tot} lei</b><br>Diferență: <b>${el.dataset.diff} lei</b>${el.dataset.dpct?' ('+el.dataset.dpct+')':''}`;
+    }
+    ctip.style.display='block';
+    const rc=cwrap.getBoundingClientRect();
+    let x=e.clientX-rc.left+14, y=e.clientY-rc.top+12;
+    if(x+ctip.offsetWidth>rc.width-4) x=e.clientX-rc.left-ctip.offsetWidth-14;
+    if(y+ctip.offsetHeight>rc.height-4) y=e.clientY-rc.top-ctip.offsetHeight-12;
+    ctip.style.left=x+'px'; ctip.style.top=y+'px';
+  });
+  cwrap.addEventListener('mouseleave',()=>{ctip.style.display='none';});
   $('c3_reset').addEventListener('click',()=>{c3ApplyDefaults();renderCmp3();});
   renderCmp3();
 }
