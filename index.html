@@ -383,6 +383,13 @@ table.mtxtab .mtxhd.mtxoff{text-decoration:line-through}
 #mx_chart circle,#c3_chart circle{cursor:pointer}
 .mxlegend .lg-grad{width:56px;height:11px;border-radius:6px;display:inline-block;background:linear-gradient(90deg,hsl(210 65% 75%),hsl(210 65% 30%))}
 .c3chdesc{border:1px solid var(--line);border-left:4px solid var(--brand);background:#fbfdfe;border-radius:10px;padding:10px 14px;font-size:13.5px;line-height:1.7;margin-bottom:14px;color:var(--ink)}
+.c3sabox{border:1.5px solid #0072B2;background:#eff6ff;border-radius:12px;padding:12px 14px 13px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,114,178,.15)}
+.c3sabox .pgroup-title{color:#075985}
+.c3sabox .pgroup-title::before{background:#0072B2}
+.c3sabox .g4nr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px 14px}
+.c3sabox .g4nr .field{display:flex;flex-direction:column;justify-content:flex-end}
+.c3sabox .g4nr .field input{margin-top:auto}
+.c3sabox input:focus{border-color:#0072B2;box-shadow:0 0 0 3px #dbeafe}
 .c3bktiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
 .c3bktiles .bk{border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fbfdfe}
 .c3bktiles .bkt{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);line-height:1.45}
@@ -821,15 +828,15 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — spor nou × ajustare <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="c3_ptscount"></span></h2>
     <div class="body">
       <div class="c3chdesc" id="c3_chdesc"></div>
-      <div class="g4newrates">
+      <div class="c3sabox">
         <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(%, sincronizat cu Parametri comuni)</span></div>
         <div class="g4nr">
           <div class="field"><label>Spor actual <span class="u">(%)</span></label><input type="number" id="c3_chsv" step="1"></div>
-          <div class="field"><label>Interval — minim <span class="u">(%)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
-          <div class="field"><label>Interval — maxim <span class="u">(%)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
-          <div class="field"><label>Folosește intervalul</label>
+          <div class="field"><label>Folosește interval minim–maxim</label>
             <div class="switchrow"><button type="button" class="switch" id="c3_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
           </div>
+          <div class="field" id="c3_sa0f" style="display:none"><label>Interval — minim <span class="u">(%)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
+          <div class="field" id="c3_sa1f" style="display:none"><label>Interval — maxim <span class="u">(%)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
         </div>
       </div>
       <div class="g4newrates">
@@ -1804,6 +1811,7 @@ function renderC3Chart(sh,totP,en){
   const STEP=2.5;
   // interval opțional pentru sporul actual (schimbă baza „prezent")
   const useSA=c3Sw('c3_sa_sw')==='Da';
+  ['c3_sa0f','c3_sa1f'].forEach(id=>$(id).style.display=useSA?'':'none');
   let sa0=Math.round(+$('c3_sa0').value||0), sa1=Math.round(+$('c3_sa1').value||0);
   if(sa1<sa0)[sa0,sa1]=[sa1,sa0];
   if(sa1-sa0>60)sa1=sa0+60;
