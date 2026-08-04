@@ -369,6 +369,9 @@ table.mtxtab td.num{font-variant-numeric:tabular-nums}
 table.mtxtab tbody td.mtxcell{cursor:pointer}
 table.mtxtab tbody td.mtxcell:hover{background:var(--brand-l);font-weight:700}
 table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px #f59e0b;font-weight:800}
+#mx_var{flex-wrap:wrap}
+#mx_var button{padding:7px 4px;font-size:13px;min-width:150px;flex:1 1 auto}
+#mx_var .mxvsub{display:block;font-size:10px;font-weight:600;opacity:.7;margin-top:2px;white-space:nowrap}
 table.mtxtab .mtxhd{cursor:pointer}
 table.mtxtab .mtxhd:hover{background:var(--brand-l)}
 table.mtxtab .mtxoff{opacity:.35;filter:grayscale(1)}
@@ -1047,14 +1050,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <section class="card">
       <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Matrice ajustări <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500">· tip de spital × specialitate · alege o celulă</span></h2>
       <div class="body">
-        <div class="seg" id="mx_var" style="max-width:420px;margin-bottom:12px">
-          <button type="button" data-v="v1" class="active" title="Rânduri −3% … +12% · coloane 0% … +10%">Varianta 1</button>
-          <button type="button" data-v="v2" title="Rânduri −10% … +10% · coloane 0% … +5%">Varianta 2</button>
-          <button type="button" data-v="v3" title="Rânduri +10% … −10% (descrescător) · coloane 0% … +5%">Varianta 3</button>
-          <button type="button" data-v="v4" title="Rânduri −3% … +12% · coloane 0% / 2% / 4% / 6% / 15%">Varianta 4</button>
-          <button type="button" data-v="v5" title="Rânduri +10% / +7% / +4% / 0% / −3% / −5% · coloane 0% / 2% / 4% / 6% / 15%">Varianta 5</button>
-          <button type="button" data-v="v6" title="Varianta 1 inversată · rânduri max +10% · ATI UPU max 12%">Varianta 6</button>
-        </div>
+        <div class="seg" id="mx_var" style="margin-bottom:12px"></div>
         <div class="fwrap">
           <table class="saltab mtxtab" id="mtxtab"></table>
         </div>
@@ -1505,7 +1501,7 @@ const MTXVAR={
   v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
   v4:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]},
   v5:{rows:[10,7,4,0,-3,-5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]},
-  v6:{rows:[10,9,6,3,0,-3], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:12}]}
+  v6:{rows:[-5,-3,0,4,7,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:12}]}
 };
 let MTXROWS=MTXVAR.v1.rows, MTXCOLS=MTXVAR.v1.cols;
 // culori pe specialitate (paletă Okabe–Ito, sigură pentru daltonism): 3 ani, 4 ani, 5 ani, Chirurgie, ATI UPU
@@ -1655,6 +1651,13 @@ function mxInit(){
     const td=e.target.closest('td.mtxcell'); if(!td) return;
     mxRi=+td.dataset.ri; mxCi=+td.dataset.ci; renderMtx(); renderMx();
   });
+  // butoanele de variantă, cu min–max pe verticală (tip spital) și orizontală (specialitate)
+  $('mx_var').innerHTML=Object.keys(MTXVAR).map((k,i)=>{
+    const v=MTXVAR[k], fmr=n=>(n>0?'+':'')+n.toLocaleString('ro-RO');
+    const rmin=Math.min(...v.rows), rmax=Math.max(...v.rows);
+    const cps=v.cols.map(c=>c.p), cmin=Math.min(...cps), cmax=Math.max(...cps);
+    return `<button type="button" data-v="${k}"${k==='v1'?' class="active"':''} title="Tip spital: ${fmr(rmin)}% … ${fmr(rmax)}% · Specialitate: ${fmr(cmin)}% … ${fmr(cmax)}%">Varianta ${i+1}<span class="mxvsub">↕ ${fmr(rmin)}…${fmr(rmax)}% · ↔ ${fmr(cmin)}…${fmr(cmax)}%</span></button>`;
+  }).join('');
   document.querySelectorAll('#mx_var button').forEach(b=>b.addEventListener('click',()=>{
     mxSetVariant(b.dataset.v); renderMtx(); renderMx();
   }));
