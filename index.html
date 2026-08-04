@@ -793,7 +793,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <div class="body">
       <p class="selfn" id="c3_meta"></p>
       <div class="g4newrates">
-        <div class="pgroup-title">Sume compensatorii <span class="u">(bază + spor condiții cel puțin la nivelul prezent)</span></div>
+        <div class="pgroup-title">Sume compensatorii <span class="u">(bază + spor condiții + OUG 63/2023 cel puțin la nivelul prezent)</span></div>
         <div class="switchrow"><button type="button" class="switch" id="c3_cmpz"><span class="knob"></span><span class="stxt">Nu</span></button></div>
       </div>
       <div class="fwrap">
@@ -824,7 +824,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
             <tr id="c3_row_ss"><td class="c3tgl"><button type="button" class="c3chk on" data-c="ss" title="Include / exclude componenta"></button></td><td class="c3lbl">Spor SDSL</td><td id="c3_ss0"></td><td id="c3_ss1"></td><td id="c3_ss2"></td><td class="cc4" id="c3_ss3"></td><td class="cc5" id="c3_ss4"></td></tr>
             <tr id="c3_row_ih"><td class="c3tgl"><button type="button" class="c3chk on" data-c="ih" title="Include / exclude componenta"></button></td><td class="c3lbl">Indemnizație de hrană</td><td id="c3_ih0"></td><td id="c3_ih1"></td><td id="c3_ih2"></td><td class="cc4" id="c3_ih3"></td><td class="cc5" id="c3_ih4"></td></tr>
             <tr id="c3_row_io"><td class="c3tgl"><button type="button" class="c3chk on" data-c="io" title="Include / exclude componenta"></button></td><td class="c3lbl">Indemnizație OUG 63/2023</td><td id="c3_io0"></td><td id="c3_io1"></td><td id="c3_io2"></td><td class="cc4" id="c3_io3"></td><td class="cc5" id="c3_io4"></td></tr>
-            <tr id="c3_row_cmpz" style="display:none"><td class="c3tgl"></td><td class="c3lbl">Sumă compensatorie <span class="u">(până la nivelul prezent)</span></td><td class="c3na">—</td><td id="c3_cz1"></td><td id="c3_cz2"></td><td class="cc4" id="c3_cz3"></td><td class="cc5" id="c3_cz4"></td></tr>
+            <tr id="c3_row_cmpz" style="display:none"><td class="c3tgl"></td><td class="c3lbl">Sumă compensatorie <span class="u">(bază + spor + OUG 63 prezent)</span></td><td class="c3na">—</td><td id="c3_cz1"></td><td id="c3_cz2"></td><td class="cc4" id="c3_cz3"></td><td class="cc5" id="c3_cz4"></td></tr>
             <tr id="c3_row_pp" class="compoff"><td class="c3tgl"><button type="button" class="c3chk" data-c="pp" title="Include / exclude componenta"></button></td><td class="c3lbl">Plată pe performanță <span class="u">(% din salariul de bază nou)</span> <input type="number" id="c3_ppct" step="1" value="15"></td><td class="c3na">—</td><td id="c3_pp1"></td><td id="c3_pp2"></td><td class="cc4" id="c3_pp3"></td><td class="cc5" id="c3_pp4"></td></tr>
             <tr class="c3total"><td class="c3tgl"></td><td class="c3lbl">TOTAL brut / lună</td><td id="c3_tn0"></td><td id="c3_tn1"></td><td id="c3_tn2"></td><td class="cc4" id="c3_tn3"></td><td class="cc5" id="c3_tn4"></td></tr>
             <tr><td class="c3tgl"></td><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="c3_df1"></td><td id="c3_df2"></td><td class="cc4" id="c3_df3"></td><td class="cc5" id="c3_df4"></td></tr>
@@ -1779,7 +1779,7 @@ function renderCmp3(){
       if(base) dl+=`<span class="c3d ${cls}">${pct(val/base-1)}</span>`;
     }
     $(id).innerHTML=top+dl;};
-  // sume compensatorii: dacă bază + spor condiții nou < nivelul prezent, se completează diferența
+  // sume compensatorii: dacă bază + spor condiții nou < bază + spor condiții + OUG 63 din prezent, se completează diferența
   const cpzOn=c3Sw('c3_cmpz')==='Da';
   $('c3_row_cmpz').style.display=cpzOn?'':'none';
   for(let i=1;i<5;i++){
@@ -1792,7 +1792,7 @@ function renderCmp3(){
     // plată pe performanță = % din salariul de bază nou (nu există în prezent)
     const ppv=((+$('c3_ppct').value||0)/100)*c.I;
     $('c3_pp'+i).textContent=lei(ppv);
-    const comp=cpzOn?Math.max(0,(cp.J+cp.M)-(c.I+c.R)):0;
+    const comp=cpzOn?Math.max(0,(cp.J+cp.M+cp.indemn)-(c.I+c.R)):0;
     if(cpzOn) $('c3_cz'+i).textContent=comp>0?lei(comp):'0';
     const totN=(en('sb')?c.I:0)+(en('sc')?c.R:0)+(en('st')?c.T:0)+(en('ss')?c.V:0)+(en('pp')?ppv:0)+comp;
     $('c3_tn'+i).textContent=lei(totN);
@@ -1803,7 +1803,7 @@ function renderCmp3(){
     const warn=totN<totP;
     ['sb','sc','st','ss','ih','io','pp','tn','df'].forEach(k=>$('c3_'+k+i).classList.toggle('c3warncell',warn));
   }
-  renderC3Chart(sh,totP,en,cp.J+cp.M);
+  renderC3Chart(sh,totP,en,cp.J+cp.M+cp.indemn);
   c3UpdatePresets();
 }
 // grafic: toate combinațiile spor nou × ajustare (pas 1%) vs. calculul prezent
@@ -1843,7 +1843,7 @@ function renderC3Chart(sh,totP,en,prez2){
     return (en('sb')?c.J:0)+(en('sc')?c.M:0)+(en('st')?c.N:0)+(en('ss')?c.O:0)+(en('ih')?c.hrana:0)+(en('io')?c.indemn:0);};
   const saVals=[]; if(useSA){for(let v=sa0;v<=sa1+1e-9;v+=STEP) saVals.push(v);} else saVals.push(null);
   const tpOf=sa=>sa==null?totP:totPAt(sa);
-  const prez2At=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return c.J+c.M;};
+  const prez2At=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return c.J+c.M+c.indemn;};
   const p2Of=sa=>sa==null?prez2:prez2At(sa);
   const pts=[];
   for(let a=a0;a<=a1+1e-9;a+=STEP)for(let sp=s0;sp<=s1+1e-9;sp+=STEP){
