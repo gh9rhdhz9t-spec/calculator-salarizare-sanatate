@@ -855,8 +855,8 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
           <div class="field"><label>Folosește interval minim–maxim</label>
             <div class="switchrow"><button type="button" class="switch" id="c3_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
           </div>
-          <div class="field" id="c3_sa0f" style="display:none"><label>Interval — minim <span class="u">(%)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
-          <div class="field" id="c3_sa1f" style="display:none"><label>Interval — maxim <span class="u">(%)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
+          <div class="field" id="c3_sa0f" style="display:none"><label>Interval — minim <span class="u">(% ↔ spor nou minim)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
+          <div class="field" id="c3_sa1f" style="display:none"><label>Interval — maxim <span class="u">(% ↔ spor nou maxim)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
         </div>
       </div>
       <div class="g4newrates">
@@ -882,7 +882,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
         <span><i class="lg-diamond"></i>Calcul prezent</span>
         <span><i class="lg-grad"></i>Ajustare: deschis = minim, închis = maxim</span>
       </div>
-      <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou × ajustare salariu nou</b> din intervalele de mai sus (pas 2,5%), folosind funcția, parametrii comuni și tipul de unitate al <b>Cazului 2</b>. Pragurile de sus arată valoarea exactă de la care <b>salariul nou depășește prezentul</b>, ținând cealaltă variabilă la capătul intervalului. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b> (Cazul 1); zona roșiatică = sub prezent. Ține cursorul pe un punct pentru detalii.</div>
+      <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou × ajustare salariu nou</b> din intervalele de mai sus (pas 2,5%), folosind funcția, parametrii comuni și tipul de unitate al <b>Cazului 2</b>. Pragurile de sus arată valoarea exactă de la care <b>salariul nou depășește prezentul</b>, ținând cealaltă variabilă la capătul intervalului. Când folosești intervalul de spor actual, acesta este <b>corelat</b> cu sporul nou (minim cu minim, maxim cu maxim) — nu se combină un spor actual minim cu un spor nou maxim. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b> (Cazul 1); zona roșiatică = sub prezent. Ține cursorul pe un punct pentru detalii.</div>
     </div>
   </section>
   </div>
@@ -1879,19 +1879,25 @@ function renderC3Chart(sh,totP,en,prez2){
   const r0=DS[c3units[0]].rows[c3sel];
   const totPAt=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});
     return (en('sb')?c.J:0)+(en('sc')?c.M:0)+(en('st')?c.N:0)+(en('ss')?c.O:0)+(en('ih')?c.hrana:0)+(en('io')?c.indemn:0);};
-  const saVals=[]; if(useSA){for(let v=sa0;v<=sa1+1e-9;v+=STEP) saVals.push(v);} else saVals.push(null);
   const tpOf=sa=>sa==null?totP:totPAt(sa);
   const prez2At=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return c.J+c.M+c.indemn;};
   const p2Of=sa=>sa==null?prez2:prez2At(sa);
-  const pts=[];
+  // sporul actual e CORELAT cu sporul nou (nu combinat liber): minimul actual merge cu minimul nou,
+  // maximul cu maximul — nu are sens să compari un spor actual minim cu un spor nou maxim.
+  const saOf=sp=>{
+    if(!useSA) return null;
+    const t=(s1===s0)?0:Math.min(1,Math.max(0,(sp-s0)/(s1-s0)));
+    return Math.round((sa0+t*(sa1-sa0))*100)/100;
+  };
+  const pts=[], saUsed=new Set();
   for(let a=a0;a<=a1+1e-9;a+=STEP)for(let sp=s0;sp<=s1+1e-9;sp+=STEP){
-    const {tot,b2}=totAt(sp,a);
-    saVals.forEach(sa=>{
-      const full=tot+(cpz?Math.max(0,p2Of(sa)-b2):0);
-      pts.push({sp,a,sa,tot:full,diff:full-tpOf(sa)});
-    });
+    const {tot,b2}=totAt(sp,a), sa=saOf(sp);
+    saUsed.add(sa);
+    const full=tot+(cpz?Math.max(0,p2Of(sa)-b2):0);
+    pts.push({sp,a,sa,tot:full,diff:full-tpOf(sa)});
   }
-  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor nou ${s0}–${s1}% × ajustare ${a0}–${a1}%${useSA?` × spor actual ${sa0}–${sa1}%`:''}, pas 2,5)`;
+  const saVals=[...saUsed];
+  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor nou ${s0}–${s1}% × ajustare ${a0}–${a1}%${useSA?` · spor actual ${sa0}–${sa1}% corelat`:''}, pas 2,5)`;
   // praguri de egalitate cu prezentul (totalul nou e liniar în spor și în ajustare → rezolvare exactă)
   const fbk=n=>n==null?'—':(n>=0?'+':'')+n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
   const fpc=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
@@ -1903,18 +1909,14 @@ function renderC3Chart(sh,totP,en,prez2){
     for(let i=0;i<60;i++){const m=(lo+hi)/2; if(g(m)>=0) hi=m; else lo=m;}
     return hi;
   };
-  const solveA=(sp,tp,p2)=>bisect(a=>totFull(sp,a,p2)-tp);
-  const solveS=(a,tp,p2)=>bisect(sp=>totFull(sp,a,p2)-tp);
-  const bk=f=>{
-    if(!useSA) return fbk(f(totP,prez2));
-    const v1=f(totPAt(sa0),prez2At(sa0)), v2=f(totPAt(sa1),prez2At(sa1));
-    if(v1==null||v2==null) return '—';
-    return fbk(Math.min(v1,v2))+' … '+fbk(Math.max(v1,v2));
-  };
-  $('c3_bkls0').textContent=fpc(s0); $('c3_bkls1').textContent=fpc(s1);
+  // fiecare prag folosește sporul actual CORELAT cu sporul nou din acel scenariu
+  const solveA=sp=>{const sa=saOf(sp);return bisect(a=>totFull(sp,a,p2Of(sa))-tpOf(sa));};
+  const solveS=a=>bisect(sp=>{const sa=saOf(sp);return totFull(sp,a,p2Of(sa))-tpOf(sa);});
+  const pair=sp=>useSA?` ↔ actual ${fpc(saOf(sp))}`:'';
+  $('c3_bkls0').textContent=fpc(s0)+pair(s0); $('c3_bkls1').textContent=fpc(s1)+pair(s1);
   $('c3_bkla0').textContent=fpc(a0); $('c3_bkla1').textContent=fpc(a1);
-  $('c3_bk1').textContent=bk((tp,p2)=>solveA(s0,tp,p2)); $('c3_bk2').textContent=bk((tp,p2)=>solveA(s1,tp,p2));
-  $('c3_bk3').textContent=bk((tp,p2)=>solveS(a0,tp,p2)); $('c3_bk4').textContent=bk((tp,p2)=>solveS(a1,tp,p2));
+  $('c3_bk1').textContent=fbk(solveA(s0)); $('c3_bk2').textContent=fbk(solveA(s1));
+  $('c3_bk3').textContent=fbk(solveS(a0)); $('c3_bk4').textContent=fbk(solveS(a1));
   const xs=[...saVals.map(tpOf),...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
   const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
   const xpad=(xmax-xmin)*0.06||1000, ypad=(ymaxR-yminR)*0.08||500;
