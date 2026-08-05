@@ -451,6 +451,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     <button class="tab" data-ds="gcmp">Comparație gărzi</button>
     <button class="tab" data-ds="sal">Salarii de bază</button>
     <button class="tab" data-ds="mtx">Matrice ajustări</button>
+    <button class="tab" data-ds="cx">Matrice complexă</button>
   </div>
 </div></header>
 <div class="wrap main">
@@ -844,47 +845,129 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="note">Toate cazurile folosesc <b>aceeași funcție și aceiași parametri comuni</b>; diferă doar prin <b>tipul de unitate</b> (bazele salariale) și <b>ajustarea salariului nou</b>. Poți adăuga până la <b>5 cazuri</b> cu butonul „+ Adaugă caz”. Valori brute lunare, în lei.</div>
     </div>
   </section>
-  <section class="card">
-    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — spor nou × ajustare <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="c3_ptscount"></span></h2>
+  </div>
+</div>
+
+<div class="grid cmp3view" id="cxview" style="display:none">
+  <section class="card c3params">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
     <div class="body">
-      <div class="c3chdesc" id="c3_chdesc"></div>
-      <div class="c3sabox">
-        <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(%, sincronizat cu Parametri comuni)</span></div>
-        <div class="g4nr">
-          <div class="field"><label>Spor actual <span class="u">(%)</span></label><input type="number" id="c3_chsv" step="1"></div>
-          <div class="field"><label>Folosește interval minim–maxim</label>
-            <div class="switchrow"><button type="button" class="switch" id="c3_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
+      <div class="pgroup"><div class="pgroup-title">Tip unitate</div>
+        <div class="seg" id="cx_unit">
+          <button type="button" data-u="clinic" class="active">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="sju">SAJ · ATI</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="cx_fnsel"></select>
+        <div class="preselabel" style="margin:10px 0 8px">Selectează rapid o funcție</div>
+        <div class="presetbar" id="cx_presetbar"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="cx_grad_lbl">5</b></span><span class="gradcoef" id="cx_grad_coef">coef. 1×</span></div>
+        <input type="range" id="cx_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="cx_ore" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor tură / noapte</div>
+        <div class="seg" id="cx_mode">
+          <button type="button" data-v="Tura">Tură</button>
+          <button type="button" data-v="Noapte">Noapte</button>
+          <button type="button" data-v="Nimic">Nimic</button>
+        </div>
+        <div class="field" id="cx_wrap_orenoapte" style="margin-top:11px"><label>Ore de noapte / lună</label><input type="number" id="cx_orenoapte" step="1"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor SDSL</div>
+        <div class="switchrow" style="margin-bottom:10px">
+          <button type="button" class="switch on" id="cx_sdsl_sw"><span class="knob"></span><span class="stxt">Da</span></button>
+        </div>
+        <div class="params two">
+          <div class="field"><label>Ore SDSL / lună</label><input type="number" id="cx_oresdsl" step="1"></div>
+          <div class="field"><label>Tarif SDSL <span class="u">(%)</span></label><input type="number" id="cx_tarifsdsl" step="1"></div>
+        </div>
+      </div>
+      <div class="pgrow">
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație de hrană</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="cx_hrana"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="cx_hranav" class="vinput" step="1"><span class="unit">lei</span>
           </div>
-          <div class="field" id="c3_sa0f" style="display:none"><label>Interval — minim <span class="u">(% ↔ spor nou minim)</span></label><input type="number" id="c3_sa0" step="1" value="55"></div>
-          <div class="field" id="c3_sa1f" style="display:none"><label>Interval — maxim <span class="u">(% ↔ spor nou maxim)</span></label><input type="number" id="c3_sa1" step="1" value="85"></div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Indemnizație OUG 63/2023</div>
+          <div class="switchrow">
+            <button type="button" class="switch on" id="cx_indemn"><span class="knob"></span><span class="stxt">Da</span></button>
+            <input type="number" id="cx_indemnv" class="vinput" step="1"><span class="unit">lei</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Plată pe performanță <span class="u">(% din salariul de bază nou)</span></div>
+          <div class="switchrow">
+            <button type="button" class="switch" id="cx_pp"><span class="knob"></span><span class="stxt">Nu</span></button>
+            <input type="number" id="cx_ppct" class="vinput" step="1" value="15"><span class="unit">%</span>
+          </div>
+        </div>
+        <div class="pgroup">
+          <div class="pgroup-title">Sume compensatorii <span class="u">(bază + spor + OUG 63 la nivelul prezent)</span></div>
+          <div class="switchrow">
+            <button type="button" class="switch" id="cx_cmpz"><span class="knob"></span><span class="stxt">Nu</span></button>
+          </div>
         </div>
       </div>
-      <div class="g4newrates">
-        <div class="pgroup-title">Intervale explorate <span class="u">(pas de 2,5 puncte procentuale)</span></div>
-        <div class="g4nr">
-          <div class="field"><label>Spor nou — de la <span class="u">(%)</span></label><input type="number" id="c3_ps0" step="1" value="10"></div>
-          <div class="field"><label>Spor nou — până la <span class="u">(%)</span></label><input type="number" id="c3_ps1" step="1" value="30"></div>
-          <div class="field"><label>Ajustare — de la <span class="u">(%)</span></label><input type="number" id="c3_pa0" step="1" value="0"></div>
-          <div class="field"><label>Ajustare — până la <span class="u">(%)</span></label><input type="number" id="c3_pa1" step="1" value="20"></div>
-        </div>
-      </div>
-      <div class="c3bktiles">
-        <div class="bk"><div class="bkt">Ajustare necesară <span class="u">la spor minim (<span id="c3_bkls0"></span>)</span></div><div class="bkv" id="c3_bk1"></div></div>
-        <div class="bk"><div class="bkt">Ajustare necesară <span class="u">la spor maxim (<span id="c3_bkls1"></span>)</span></div><div class="bkv" id="c3_bk2"></div></div>
-        <div class="bk"><div class="bkt">Spor necesar <span class="u">la ajustare minimă (<span id="c3_bkla0"></span>)</span></div><div class="bkv" id="c3_bk3"></div></div>
-        <div class="bk"><div class="bkt">Spor necesar <span class="u">la ajustare maximă (<span id="c3_bkla1"></span>)</span></div><div class="bkv" id="c3_bk4"></div></div>
-      </div>
-      <div id="c3_chartwrap" style="position:relative">
-        <div id="c3_chart"></div>
-        <div id="c3_ctip"></div>
-      </div>
-      <div class="mxlegend">
-        <span><i class="lg-diamond"></i>Calcul prezent</span>
-        <span><i class="lg-grad"></i>Ajustare: deschis = minim, închis = maxim</span>
-      </div>
-      <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou × ajustare salariu nou</b> din intervalele de mai sus (pas 2,5%), folosind funcția, parametrii comuni și tipul de unitate al <b>Cazului 2</b>. Pragurile de sus arată valoarea exactă de la care <b>salariul nou depășește prezentul</b>, ținând cealaltă variabilă la capătul intervalului. Când folosești intervalul de spor actual, acesta este <b>corelat</b> cu sporul nou (minim cu minim, maxim cu maxim) — nu se combină un spor actual minim cu un spor nou maxim. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b> (Cazul 1); zona roșiatică = sub prezent. Ține cursorul pe un punct pentru detalii.</div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="cx_reset">↺ Resetează parametrii</button></div>
     </div>
   </section>
+  <div class="mxright">
+    <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Ajustările din variantă <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500">· fiecare celulă = o ajustare a salariului nou</span></h2>
+      <div class="body">
+        <div id="cx_var"></div>
+        <div class="fwrap">
+          <table class="saltab mtxtab" id="cxmtx"></table>
+        </div>
+        <div class="note">Ajustările salariului nou <b>nu se mai introduc manual</b> — sunt cele din varianta selectată (coeficient = 1 + tip spital + specialitate). Click pe anteturi pentru a scoate rânduri / coloane din grafic.</div>
+      </div>
+    </section>
+    <section class="card">
+      <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="9" cy="13" r="1.6"/><circle cx="13" cy="8" r="1.6"/><circle cx="17" cy="15" r="1.6"/></svg>Grafic — spor nou × ajustările variantei <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="cx_ptscount"></span></h2>
+      <div class="body">
+        <div class="c3chdesc" id="cx_chdesc"></div>
+        <div class="c3sabox">
+          <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(%)</span></div>
+          <div class="g4nr">
+            <div class="field"><label>Spor actual <span class="u">(%)</span></label><input type="number" id="cx_svechi" step="1"></div>
+            <div class="field"><label>Folosește interval minim–maxim</label>
+              <div class="switchrow"><button type="button" class="switch" id="cx_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
+            </div>
+            <div class="field" id="cx_sa0f" style="display:none"><label>Interval — minim <span class="u">(% ↔ spor nou minim)</span></label><input type="number" id="cx_sa0" step="1" value="55"></div>
+            <div class="field" id="cx_sa1f" style="display:none"><label>Interval — maxim <span class="u">(% ↔ spor nou maxim)</span></label><input type="number" id="cx_sa1" step="1" value="85"></div>
+          </div>
+        </div>
+        <div class="g4newrates">
+          <div class="pgroup-title">Spor condiții nou — interval explorat <span class="u">(pas de 2,5 puncte procentuale)</span></div>
+          <div class="g4nr">
+            <div class="field"><label>Spor nou — de la <span class="u">(%)</span></label><input type="number" id="cx_ps0" step="1" value="10"></div>
+            <div class="field"><label>Spor nou — până la <span class="u">(%)</span></label><input type="number" id="cx_ps1" step="1" value="30"></div>
+          </div>
+        </div>
+        <div class="c3bktiles">
+          <div class="bk"><div class="bkt">Coeficient necesar <span class="u">la spor nou minim (<span id="cx_bkls0"></span>)</span></div><div class="bkv" id="cx_bk1"></div></div>
+          <div class="bk"><div class="bkt">Coeficient necesar <span class="u">la spor nou maxim (<span id="cx_bkls1"></span>)</span></div><div class="bkv" id="cx_bk2"></div></div>
+          <div class="bk"><div class="bkt">Spor nou necesar <span class="u">la coeficientul minim (<span id="cx_bklc0"></span>)</span></div><div class="bkv" id="cx_bk3"></div></div>
+          <div class="bk"><div class="bkt">Spor nou necesar <span class="u">la coeficientul maxim (<span id="cx_bklc1"></span>)</span></div><div class="bkv" id="cx_bk4"></div></div>
+        </div>
+        <div id="cx_chartwrap" style="position:relative">
+          <div id="cx_chart"></div>
+          <div id="cx_ctip"></div>
+        </div>
+        <div class="mxlegend" id="cx_legend"></div>
+        <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou</b> (din intervalul de mai sus, pas 2,5%) × <b>o celulă din variantă</b> (ajustarea salariului nou). Culoarea urmează <b>specialitatea</b> din matrice. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b>; zona roșiatică = sub prezent. Sporul actual, dacă e pe interval, este <b>corelat</b> cu sporul nou (minim cu minim, maxim cu maxim).</div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -1409,10 +1492,12 @@ function renderCoef(){
   $('coefnotes').innerHTML=COEF.notes.map(n=>`<div class="nt${/^NOT/i.test(n)?' hd':''}">${n}</div>`).join('');
 }
 function showView(ds){
-  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp', isMtx=ds==='mtx';
-  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp&&!isMtx;
+  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp', isMtx=ds==='mtx', isCx=ds==='cx';
+  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp&&!isMtx&&!isCx;
   $('mtxview').style.display=isMtx?'':'none';
   if(isMtx) renderMx();
+  $('cxview').style.display=isCx?'':'none';
+  if(isCx){cxRenderVar();renderCx();}
   $('salview').style.display=isSal?'':'none';
   if(isSal) renderSal();
   $('gcmpview').style.display=isGcmp?'':'none';
@@ -1732,6 +1817,201 @@ function mxInit(){
   mxSetVariant('v0'); renderMtx(); renderMx();
 }
 
+// ===== Matrice complexă: spor nou × ajustările variantei =====
+let cxSel=0, cxUnit='clinic', cxVar='v0';
+const cxRowOff=new Set(), cxColOff=new Set();
+function cxMode(){return document.querySelector('#cx_mode button.active')?.dataset.v||'Nimic';}
+function cxSetMode(m){document.querySelectorAll('#cx_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));$('cx_wrap_orenoapte').style.display=(m==='Noapte')?'':'none';}
+function cxUpdateGrad(){const v=+$('cx_grad').value;$('cx_grad_lbl').textContent=v;$('cx_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('cx_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function cxShared(){return {
+  ore:+$('cx_ore').value||1, grad:+$('cx_grad').value,
+  svechi:(+$('cx_svechi').value||0)/100, snou:0,
+  noapte:cxMode()==='Noapte'?'Da':'Nu', orenoapte:+$('cx_orenoapte').value||0,
+  tura:cxMode()==='Tura'?'Da':'Nu',
+  oresdsl:c3Sw('cx_sdsl_sw')==='Da'?(+$('cx_oresdsl').value||0):0,
+  tarifsdsl:(+$('cx_tarifsdsl').value||0)/100,
+  hrana:c3Sw('cx_hrana'), hranav:+$('cx_hranav').value||0,
+  indemn:c3Sw('cx_indemn'), indemnv:+$('cx_indemnv').value||0
+};}
+function cxApplyDefaults(){
+  $('cx_ore').value=168; $('cx_grad').value=5; cxUpdateGrad();
+  $('cx_svechi').value=85;
+  cxSetMode('Tura'); $('cx_orenoapte').value=0;
+  $('cx_oresdsl').value=48; $('cx_tarifsdsl').value=30; c3SetSw('cx_sdsl_sw',true);
+  c3SetSw('cx_hrana',true); $('cx_hranav').value=347;
+  c3SetSw('cx_indemn',true); $('cx_indemnv').value=800;
+  c3SetSw('cx_pp',false); $('cx_ppct').value=15;
+  c3SetSw('cx_cmpz',false);
+  c3SetSw('cx_sa_sw',false); $('cx_sa0').value=55; $('cx_sa1').value=85;
+  $('cx_ps0').value=10; $('cx_ps1').value=30;
+  cxUnit='clinic'; document.querySelectorAll('#cx_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
+  cxRowOff.clear(); cxColOff.clear();
+}
+const cxRows=()=>MTXVAR[cxVar].rows, cxCols=()=>MTXVAR[cxVar].cols;
+const cxCoef=(ri,ci)=>1+(cxRows()[ri]+cxCols()[ci].p)/100;
+function cxRenderVar(){
+  $('cx_var').innerHTML=Object.keys(MTXVAR).map((k,i)=>{
+    const gold=!!MTXVAR[k].gold, cls=(gold?'mxgold':'')+(k===cxVar?' active':'');
+    return `<button type="button" data-v="${k}" class="${cls.trim()}">${gold?'★ Varianta personalizată':'Varianta '+i}<span class="mxvsub">${mxSubLabel(k)}</span></button>`;
+  }).join('');
+}
+function cxRenderMtx(){
+  const R=cxRows(), C=cxCols(), edit=!!MTXVAR[cxVar].gold;
+  const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:2})+'%';
+  const coff=ci=>cxColOff.has(ci), roff=ri=>cxRowOff.has(ri);
+  let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+C.map((c,ci)=>`<th class="num mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: scoate / include coloana"><span class="mtxdot" style="background:${MTXCOLORS[ci]}"></span>${c.l}</th>`).join('')+'</tr>';
+  h+='<tr><th class="mtxcorner" colspan="2"></th>'+C.map((c,ci)=>edit
+    ? `<th class="num mtxpct${coff(ci)?' mtxoff':''}"><input class="mtxin" type="number" step="0.25" value="${c.p}" data-c="${ci}">%</th>`
+    : `<th class="num mtxpct mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: scoate / include coloana">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
+  R.forEach((r,ri)=>{
+    h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${R.length}">Tip de spital</th>`:'');
+    h+=edit
+      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: scoate / include rândul"><input class="mtxin" type="number" step="1" value="${r}" data-r="${ri}">%</td>`
+      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: scoate / include rândul"><b>${r>0?'+':''}${r}%</b></td>`;
+    h+=C.map((c,ci)=>`<td class="num${roff(ri)||coff(ci)?' mtxoff':''}">${fcoef(cxCoef(ri,ci))}</td>`).join('')+'</tr>';
+  });
+  $('cxmtx').innerHTML=h+'</tbody>';
+  $('cxmtx').classList.toggle('mtxgold',edit);
+}
+function renderCx(){
+  cxRenderMtx();
+  const sh=cxShared(), R=cxRows(), C=cxCols();
+  const meta=DS.clinic.rows[cxSel], row=DS[cxUnit].rows[cxSel];
+  const ppOn=c3Sw('cx_pp')==='Da', ppct=(+$('cx_ppct').value||0)/100, cpz=c3Sw('cx_cmpz')==='Da';
+  const dmode=sh.noapte==='Da'?`noapte (${sh.orenoapte} ore/lună, 25%)`:(sh.tura==='Da'?'tură (15%)':'fără');
+  $('cx_chdesc').innerHTML=`<b>${meta.fn}</b> · studii <b>${meta.studii||'—'}</b> · unitate <b>${C3_UNITLBL[cxUnit]}</b> · gradația <b>${sh.grad}</b> · <b>${sh.ore}</b> ore lucrătoare/lună<br>`+
+    `Spor tură/noapte: <b>${dmode}</b> · SDSL: <b>${sh.oresdsl} ore/lună</b> la <b>${Math.round(sh.tarifsdsl*100)}%</b> · Indemnizație de hrană: <b>${sh.hrana==='Da'?lei(sh.hranav)+' lei':'nu'}</b> · OUG 63/2023: <b>${sh.indemn==='Da'?lei(sh.indemnv)+' lei':'nu'}</b> · Plată pe performanță: <b>${ppOn?Math.round(ppct*100)+'%':'nu'}</b> · Sume compensatorii: <b>${cpz?'da':'nu'}</b>`;
+  const cl=v=>Math.round(+v||0);
+  let s0=cl($('cx_ps0').value), s1=cl($('cx_ps1').value);
+  if(s1<s0)[s0,s1]=[s1,s0]; if(s1-s0>60)s1=s0+60;
+  const useSA=c3Sw('cx_sa_sw')==='Da';
+  ['cx_sa0f','cx_sa1f'].forEach(id=>$(id).style.display=useSA?'':'none');
+  let sa0=cl($('cx_sa0').value), sa1=cl($('cx_sa1').value);
+  if(sa1<sa0)[sa0,sa1]=[sa1,sa0];
+  // sporul actual e corelat cu sporul nou (min cu min, max cu max)
+  const saOf=sp=>{if(!useSA) return Math.round(sh.svechi*10000)/100;
+    const t=(s1===s0)?0:Math.min(1,Math.max(0,(sp-s0)/(s1-s0))); return Math.round((sa0+t*(sa1-sa0))*100)/100;};
+  const prezAt=sa=>{const c=calc(row,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return {tot:c.P, base:c.J+c.M+c.indemn};};
+  const nouAt=(sp,adj)=>{const c=calc(row,{...sh, snou:sp/100, adjust:adj, indemnAll: sh.indemn==='Da'});const pp=ppOn?ppct*c.I:0;return {tot:c.I+c.R+c.T+c.V+pp, b2:c.I+c.R};};
+  const totFull=(sp,adj,sa)=>{const n=nouAt(sp,adj), p=prezAt(sa);return n.tot+(cpz?Math.max(0,p.base-n.b2):0);};
+  const STEP=2.5, pts=[], saMap=new Map(), coefs=[];
+  for(let sp=s0;sp<=s1+1e-9;sp+=STEP){
+    const sa=saOf(sp), P=prezAt(sa).tot;
+    saMap.set(sa,P);
+    R.forEach((rv,ri)=>{ if(cxRowOff.has(ri)) return;
+      C.forEach((cv,ci)=>{ if(cxColOff.has(ci)) return;
+        const coef=cxCoef(ri,ci), tot=totFull(sp,coef-1,sa);
+        if(sp===s0) coefs.push(coef);
+        pts.push({sp,sa,ri,ci,coef,tot,diff:tot-P});
+      });
+    });
+  }
+  const nCells=(R.length-cxRowOff.size)*(C.length-cxColOff.size);
+  $('cx_ptscount').textContent=`· ${pts.length} puncte (spor nou ${s0}–${s1}%, pas 2,5 × ${nCells} celule)`;
+  // praguri
+  const fbk=n=>n==null?'—':(n>=0?'+':'')+n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
+  const fpc=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:2})+'%';
+  const bisect=g=>{let lo=-100,hi=500; if(g(hi)<0) return null; if(g(lo)>=0) return lo;
+    for(let i=0;i<60;i++){const m=(lo+hi)/2; if(g(m)>=0) hi=m; else lo=m;} return hi;};
+  const cmin=coefs.length?Math.min(...coefs):1, cmax=coefs.length?Math.max(...coefs):1;
+  const solveCoef=sp=>{const sa=saOf(sp), P=prezAt(sa).tot; const a=bisect(x=>totFull(sp,x/100,sa)-P); return a==null?null:1+a/100;};
+  const solveSp=coef=>{const v=bisect(sp=>{const sa=saOf(sp);return totFull(sp,coef-1,sa)-prezAt(sa).tot;}); return v;};
+  const pair=sp=>useSA?` ↔ actual ${fpc(saOf(sp))}`:'';
+  $('cx_bkls0').textContent=fpc(s0)+pair(s0); $('cx_bkls1').textContent=fpc(s1)+pair(s1);
+  $('cx_bklc0').textContent=fcoef(cmin); $('cx_bklc1').textContent=fcoef(cmax);
+  const c1=solveCoef(s0), c2=solveCoef(s1);
+  $('cx_bk1').textContent=c1==null?'—':fcoef(Math.round(c1*1000)/1000);
+  $('cx_bk2').textContent=c2==null?'—':fcoef(Math.round(c2*1000)/1000);
+  $('cx_bk3').textContent=fbk(solveSp(cmin)); $('cx_bk4').textContent=fbk(solveSp(cmax));
+  // legendă
+  $('cx_legend').innerHTML='<span><i class="lg-diamond"></i>Calcul prezent</span>'+
+    C.map((c,ci)=>cxColOff.has(ci)?'':`<span><i class="lg-dot" style="background:${MTXCOLORS[ci]}"></i>${c.l}</span>`).join('');
+  // grafic
+  const saVals=[...saMap.keys()];
+  const xs=[...saMap.values(),...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
+  const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
+  const xpad=(xmax-xmin)*0.06||1000, ypad=(ymaxR-yminR)*0.08||500;
+  const x0=xmin-xpad, x1=xmax+xpad, y0=yminR-ypad, y1=ymaxR+ypad;
+  const W=760,H=430,ML=88,MR=16,MT=14,MB=44;
+  const X=v=>ML+(v-x0)/(x1-x0)*(W-ML-MR), Y=v=>MT+(y1-v)/(y1-y0)*(H-MT-MB);
+  const ticks=(a,b,n)=>{const st0=(b-a)/n;const m=Math.pow(10,Math.floor(Math.log10(st0)));const st=Math.ceil(st0/m)*m;const t=[];for(let v=Math.ceil(a/st)*st;v<=b;v+=st)t.push(v);return t;};
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font:12px system-ui">`;
+  if(y0<0) s+=`<rect x="${ML}" y="${Y(Math.min(0,y1))}" width="${W-ML-MR}" height="${Y(y0)-Y(Math.min(0,y1))}" fill="#e11d48" opacity="0.06"/>`;
+  ticks(y0,y1,6).forEach(v=>{s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e2e8f0"/><text x="${ML-8}" y="${Y(v)+4}" text-anchor="end" fill="#64748b">${v>0?'+':''}${lei(v)}</text>`;});
+  ticks(x0,x1,6).forEach(v=>{s+=`<text x="${X(v)}" y="${H-MB+18}" text-anchor="middle" fill="#64748b">${lei(v)}</text>`;});
+  if(0>=y0&&0<=y1) s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(0)}" y2="${Y(0)}" stroke="#0f172a" stroke-width="1.5"/><text x="${W-MR-4}" y="${Y(0)-6}" text-anchor="end" fill="#0f172a" font-weight="600">prezent (dif. 0)</text>`;
+  pts.forEach(p=>{
+    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="4" fill="${MTXCOLORS[p.ci]}" stroke="#fff" stroke-width="1" data-sp="${p.sp}" data-sa="${p.sa}" data-r="${R[p.ri]}" data-cl="${C[p.ci].l}" data-cp="${C[p.ci].p}" data-coef="${fcoef(p.coef)}" data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}"/>`;
+  });
+  saVals.forEach(sa=>{const tp=saMap.get(sa), sz=saVals.length>1?6:8;
+    s+=`<path d="M ${X(tp)} ${Y(0)-sz} l ${sz} ${sz} l -${sz} ${sz} l -${sz} -${sz} Z" fill="#0f172a" stroke="#fff" stroke-width="1.5" data-prez="1" data-sa="${sa}" data-tot="${lei(tp)}"/>`;});
+  s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
+  s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență nou − prezent (lei)</text>`;
+  $('cx_chart').innerHTML=s+'</svg>';
+}
+function cxInit(){
+  $('cx_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('cx_fnsel').value=0;
+  $('cx_presetbar').innerHTML=PRESETS.map((pr,i)=>`<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
+  cxApplyDefaults(); cxRenderVar();
+  $('cx_fnsel').addEventListener('change',e=>{cxSel=+e.target.value;renderCx();});
+  document.querySelectorAll('#cx_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
+    const pr=PRESETS[+b.dataset.p], idx=DS.clinic.rows.findIndex(pr.match); if(idx<0)return;
+    cxSel=idx; $('cx_fnsel').value=idx;
+    if(/^Medic (primar|specialist)$/.test(pr.label)){
+      $('cx_svechi').value=85; cxSetMode('Nimic');
+      $('cx_oresdsl').value=0; c3SetSw('cx_sdsl_sw',false);
+      c3SetSw('cx_hrana',false); c3SetSw('cx_indemn',false);
+    }
+    renderCx();
+  }));
+  document.querySelectorAll('#cx_unit button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#cx_unit button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cxUnit=b.dataset.u; renderCx();
+  }));
+  document.querySelectorAll('#cx_mode button').forEach(b=>b.addEventListener('click',()=>{cxSetMode(b.dataset.v);renderCx();}));
+  $('cx_grad').addEventListener('input',()=>{cxUpdateGrad();renderCx();});
+  ['cx_hrana','cx_indemn','cx_sdsl_sw','cx_pp','cx_cmpz','cx_sa_sw'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCx();}));
+  ['cx_ore','cx_svechi','cx_orenoapte','cx_oresdsl','cx_tarifsdsl','cx_hranav','cx_indemnv','cx_ppct','cx_ps0','cx_ps1','cx_sa0','cx_sa1'].forEach(id=>$(id).addEventListener('input',renderCx));
+  $('cx_reset').addEventListener('click',()=>{cxApplyDefaults();renderCx();});
+  $('cx_var').addEventListener('click',e=>{const b=e.target.closest('button[data-v]'); if(!b)return;
+    cxVar=b.dataset.v; cxRowOff.clear(); cxColOff.clear(); cxRenderVar(); renderCx();});
+  $('cxmtx').addEventListener('input',e=>{
+    const inp=e.target.closest('input.mtxin'); if(!inp) return;
+    const v=+inp.value||0;
+    if(inp.dataset.r!=null) MTXVAR[cxVar].rows[+inp.dataset.r]=v; else MTXVAR[cxVar].cols[+inp.dataset.c].p=v;
+    const sub=document.querySelector('#cx_var button[data-v="'+cxVar+'"] .mxvsub'); if(sub) sub.textContent=mxSubLabel(cxVar);
+    renderCx();
+  });
+  $('cxmtx').addEventListener('click',e=>{
+    if(e.target.closest('input.mtxin')) return;
+    const hd=e.target.closest('[data-coloff],[data-rowoff]'); if(!hd) return;
+    if(hd.dataset.coloff!=null){const ci=+hd.dataset.coloff; cxColOff.has(ci)?cxColOff.delete(ci):cxColOff.add(ci);}
+    else{const ri=+hd.dataset.rowoff; cxRowOff.has(ri)?cxRowOff.delete(ri):cxRowOff.add(ri);}
+    renderCx();
+  });
+  const tip=$('cx_ctip'), wrap=$('cx_chartwrap');
+  wrap.addEventListener('mousemove',e=>{
+    const el=e.target.closest('circle[data-tot],path[data-prez]');
+    if(!el){tip.style.display='none';return;}
+    if(el.dataset.prez){
+      tip.innerHTML=`<b>◆ Calcul prezent</b><br>Spor actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
+    }else{
+      tip.innerHTML=`Tip spital: <b>${el.dataset.r>0?'+':''}${el.dataset.r}%</b><br>Specialitate: <b>${el.dataset.cl}</b> (+${(+el.dataset.cp).toLocaleString('ro-RO')}%)<br>`+
+        `Coeficient: <b>${el.dataset.coef}</b><br>Spor nou: <b>${(+el.dataset.sp).toLocaleString('ro-RO')}%</b> · actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>`+
+        `Total: <b>${el.dataset.tot} lei</b><br>Diferență: <b>${el.dataset.diff} lei</b>`;
+    }
+    tip.style.display='block';
+    const rc=wrap.getBoundingClientRect();
+    let x=e.clientX-rc.left+14, y=e.clientY-rc.top+12;
+    if(x+tip.offsetWidth>rc.width-4) x=e.clientX-rc.left-tip.offsetWidth-14;
+    if(y+tip.offsetHeight>rc.height-4) y=e.clientY-rc.top-tip.offsetHeight-12;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  });
+  wrap.addEventListener('mouseleave',()=>{tip.style.display='none';});
+  renderCx();
+}
+
 // ===== Comparație 3 cazuri =====
 let c3sel=0;
 function c3Mode(){return document.querySelector('#c3_mode button.active')?.dataset.v||'Nimic';}
@@ -1770,7 +2050,6 @@ function c3SyncSpor(){
   // valorile per caz preiau implicit sporul din Parametri comuni (caz 1 = actual, cazurile noi = nou)
   $('c3_sp0').value=$('c3_svechi').value;
   for(let i=1;i<5;i++) $('c3_sp'+i).value=$('c3_snou').value;
-  $('c3_chsv').value=$('c3_svechi').value; // oglinda din cardul graficului
 }
 function c3ApplyDefaults(){
   $('c3_ore').value=168; $('c3_grad').value=5; c3UpdateGrad();
@@ -1790,8 +2069,6 @@ function c3ApplyDefaults(){
   $('c3_row_pp').classList.add('compoff');
   $('c3_ppct').value=15; $('c3_pp_pct').value=15;
   c3SetSw('c3_pp_sw',false);
-  $('c3_ps0').value=10; $('c3_ps1').value=30; $('c3_pa0').value=0; $('c3_pa1').value=20;
-  $('c3_sa0').value=55; $('c3_sa1').value=85; c3SetSw('c3_sa_sw',false);
   c3SetSw('c3_cmpz',false);
   c3count=3; c3SyncCols();
 }
@@ -1841,107 +2118,7 @@ function renderCmp3(){
     const warn=totN<totP;
     ['sb','sc','st','ss','ih','io','pp','tn','df'].forEach(k=>$('c3_'+k+i).classList.toggle('c3warncell',warn));
   }
-  renderC3Chart(sh,totP,en,cp.J+cp.M+cp.indemn);
   c3UpdatePresets();
-}
-// grafic: toate combinațiile spor nou × ajustare (pas 1%) vs. calculul prezent
-function renderC3Chart(sh,totP,en,prez2){
-  const cl=v=>Math.round(+v||0);
-  let s0=cl($('c3_ps0').value), s1=cl($('c3_ps1').value);
-  let a0=cl($('c3_pa0').value), a1=cl($('c3_pa1').value);
-  if(s1<s0)[s0,s1]=[s1,s0]; if(a1<a0)[a0,a1]=[a1,a0];
-  if(s1-s0>60)s1=s0+60; if(a1-a0>60)a1=a0+60; // limită de siguranță
-  const r=DS[c3units[1]].rows[c3sel];
-  const ppct=(+$('c3_ppct').value||0)/100;
-  const cpz=c3Sw('c3_cmpz')==='Da';
-  const totAt=(sp,a)=>{
-    const c=calc(r,{...sh, snou:sp/100, adjust:a/100, indemnAll: sh.indemn==='Da'});
-    const ppv=en('pp')?ppct*c.I:0;
-    return {tot:(en('sb')?c.I:0)+(en('sc')?c.R:0)+(en('st')?c.T:0)+(en('ss')?c.V:0)+(en('pp')?ppv:0), b2:c.I+c.R};
-  };
-  // total cu sumă compensatorie (dacă e activă): bază + spor condiții cel puțin la nivelul prezent p2
-  const totFull=(sp,a,p2)=>{const {tot,b2}=totAt(sp,a); return tot+(cpz?Math.max(0,p2-b2):0);};
-  // descrierea cazului analizat: funcția, sporurile și celelalte beneficii
-  const dmeta=DS.clinic.rows[c3sel];
-  const dmode=sh.noapte==='Da'?`noapte (${sh.orenoapte} ore/lună, 25%)`:(sh.tura==='Da'?'tură (15%)':'fără');
-  $('c3_chdesc').innerHTML=
-    `<b>${dmeta.fn}</b> · studii <b>${dmeta.studii||'—'}</b> · unitate <b>${C3_UNITLBL[c3units[1]]}</b> · gradația <b>${sh.grad}</b> · <b>${sh.ore}</b> ore lucrătoare/lună<br>`+
-    `Spor condiții deosebite în prezent: <b>${Math.round(sh.svechi*100)}%</b> · Spor tură/noapte: <b>${dmode}</b> · SDSL: <b>${sh.oresdsl} ore/lună</b> la tarif <b>${Math.round(sh.tarifsdsl*100)}%</b> · `+
-    `Indemnizație de hrană: <b>${sh.hrana==='Da'?lei(sh.hranav)+' lei':'nu'}</b> <span class="u">(doar în prezent)</span> · Indemnizație OUG 63/2023: <b>${sh.indemn==='Da'?lei(sh.indemnv)+' lei':'nu'}</b> <span class="u">(doar în prezent)</span> · `+
-    `Plată pe performanță: <b>${en('pp')?((+$('c3_ppct').value||0)+'% din salariul de bază nou'):'dezactivată'}</b>`;
-  const STEP=2.5;
-  // interval opțional pentru sporul actual (schimbă baza „prezent")
-  const useSA=c3Sw('c3_sa_sw')==='Da';
-  ['c3_sa0f','c3_sa1f'].forEach(id=>$(id).style.display=useSA?'':'none');
-  let sa0=Math.round(+$('c3_sa0').value||0), sa1=Math.round(+$('c3_sa1').value||0);
-  if(sa1<sa0)[sa0,sa1]=[sa1,sa0];
-  if(sa1-sa0>60)sa1=sa0+60;
-  const r0=DS[c3units[0]].rows[c3sel];
-  const totPAt=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});
-    return (en('sb')?c.J:0)+(en('sc')?c.M:0)+(en('st')?c.N:0)+(en('ss')?c.O:0)+(en('ih')?c.hrana:0)+(en('io')?c.indemn:0);};
-  const tpOf=sa=>sa==null?totP:totPAt(sa);
-  const prez2At=sa=>{const c=calc(r0,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return c.J+c.M+c.indemn;};
-  const p2Of=sa=>sa==null?prez2:prez2At(sa);
-  // sporul actual e CORELAT cu sporul nou (nu combinat liber): minimul actual merge cu minimul nou,
-  // maximul cu maximul — nu are sens să compari un spor actual minim cu un spor nou maxim.
-  const saOf=sp=>{
-    if(!useSA) return null;
-    const t=(s1===s0)?0:Math.min(1,Math.max(0,(sp-s0)/(s1-s0)));
-    return Math.round((sa0+t*(sa1-sa0))*100)/100;
-  };
-  const pts=[], saUsed=new Set();
-  for(let a=a0;a<=a1+1e-9;a+=STEP)for(let sp=s0;sp<=s1+1e-9;sp+=STEP){
-    const {tot,b2}=totAt(sp,a), sa=saOf(sp);
-    saUsed.add(sa);
-    const full=tot+(cpz?Math.max(0,p2Of(sa)-b2):0);
-    pts.push({sp,a,sa,tot:full,diff:full-tpOf(sa)});
-  }
-  const saVals=[...saUsed];
-  $('c3_ptscount').textContent=`· ${pts.length} combinații (spor nou ${s0}–${s1}% × ajustare ${a0}–${a1}%${useSA?` · spor actual ${sa0}–${sa1}% corelat`:''}, pas 2,5)`;
-  // praguri de egalitate cu prezentul (totalul nou e liniar în spor și în ajustare → rezolvare exactă)
-  const fbk=n=>n==null?'—':(n>=0?'+':'')+n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
-  const fpc=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:1})+'%';
-  // pragurile se rezolvă prin bisecție (cu sumele compensatorii totalul devine liniar pe porțiuni)
-  const bisect=g=>{
-    let lo=-100, hi=500;
-    if(g(hi)<0) return null;
-    if(g(lo)>=0) return lo;
-    for(let i=0;i<60;i++){const m=(lo+hi)/2; if(g(m)>=0) hi=m; else lo=m;}
-    return hi;
-  };
-  // fiecare prag folosește sporul actual CORELAT cu sporul nou din acel scenariu
-  const solveA=sp=>{const sa=saOf(sp);return bisect(a=>totFull(sp,a,p2Of(sa))-tpOf(sa));};
-  const solveS=a=>bisect(sp=>{const sa=saOf(sp);return totFull(sp,a,p2Of(sa))-tpOf(sa);});
-  const pair=sp=>useSA?` ↔ actual ${fpc(saOf(sp))}`:'';
-  $('c3_bkls0').textContent=fpc(s0)+pair(s0); $('c3_bkls1').textContent=fpc(s1)+pair(s1);
-  $('c3_bkla0').textContent=fpc(a0); $('c3_bkla1').textContent=fpc(a1);
-  $('c3_bk1').textContent=fbk(solveA(s0)); $('c3_bk2').textContent=fbk(solveA(s1));
-  $('c3_bk3').textContent=fbk(solveS(a0)); $('c3_bk4').textContent=fbk(solveS(a1));
-  const xs=[...saVals.map(tpOf),...pts.map(p=>p.tot)], ys=[0,...pts.map(p=>p.diff)];
-  const xmin=Math.min(...xs), xmax=Math.max(...xs), yminR=Math.min(...ys), ymaxR=Math.max(...ys);
-  const xpad=(xmax-xmin)*0.06||1000, ypad=(ymaxR-yminR)*0.08||500;
-  const x0=xmin-xpad, x1=xmax+xpad, y0=yminR-ypad, y1=ymaxR+ypad;
-  const W=760,H=420,ML=86,MR=16,MT=14,MB=44;
-  const X=v=>ML+(v-x0)/(x1-x0)*(W-ML-MR), Y=v=>MT+(y1-v)/(y1-y0)*(H-MT-MB);
-  const ticks=(a,b,n)=>{const st0=(b-a)/n;const m=Math.pow(10,Math.floor(Math.log10(st0)));const st=Math.ceil(st0/m)*m;const t=[];for(let v=Math.ceil(a/st)*st;v<=b;v+=st)t.push(v);return t;};
-  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font:12px system-ui">`;
-  if(y0<0) s+=`<rect x="${ML}" y="${Y(Math.min(0,y1))}" width="${W-ML-MR}" height="${Y(y0)-Y(Math.min(0,y1))}" fill="#e11d48" opacity="0.06"/>`;
-  ticks(y0,y1,6).forEach(v=>{s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e2e8f0" stroke-width="1"/><text x="${ML-8}" y="${Y(v)+4}" text-anchor="end" fill="#64748b">${v>0?'+':''}${lei(v)}</text>`;});
-  ticks(x0,x1,6).forEach(v=>{s+=`<text x="${X(v)}" y="${H-MB+18}" text-anchor="middle" fill="#64748b">${lei(v)}</text>`;});
-  if(0>=y0&&0<=y1) s+=`<line x1="${ML}" x2="${W-MR}" y1="${Y(0)}" y2="${Y(0)}" stroke="#0f172a" stroke-width="1.5"/><text x="${W-MR-4}" y="${Y(0)-6}" text-anchor="end" fill="#0f172a" font-weight="600">prezent (dif. 0)</text>`;
-  // culoare secvențială după ajustare (deschis → închis)
-  pts.forEach(p=>{
-    const t=(p.a-a0)/Math.max(1,a1-a0), L=75-45*t;
-    const tp=tpOf(p.sa);
-    s+=`<circle cx="${X(p.tot)}" cy="${Y(p.diff)}" r="4" fill="hsl(210 65% ${L}%)" stroke="#fff" stroke-width="1" data-sp="${p.sp}" data-a="${p.a}"${p.sa==null?'':` data-sa="${p.sa}"`} data-tot="${lei(p.tot)}" data-diff="${(p.diff>=0?'+':'')+lei(p.diff)}" data-dpct="${tp?pct(p.tot/tp-1):''}"/>`;
-  });
-  saVals.forEach(sa=>{
-    const tp=tpOf(sa), sz=useSA?6:8;
-    s+=`<path d="M ${X(tp)} ${Y(0)-sz} l ${sz} ${sz} l -${sz} ${sz} l -${sz} -${sz} Z" fill="#0f172a" stroke="#fff" stroke-width="1.5" data-prez="1"${sa==null?'':` data-sa="${sa}"`} data-tot="${lei(tp)}"/>`;
-  });
-  s+=`<text x="${(ML+W-MR)/2}" y="${H-6}" text-anchor="middle" fill="#0f172a" font-weight="600">TOTAL brut / lună (lei)</text>`;
-  s+=`<text x="14" y="${(MT+H-MB)/2}" transform="rotate(-90 14 ${(MT+H-MB)/2})" text-anchor="middle" fill="#0f172a" font-weight="600">Diferență nou − prezent (lei)</text>`;
-  $('c3_chart').innerHTML=s+'</svg>';
 }
 function c3UpdatePresets(){
   document.querySelectorAll('#c3_presetbar .preset').forEach(b=>b.classList.toggle('active', DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match)===c3sel));
@@ -1997,30 +2174,9 @@ function c3Init(){
   $('c3_rm5').addEventListener('click',()=>{c3count=4;c3SyncCols();renderCmp3();});
   document.querySelectorAll('#c3_mode button').forEach(b=>b.addEventListener('click',()=>{c3SetMode(b.dataset.v);renderCmp3();}));
   $('c3_grad').addEventListener('input',()=>{c3UpdateGrad();renderCmp3();});
-  ['c3_hrana','c3_indemn','c3_sdsl_sw','c3_sa_sw','c3_cmpz'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
+  ['c3_hrana','c3_indemn','c3_sdsl_sw','c3_cmpz'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCmp3();}));
   ['c3_svechi','c3_snou'].forEach(id=>$(id).addEventListener('input',()=>{c3SyncSpor();renderCmp3();}));
-  $('c3_chsv').addEventListener('input',()=>{$('c3_svechi').value=$('c3_chsv').value;c3SyncSpor();renderCmp3();});
-  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct','c3_ps0','c3_ps1','c3_pa0','c3_pa1','c3_sa0','c3_sa1'].forEach(id=>$(id).addEventListener('input',renderCmp3));
-  // tooltip pe graficul spor × ajustare
-  const ctip=$('c3_ctip'), cwrap=$('c3_chartwrap');
-  cwrap.addEventListener('mousemove',e=>{
-    const el=e.target.closest('circle[data-tot],path[data-prez]');
-    if(!el){ctip.style.display='none';return;}
-    const saLine=el.dataset.sa!=null?`Spor actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>`:'';
-    if(el.dataset.prez){
-      ctip.innerHTML=`<b>◆ Calcul prezent</b><br>${saLine}Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
-    }else{
-      ctip.innerHTML=`Spor nou: <b>${(+el.dataset.sp).toLocaleString('ro-RO')}%</b><br>Ajustare: <b>${el.dataset.a>0?'+':''}${(+el.dataset.a).toLocaleString('ro-RO')}%</b><br>`+saLine+
-        `Total: <b>${el.dataset.tot} lei</b><br>Diferență: <b>${el.dataset.diff} lei</b>${el.dataset.dpct?' ('+el.dataset.dpct+')':''}`;
-    }
-    ctip.style.display='block';
-    const rc=cwrap.getBoundingClientRect();
-    let x=e.clientX-rc.left+14, y=e.clientY-rc.top+12;
-    if(x+ctip.offsetWidth>rc.width-4) x=e.clientX-rc.left-ctip.offsetWidth-14;
-    if(y+ctip.offsetHeight>rc.height-4) y=e.clientY-rc.top-ctip.offsetHeight-12;
-    ctip.style.left=x+'px'; ctip.style.top=y+'px';
-  });
-  cwrap.addEventListener('mouseleave',()=>{ctip.style.display='none';});
+  ['c3_ore','c3_orenoapte','c3_oresdsl','c3_tarifsdsl','c3_hranav','c3_indemnv','c3_adj1','c3_adj2','c3_adj3','c3_adj4','c3_sp0','c3_sp1','c3_sp2','c3_sp3','c3_sp4','c3_ppct'].forEach(id=>$(id).addEventListener('input',renderCmp3));
   $('c3_reset').addEventListener('click',()=>{c3ApplyDefaults();renderCmp3();});
   renderCmp3();
 }
@@ -2444,6 +2600,7 @@ pfInit();
 loadDS();
 $('sal_search').addEventListener('input',renderSal);
 mxInit();
+cxInit();
 document.querySelectorAll('#sal_unit button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#sal_unit button').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); salUnit=b.dataset.u; renderSal();
