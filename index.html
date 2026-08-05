@@ -937,14 +937,17 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="body">
         <div class="c3chdesc" id="cx_chdesc"></div>
         <div class="c3sabox">
-          <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(%)</span></div>
+          <div class="pgroup-title">Spor condiții deosebite — actual <span class="u">(interval, corelat cu sporul nou)</span></div>
           <div class="g4nr">
-            <div class="field"><label>Spor actual <span class="u">(%)</span></label><input type="number" id="cx_svechi" step="1"></div>
-            <div class="field"><label>Folosește interval minim–maxim</label>
-              <div class="switchrow"><button type="button" class="switch" id="cx_sa_sw"><span class="knob"></span><span class="stxt">Nu</span></button></div>
-            </div>
-            <div class="field" id="cx_sa0f" style="display:none"><label>Interval — minim <span class="u">(% ↔ spor nou minim)</span></label><input type="number" id="cx_sa0" step="1" value="55"></div>
-            <div class="field" id="cx_sa1f" style="display:none"><label>Interval — maxim <span class="u">(% ↔ spor nou maxim)</span></label><input type="number" id="cx_sa1" step="1" value="85"></div>
+            <div class="field"><label>De la <span class="u">(% ↔ spor nou minim)</span></label><input type="number" id="cx_sa0" step="1" value="55"></div>
+            <div class="field"><label>Până la <span class="u">(% ↔ spor nou maxim)</span></label><input type="number" id="cx_sa1" step="1" value="85"></div>
+          </div>
+          <div class="sporpresets" id="cx_sapresets">
+            <button type="button" class="sppreset" data-a="0" data-b="15">0 – 15%</button>
+            <button type="button" class="sppreset" data-a="15" data-b="30">15 – 30%</button>
+            <button type="button" class="sppreset" data-a="15" data-b="50">15 – 50%</button>
+            <button type="button" class="sppreset" data-a="55" data-b="75">55 – 75%</button>
+            <button type="button" class="sppreset" data-a="55" data-b="85">55 – 85%</button>
           </div>
         </div>
         <div class="g4newrates">
@@ -965,7 +968,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
           <div id="cx_ctip"></div>
         </div>
         <div class="mxlegend" id="cx_legend"></div>
-        <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou</b> (din intervalul de mai sus, pas 2,5%) × <b>o celulă din variantă</b> (ajustarea salariului nou). Culoarea urmează <b>specialitatea</b> din matrice. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b>; zona roșiatică = sub prezent. Sporul actual, dacă e pe interval, este <b>corelat</b> cu sporul nou (minim cu minim, maxim cu maxim).</div>
+        <div class="note">Fiecare punct = un <b>calcul nou</b> pentru o combinație <b>spor condiții nou</b> (din intervalul de mai sus, pas 2,5%) × <b>o celulă din variantă</b> (ajustarea salariului nou). Culoarea urmează <b>specialitatea</b> din matrice. Axa X = total brut/lună; axa Y = diferența față de <b>calculul prezent</b>; zona roșiatică = sub prezent. Sporul actual se dă întotdeauna ca <b>interval</b> și este <b>corelat</b> cu sporul nou (minim cu minim, maxim cu maxim) — fiecare romb negru e un calcul prezent pentru o valoare din interval.</div>
       </div>
     </section>
   </div>
@@ -1825,7 +1828,7 @@ function cxSetMode(m){document.querySelectorAll('#cx_mode button').forEach(b=>b.
 function cxUpdateGrad(){const v=+$('cx_grad').value;$('cx_grad_lbl').textContent=v;$('cx_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('cx_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
 function cxShared(){return {
   ore:+$('cx_ore').value||1, grad:+$('cx_grad').value,
-  svechi:(+$('cx_svechi').value||0)/100, snou:0,
+  svechi:(+$('cx_sa0').value||0)/100, snou:0,
   noapte:cxMode()==='Noapte'?'Da':'Nu', orenoapte:+$('cx_orenoapte').value||0,
   tura:cxMode()==='Tura'?'Da':'Nu',
   oresdsl:c3Sw('cx_sdsl_sw')==='Da'?(+$('cx_oresdsl').value||0):0,
@@ -1835,14 +1838,13 @@ function cxShared(){return {
 };}
 function cxApplyDefaults(){
   $('cx_ore').value=168; $('cx_grad').value=5; cxUpdateGrad();
-  $('cx_svechi').value=85;
   cxSetMode('Tura'); $('cx_orenoapte').value=0;
   $('cx_oresdsl').value=48; $('cx_tarifsdsl').value=30; c3SetSw('cx_sdsl_sw',true);
   c3SetSw('cx_hrana',true); $('cx_hranav').value=347;
   c3SetSw('cx_indemn',true); $('cx_indemnv').value=800;
   c3SetSw('cx_pp',false); $('cx_ppct').value=15;
   c3SetSw('cx_cmpz',false);
-  c3SetSw('cx_sa_sw',false); $('cx_sa0').value=55; $('cx_sa1').value=85;
+  $('cx_sa0').value=55; $('cx_sa1').value=85;
   $('cx_ps0').value=10; $('cx_ps1').value=30;
   cxUnit='clinic'; document.querySelectorAll('#cx_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
   cxRowOff.clear(); cxColOff.clear();
@@ -1884,13 +1886,11 @@ function renderCx(){
   const cl=v=>Math.round(+v||0);
   let s0=cl($('cx_ps0').value), s1=cl($('cx_ps1').value);
   if(s1<s0)[s0,s1]=[s1,s0]; if(s1-s0>60)s1=s0+60;
-  const useSA=c3Sw('cx_sa_sw')==='Da';
-  ['cx_sa0f','cx_sa1f'].forEach(id=>$(id).style.display=useSA?'':'none');
   let sa0=cl($('cx_sa0').value), sa1=cl($('cx_sa1').value);
   if(sa1<sa0)[sa0,sa1]=[sa1,sa0];
+  document.querySelectorAll('#cx_sapresets .sppreset').forEach(b=>b.classList.toggle('active',+b.dataset.a===sa0&&+b.dataset.b===sa1));
   // sporul actual e corelat cu sporul nou (min cu min, max cu max)
-  const saOf=sp=>{if(!useSA) return Math.round(sh.svechi*10000)/100;
-    const t=(s1===s0)?0:Math.min(1,Math.max(0,(sp-s0)/(s1-s0))); return Math.round((sa0+t*(sa1-sa0))*100)/100;};
+  const saOf=sp=>{const t=(s1===s0)?0:Math.min(1,Math.max(0,(sp-s0)/(s1-s0))); return Math.round((sa0+t*(sa1-sa0))*100)/100;};
   const prezAt=sa=>{const c=calc(row,{...sh, svechi:sa/100, adjust:0, indemnAll: sh.indemn==='Da'});return {tot:c.P, base:c.J+c.M+c.indemn};};
   const nouAt=(sp,adj)=>{const c=calc(row,{...sh, snou:sp/100, adjust:adj, indemnAll: sh.indemn==='Da'});const pp=ppOn?ppct*c.I:0;return {tot:c.I+c.R+c.T+c.V+pp, b2:c.I+c.R};};
   const totFull=(sp,adj,sa)=>{const n=nouAt(sp,adj), p=prezAt(sa);return n.tot+(cpz?Math.max(0,p.base-n.b2):0);};
@@ -1916,7 +1916,7 @@ function renderCx(){
   const cmin=coefs.length?Math.min(...coefs):1, cmax=coefs.length?Math.max(...coefs):1;
   const solveCoef=sp=>{const sa=saOf(sp), P=prezAt(sa).tot; const a=bisect(x=>totFull(sp,x/100,sa)-P); return a==null?null:1+a/100;};
   const solveSp=coef=>{const v=bisect(sp=>{const sa=saOf(sp);return totFull(sp,coef-1,sa)-prezAt(sa).tot;}); return v;};
-  const pair=sp=>useSA?` ↔ actual ${fpc(saOf(sp))}`:'';
+  const pair=sp=>` ↔ actual ${fpc(saOf(sp))}`;
   $('cx_bkls0').textContent=fpc(s0)+pair(s0); $('cx_bkls1').textContent=fpc(s1)+pair(s1);
   $('cx_bklc0').textContent=fcoef(cmin); $('cx_bklc1').textContent=fcoef(cmax);
   const c1=solveCoef(s0), c2=solveCoef(s1);
@@ -1959,7 +1959,7 @@ function cxInit(){
     const pr=PRESETS[+b.dataset.p], idx=DS.clinic.rows.findIndex(pr.match); if(idx<0)return;
     cxSel=idx; $('cx_fnsel').value=idx;
     if(/^Medic (primar|specialist)$/.test(pr.label)){
-      $('cx_svechi').value=85; cxSetMode('Nimic');
+      cxSetMode('Nimic');
       $('cx_oresdsl').value=0; c3SetSw('cx_sdsl_sw',false);
       c3SetSw('cx_hrana',false); c3SetSw('cx_indemn',false);
     }
@@ -1971,8 +1971,11 @@ function cxInit(){
   }));
   document.querySelectorAll('#cx_mode button').forEach(b=>b.addEventListener('click',()=>{cxSetMode(b.dataset.v);renderCx();}));
   $('cx_grad').addEventListener('input',()=>{cxUpdateGrad();renderCx();});
-  ['cx_hrana','cx_indemn','cx_sdsl_sw','cx_pp','cx_cmpz','cx_sa_sw'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCx();}));
-  ['cx_ore','cx_svechi','cx_orenoapte','cx_oresdsl','cx_tarifsdsl','cx_hranav','cx_indemnv','cx_ppct','cx_ps0','cx_ps1','cx_sa0','cx_sa1'].forEach(id=>$(id).addEventListener('input',renderCx));
+  ['cx_hrana','cx_indemn','cx_sdsl_sw','cx_pp','cx_cmpz'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderCx();}));
+  ['cx_ore','cx_orenoapte','cx_oresdsl','cx_tarifsdsl','cx_hranav','cx_indemnv','cx_ppct','cx_ps0','cx_ps1','cx_sa0','cx_sa1'].forEach(id=>$(id).addEventListener('input',renderCx));
+  document.querySelectorAll('#cx_sapresets .sppreset').forEach(b=>b.addEventListener('click',()=>{
+    $('cx_sa0').value=b.dataset.a; $('cx_sa1').value=b.dataset.b; renderCx();
+  }));
   $('cx_reset').addEventListener('click',()=>{cxApplyDefaults();renderCx();});
   $('cx_var').addEventListener('click',e=>{const b=e.target.closest('button[data-v]'); if(!b)return;
     cxVar=b.dataset.v; cxRowOff.clear(); cxColOff.clear(); cxRenderVar(); renderCx();});
