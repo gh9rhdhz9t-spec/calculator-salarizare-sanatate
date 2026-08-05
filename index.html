@@ -374,6 +374,16 @@ table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px 
 #mx_var button:hover{background:var(--brand-l);border-color:var(--brand);color:var(--brand-d)}
 #mx_var button.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(226,0,26,.25)}
 #mx_var .mxvsub{display:block;font-size:10px;font-weight:600;opacity:.75;margin-top:2px;white-space:nowrap}
+/* varianta personalizată — aur */
+#mx_var button.mxgold{border-color:#c9971b;background:linear-gradient(180deg,#fffaf0,#fdf0d0);color:#8a6a10}
+#mx_var button.mxgold:hover{background:linear-gradient(180deg,#fff6e0,#fbe7ba);border-color:#b8860b;color:#7a5c0a}
+#mx_var button.mxgold.active{background:linear-gradient(180deg,#e6b422,#c9971b);border-color:#a9800f;color:#fff;box-shadow:0 2px 10px rgba(201,151,27,.4)}
+table.mtxtab.mtxgold thead th.mtxcorner,table.mtxtab.mtxgold th.mtxside{background:#fffaf0}
+table.mtxtab.mtxgold thead th{background:#fdf3dc}
+table.mtxtab.mtxgold tbody td.mtxcell.sel{background:#fffaf0;box-shadow:inset 0 0 0 2px #c9971b}
+table.mtxtab th.mtxpct,table.mtxtab td.mtxpct{white-space:nowrap}
+.mtxin{width:52px;font:inherit;font-size:12.5px;font-weight:700;padding:3px 4px;border:1.5px solid #e0c68a;border-radius:7px;text-align:right;background:#fff;color:var(--brand-d);margin-right:2px}
+.mtxin:focus{outline:none;border-color:#c9971b;box-shadow:0 0 0 3px #fdf0d0}
 table.mtxtab .mtxhd{cursor:pointer}
 table.mtxtab .mtxhd:hover{background:var(--brand-l)}
 table.mtxtab .mtxoff{opacity:.35;filter:grayscale(1)}
@@ -1503,6 +1513,7 @@ function renderSal(){
 
 // ===== Matrice ajustări (tip de spital × specialitate) + comparație prezent/nou =====
 const MTXVAR={
+  v0:{gold:true, rows:[10,7,3,0,-3,-5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
   v1:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
   v2:{rows:[-10,-5,0,5,8,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
   v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
@@ -1510,11 +1521,11 @@ const MTXVAR={
   v5:{rows:[10,7,4,0,-3,-5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]},
   v6:{rows:[-5,-3,0,4,7,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:12}]}
 };
-let MTXROWS=MTXVAR.v1.rows, MTXCOLS=MTXVAR.v1.cols;
+let MTXROWS=MTXVAR.v0.rows, MTXCOLS=MTXVAR.v0.cols, mxVar='v0';
 // culori pe specialitate (paletă Okabe–Ito, sigură pentru daltonism): 3 ani, 4 ani, 5 ani, Chirurgie, ATI UPU
 const MTXCOLORS=['#0072B2','#E69F00','#009E73','#D55E00','#CC79A7'];
 function mxSetVariant(v){
-  MTXROWS=MTXVAR[v].rows; MTXCOLS=MTXVAR[v].cols;
+  mxVar=v; MTXROWS=MTXVAR[v].rows; MTXCOLS=MTXVAR[v].cols;
   mxRi=Math.max(0,MTXROWS.indexOf(0)); mxCi=0;
   mxRowOff.clear(); mxColOff.clear();
   document.querySelectorAll('#mx_var button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
@@ -1526,17 +1537,35 @@ const fcoef=n=>n.toLocaleString('ro-RO',{maximumFractionDigits:3});
 function renderMtx(){
   const fp=n=>n.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:2})+'%';
   const coff=ci=>mxColOff.has(ci), roff=ri=>mxRowOff.has(ri);
+  const edit=!!MTXVAR[mxVar].gold; // varianta personalizată — procente editabile
   let h='<thead><tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana"><span class="mtxdot" style="background:${MTXCOLORS[ci]}"></span>${c.l}</th>`).join('')+'</tr>';
-  h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>`<th class="num mtxpct mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
+  h+='<tr><th class="mtxcorner" colspan="2"></th>'+MTXCOLS.map((c,ci)=>edit
+    ? `<th class="num mtxpct${coff(ci)?' mtxoff':''}"><input class="mtxin" type="number" step="0.25" value="${c.p}" data-c="${ci}" title="Modifică procentul specialității">%</th>`
+    : `<th class="num mtxpct mtxhd${coff(ci)?' mtxoff':''}" data-coloff="${ci}" title="Click: ascunde / afișează coloana">${fp(c.p)}</th>`).join('')+'</tr></thead><tbody>';
   MTXROWS.forEach((r,ri)=>{
     h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${MTXROWS.length}">Tip de spital</th>`:'');
-    h+=`<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: ascunde / afișează rândul"><b>${r>0?'+':''}${r}%</b></td>`;
+    h+=edit
+      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: ascunde / afișează rândul"><input class="mtxin" type="number" step="1" value="${r}" data-r="${ri}" title="Modifică procentul tipului de spital">%</td>`
+      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: ascunde / afișează rândul"><b>${r>0?'+':''}${r}%</b></td>`;
     h+=MTXCOLS.map((c,ci)=>{
       const off=roff(ri)||coff(ci);
       return `<td class="num mtxcell${ri===mxRi&&ci===mxCi?' sel':''}${off?' mtxoff':''}" data-ri="${ri}" data-ci="${ci}" title="Aplică coeficientul ${fcoef(mxCoefAt(ri,ci))}">${fcoef(mxCoefAt(ri,ci))}</td>`;
     }).join('')+'</tr>';
   });
   $('mtxtab').innerHTML=h+'</tbody>';
+  document.querySelector('#mtxview .mtxtab').classList.toggle('mtxgold',edit);
+}
+// actualizează doar coeficienții din celule (păstrează focusul pe input-uri)
+function mxRefreshCells(){
+  document.querySelectorAll('#mtxtab td.mtxcell').forEach(td=>{td.textContent=fcoef(mxCoefAt(+td.dataset.ri,+td.dataset.ci));});
+  const b=document.querySelector('#mx_var button[data-v="'+mxVar+'"] .mxvsub');
+  if(b) b.textContent=mxSubLabel(mxVar);
+}
+function mxSubLabel(k){
+  const v=MTXVAR[k], fmr=n=>(n>0?'+':'')+n.toLocaleString('ro-RO');
+  const rmin=Math.min(...v.rows), rmax=Math.max(...v.rows);
+  const cps=v.cols.map(c=>c.p), cmin=Math.min(...cps), cmax=Math.max(...cps);
+  return `↕ ${fmr(rmin)}…${fmr(rmax)}% · ↔ ${fmr(cmin)}…${fmr(cmax)}%`;
 }
 function mxMode(){return document.querySelector('#mx_mode button.active')?.dataset.v||'Nimic';}
 function mxSetMode(m){document.querySelectorAll('#mx_mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===m));$('mx_wrap_orenoapte').style.display=(m==='Noapte')?'':'none';}
@@ -1648,7 +1677,16 @@ function mxInit(){
   ['mx_hrana','mx_indemn','mx_pp'].forEach(id=>$(id).addEventListener('click',()=>{c3SetSw(id,!$(id).classList.contains('on'));renderMx();}));
   ['mx_ore','mx_svechi','mx_snou','mx_orenoapte','mx_oresdsl','mx_tarifsdsl','mx_hranav','mx_indemnv','mx_ppct'].forEach(id=>$(id).addEventListener('input',renderMx));
   $('mx_reset').addEventListener('click',()=>{mxApplyDefaults();renderMtx();renderMx();});
+  // editarea procentelor în varianta personalizată
+  $('mtxtab').addEventListener('input',e=>{
+    const inp=e.target.closest('input.mtxin'); if(!inp) return;
+    const v=+inp.value||0;
+    if(inp.dataset.r!=null) MTXVAR[mxVar].rows[+inp.dataset.r]=v;
+    else MTXVAR[mxVar].cols[+inp.dataset.c].p=v;
+    mxRefreshCells(); renderMx();
+  });
   $('mtxtab').addEventListener('click',e=>{
+    if(e.target.closest('input.mtxin')) return;
     const hd=e.target.closest('[data-coloff],[data-rowoff]');
     if(hd){
       if(hd.dataset.coloff!=null){const ci=+hd.dataset.coloff; mxColOff.has(ci)?mxColOff.delete(ci):mxColOff.add(ci);}
@@ -1660,10 +1698,10 @@ function mxInit(){
   });
   // butoanele de variantă, cu min–max pe verticală (tip spital) și orizontală (specialitate)
   $('mx_var').innerHTML=Object.keys(MTXVAR).map((k,i)=>{
-    const v=MTXVAR[k], fmr=n=>(n>0?'+':'')+n.toLocaleString('ro-RO');
-    const rmin=Math.min(...v.rows), rmax=Math.max(...v.rows);
-    const cps=v.cols.map(c=>c.p), cmin=Math.min(...cps), cmax=Math.max(...cps);
-    return `<button type="button" data-v="${k}"${k==='v1'?' class="active"':''} title="Tip spital: ${fmr(rmin)}% … ${fmr(rmax)}% · Specialitate: ${fmr(cmin)}% … ${fmr(cmax)}%">Varianta ${i+1}<span class="mxvsub">↕ ${fmr(rmin)}…${fmr(rmax)}% · ↔ ${fmr(cmin)}…${fmr(cmax)}%</span></button>`;
+    const gold=!!MTXVAR[k].gold;
+    const cls=(gold?'mxgold':'')+(k===mxVar?' active':'');
+    const name=gold?'★ Varianta personalizată':`Varianta ${i}`;
+    return `<button type="button" data-v="${k}" class="${cls.trim()}" title="${gold?'Procente editabile direct în matrice':'Tip spital / specialitate'}">${name}<span class="mxvsub">${mxSubLabel(k)}</span></button>`;
   }).join('');
   document.querySelectorAll('#mx_var button').forEach(b=>b.addEventListener('click',()=>{
     mxSetVariant(b.dataset.v); renderMtx(); renderMx();
@@ -1691,7 +1729,7 @@ function mxInit(){
     tip.style.left=x+'px'; tip.style.top=y+'px';
   });
   wrap.addEventListener('mouseleave',()=>{tip.style.display='none';});
-  renderMtx(); renderMx();
+  mxSetVariant('v0'); renderMtx(); renderMx();
 }
 
 // ===== Comparație 3 cazuri =====
