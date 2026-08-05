@@ -369,15 +369,15 @@ table.mtxtab td.num{font-variant-numeric:tabular-nums}
 table.mtxtab tbody td.mtxcell{cursor:pointer}
 table.mtxtab tbody td.mtxcell:hover{background:var(--brand-l);font-weight:700}
 table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px #f59e0b;font-weight:800}
-#mx_var{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-#mx_var button{appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;text-align:center}
-#mx_var button:hover{background:var(--brand-l);border-color:var(--brand);color:var(--brand-d)}
-#mx_var button.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(226,0,26,.25)}
-#mx_var .mxvsub{display:block;font-size:10px;font-weight:600;opacity:.75;margin-top:2px;white-space:nowrap}
+#mx_var,#cx_var{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+#mx_var button,#cx_var button{appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;text-align:center}
+#mx_var button:hover,#cx_var button:hover{background:var(--brand-l);border-color:var(--brand);color:var(--brand-d)}
+#mx_var button.active,#cx_var button.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(226,0,26,.25)}
+#mx_var .mxvsub,#cx_var .mxvsub{display:block;font-size:10px;font-weight:600;opacity:.75;margin-top:2px;white-space:nowrap}
 /* varianta personalizată — aur */
-#mx_var button.mxgold{border-color:#c9971b;background:linear-gradient(180deg,#fffaf0,#fdf0d0);color:#8a6a10}
-#mx_var button.mxgold:hover{background:linear-gradient(180deg,#fff6e0,#fbe7ba);border-color:#b8860b;color:#7a5c0a}
-#mx_var button.mxgold.active{background:linear-gradient(180deg,#e6b422,#c9971b);border-color:#a9800f;color:#fff;box-shadow:0 2px 10px rgba(201,151,27,.4)}
+#mx_var button.mxgold,#cx_var button.mxgold{border-color:#c9971b;background:linear-gradient(180deg,#fffaf0,#fdf0d0);color:#8a6a10}
+#mx_var button.mxgold:hover,#cx_var button.mxgold:hover{background:linear-gradient(180deg,#fff6e0,#fbe7ba);border-color:#b8860b;color:#7a5c0a}
+#mx_var button.mxgold.active,#cx_var button.mxgold.active{background:linear-gradient(180deg,#e6b422,#c9971b);border-color:#a9800f;color:#fff;box-shadow:0 2px 10px rgba(201,151,27,.4)}
 table.mtxtab.mtxgold thead th.mtxcorner,table.mtxtab.mtxgold th.mtxside{background:#fffaf0}
 table.mtxtab.mtxgold thead th{background:#fdf3dc}
 table.mtxtab.mtxgold tbody td.mtxcell.sel{background:#fffaf0;box-shadow:inset 0 0 0 2px #c9971b}
