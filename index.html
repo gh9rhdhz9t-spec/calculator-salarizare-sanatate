@@ -1608,7 +1608,7 @@ function renderSal(){
 
 // ===== Matrice ajustări (tip de spital × specialitate) + comparație prezent/nou =====
 const MTXVAR={
-  v0:{gold:true, rows:[10,7,3,0,-3,-5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
+  v0:{gold:true, rows:[-5,-2.5,0,2.5,5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
   v1:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:10}]},
   v2:{rows:[-10,-5,0,5,8,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
   v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
@@ -1641,8 +1641,8 @@ function renderMtx(){
   MTXROWS.forEach((r,ri)=>{
     h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${MTXROWS.length}">Tip de spital</th>`:'');
     h+=edit
-      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: ascunde / afișează rândul"><input class="mtxin" type="number" step="1" value="${r}" data-r="${ri}" title="Modifică procentul tipului de spital">%</td>`
-      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: ascunde / afișează rândul"><b>${r>0?'+':''}${r}%</b></td>`;
+      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: ascunde / afișează rândul"><input class="mtxin" type="number" step="0.5" value="${r}" data-r="${ri}" title="Modifică procentul tipului de spital">%</td>`
+      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: ascunde / afișează rândul"><b>${r>0?'+':''}${r.toLocaleString('ro-RO')}%</b></td>`;
     h+=MTXCOLS.map((c,ci)=>{
       const off=roff(ri)||coff(ci);
       return `<td class="num mtxcell${ri===mxRi&&ci===mxCi?' sel':''}${off?' mtxoff':''}" data-ri="${ri}" data-ci="${ci}" title="Aplică coeficientul ${fcoef(mxCoefAt(ri,ci))}">${fcoef(mxCoefAt(ri,ci))}</td>`;
@@ -1695,7 +1695,7 @@ function mxTotNou(r,sh,adj){
 function renderMx(){
   const sh=mxShared(); const meta=DS.clinic.rows[mxSel], r=DS[mxUnit].rows[mxSel];
   const coef=mxCoefAt(mxRi,mxCi);
-  $('mx_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[mxUnit]} · matrice: ${MTXROWS[mxRi]>0?'+':''}${MTXROWS[mxRi]}% spital + ${MTXCOLS[mxCi].p}% ${MTXCOLS[mxCi].l}`;
+  $('mx_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[mxUnit]} · matrice: ${MTXROWS[mxRi]>0?'+':''}${MTXROWS[mxRi].toLocaleString('ro-RO')}% spital + ${MTXCOLS[mxCi].p.toLocaleString('ro-RO')}% ${MTXCOLS[mxCi].l}`;
   $('mx_coeflbl').textContent='· coef. selectat '+fcoef(coef);
   $('mx_c2sub').textContent='Nou 2026 · coef. '+fcoef(coef);
   const cp=calc(r,{...sh, adjust:0, indemnAll: sh.indemn==='Da'});
@@ -1812,7 +1812,7 @@ function mxInit(){
       tip.innerHTML=`<b>◆ Calcul prezent</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
     }else{
       const ri=+el.dataset.ri, ci=+el.dataset.ci, rp=MTXROWS[ri], cpp=MTXCOLS[ci];
-      tip.innerHTML=`Tip spital: <b>${rp>0?'+':''}${rp}%</b><br>`+
+      tip.innerHTML=`Tip spital: <b>${rp>0?'+':''}${rp.toLocaleString('ro-RO')}%</b><br>`+
         `Specialitate: <b>${cpp.l}</b> (+${cpp.p.toLocaleString('ro-RO',{minimumFractionDigits:1,maximumFractionDigits:1})}%)<br>`+
         `Coeficient: <b>${el.dataset.coef}</b><br>`+
         `Total: <b>${el.dataset.tot} lei</b><br>`+
@@ -1878,8 +1878,8 @@ function cxRenderMtx(){
   R.forEach((r,ri)=>{
     h+='<tr>'+(ri===0?`<th class="mtxside" rowspan="${R.length}">Tip de spital</th>`:'');
     h+=edit
-      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: scoate / include rândul"><input class="mtxin" type="number" step="1" value="${r}" data-r="${ri}">%</td>`
-      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: scoate / include rândul"><b>${r>0?'+':''}${r}%</b></td>`;
+      ? `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click lângă câmp: scoate / include rândul"><input class="mtxin" type="number" step="0.5" value="${r}" data-r="${ri}">%</td>`
+      : `<td class="num mtxpct mtxhd${roff(ri)?' mtxoff':''}" data-rowoff="${ri}" title="Click: scoate / include rândul"><b>${r>0?'+':''}${r.toLocaleString('ro-RO')}%</b></td>`;
     h+=C.map((c,ci)=>`<td class="num${roff(ri)||coff(ci)?' mtxoff':''}">${fcoef(cxCoef(ri,ci))}</td>`).join('')+'</tr>';
   });
   $('cxmtx').innerHTML=h+'</tbody>';
@@ -2011,7 +2011,7 @@ function cxInit(){
     if(el.dataset.prez){
       tip.innerHTML=`<b>◆ Calcul prezent</b><br>Spor actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>Total: <b>${el.dataset.tot} lei</b><br>Diferență: 0 lei`;
     }else{
-      tip.innerHTML=`Tip spital: <b>${el.dataset.r>0?'+':''}${el.dataset.r}%</b><br>Specialitate: <b>${el.dataset.cl}</b> (+${(+el.dataset.cp).toLocaleString('ro-RO')}%)<br>`+
+      tip.innerHTML=`Tip spital: <b>${el.dataset.r>0?'+':''}${(+el.dataset.r).toLocaleString('ro-RO')}%</b><br>Specialitate: <b>${el.dataset.cl}</b> (+${(+el.dataset.cp).toLocaleString('ro-RO')}%)<br>`+
         `Coeficient: <b>${el.dataset.coef}</b><br>Spor nou: <b>${(+el.dataset.sp).toLocaleString('ro-RO')}%</b> · actual: <b>${(+el.dataset.sa).toLocaleString('ro-RO')}%</b><br>`+
         `Total: <b>${el.dataset.tot} lei</b><br>Diferență: <b>${el.dataset.diff} lei</b>`;
     }
