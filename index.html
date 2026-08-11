@@ -1064,9 +1064,9 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   <section class="card c3params">
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
     <div class="body">
-      <div class="pgroup"><div class="pgroup-title">Tip unitate</div>
-        <div class="seg" id="to_unit">
-          <button type="button" data-u="clinic" class="active">Clinic</button>
+      <div class="pgroup"><div class="pgroup-title">Tip unitate <span class="u">(setează toate cazurile)</span></div>
+        <div class="seg" id="to_unitall">
+          <button type="button" data-u="clinic">Clinic</button>
           <button type="button" data-u="neclinic">Neclinic</button>
           <button type="button" data-u="sju">SAJ · ATI</button>
         </div>
@@ -1082,7 +1082,6 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
         <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
       </div>
       <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="to_ore" step="1"></div>
-      <div class="pgroup"><div class="pgroup-title">Ajustare salariu nou <span class="u">(%)</span></div><input type="number" id="to_adj" step="1"></div>
       <div class="pgroup">
         <div class="pgroup-title">Spor condiții deosebite</div>
         <div class="params two">
@@ -1102,22 +1101,40 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
     </div>
   </section>
   <section class="card">
-    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Tarif orar — prezent vs. nou <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="to_sub"></span></h2>
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Tarif orar — cazuri<button class="printbtn" id="to_add" title="Adaugă un caz nou (max. 5)">+ Adaugă caz</button><button class="printbtn" id="to_toggleparams" title="Arată / ascunde panoul Parametri comuni">⚙ Ascunde parametrii</button></h2>
     <div class="body">
       <p class="selfn" id="to_meta"></p>
       <div class="fwrap">
         <table class="c3tab totab">
-          <thead><tr><th class="c3lbl"></th><th>Prezent<span class="c3sub">lei / oră</span></th><th>Nou 2026<span class="c3sub">lei / oră</span></th><th>Diferență</th></tr></thead>
+          <thead><tr><th class="c3lbl"></th>
+            <th>Cazul 1<span class="c3sub">Prezent · lei/oră</span><div class="seg c3useg" id="to_unit0"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th>Cazul 2<span class="c3sub">Nou 2026 · lei/oră</span><div class="seg c3useg" id="to_unit1"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th>Cazul 3<span class="c3sub">Nou 2026 · lei/oră</span><div class="seg c3useg" id="to_unit2"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th class="cc4"><button type="button" class="c3rm" id="to_rm4" title="Elimină cazul">×</button>Cazul 4<span class="c3sub">Nou 2026 · lei/oră</span><div class="seg c3useg" id="to_unit3"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th>
+            <th class="cc5"><button type="button" class="c3rm" id="to_rm5" title="Elimină cazul">×</button>Cazul 5<span class="c3sub">Nou 2026 · lei/oră</span><div class="seg c3useg" id="to_unit4"><button type="button" data-u="clinic" class="active">Clinic</button><button type="button" data-u="neclinic">Neclinic</button><button type="button" data-u="sju">SAJ · ATI</button></div></th></tr></thead>
           <tbody>
+            <tr class="c3ctrl"><td class="c3lbl">Ajustare salariu nou <span class="u">(%)</span></td>
+              <td class="c3na">—</td>
+              <td><input type="number" id="to_adj1" step="1"></td>
+              <td><input type="number" id="to_adj2" step="1"></td>
+              <td class="cc4"><input type="number" id="to_adj3" step="1"></td>
+              <td class="cc5"><input type="number" id="to_adj4" step="1"></td></tr>
+            <tr class="c3ctrl"><td class="c3lbl">Spor condiții <span class="u">(%)</span></td>
+              <td><input type="number" id="to_sp0" step="1"></td>
+              <td><input type="number" id="to_sp1" step="1"></td>
+              <td><input type="number" id="to_sp2" step="1"></td>
+              <td class="cc4"><input type="number" id="to_sp3" step="1"></td>
+              <td class="cc5"><input type="number" id="to_sp4" step="1"></td></tr>
             <tr class="c3sec"><td colspan="4">Tarife orare de bază</td></tr>
-            <tr><td class="c3lbl">Tarif orar — salariu de bază</td><td id="to_b0"></td><td id="to_b1"></td><td id="to_bd"></td></tr>
-            <tr><td class="c3lbl">Tarif orar — bază de calcul sporuri <span class="u">(2018 în prezent)</span></td><td id="to_s0"></td><td id="to_s1"></td><td id="to_sd"></td></tr>
+            <tr><td class="c3lbl">Tarif orar — salariu de bază</td><td id="to_b0"></td><td id="to_b1"></td><td id="to_b2"></td><td class="cc4" id="to_b3"></td><td class="cc5" id="to_b4"></td></tr>
+            <tr><td class="c3lbl">Tarif orar — bază de calcul sporuri <span class="u">(2018 în prezent)</span></td><td id="to_s0"></td><td id="to_s1"></td><td id="to_s2"></td><td class="cc4" id="to_s3"></td><td class="cc5" id="to_s4"></td></tr>
             <tr class="c3sec"><td colspan="4">Sporuri — lei / oră</td></tr>
-            <tr><td class="c3lbl">Spor condiții deosebite <span class="u" id="to_lblsc"></span></td><td id="to_c0"></td><td id="to_c1"></td><td id="to_cd"></td></tr>
-            <tr><td class="c3lbl">Spor tură <span class="u">(15%)</span></td><td id="to_t0"></td><td id="to_t1"></td><td id="to_td"></td></tr>
-            <tr><td class="c3lbl">Spor noapte <span class="u">(25%)</span></td><td id="to_n0"></td><td id="to_n1"></td><td id="to_nd"></td></tr>
-            <tr><td class="c3lbl">Tarif orar SDSL <span class="u" id="to_lblsdsl"></span></td><td id="to_d0"></td><td id="to_d1"></td><td id="to_dd"></td></tr>
-            <tr class="c3total"><td class="c3lbl">Tarif orar total <span class="u">(bază + spor condiții)</span></td><td id="to_x0"></td><td id="to_x1"></td><td id="to_xd"></td></tr>
+            <tr><td class="c3lbl">Spor condiții deosebite</td><td id="to_c0"></td><td id="to_c1"></td><td id="to_c2"></td><td class="cc4" id="to_c3"></td><td class="cc5" id="to_c4"></td></tr>
+            <tr><td class="c3lbl">Spor tură <span class="u">(15%)</span></td><td id="to_t0"></td><td id="to_t1"></td><td id="to_t2"></td><td class="cc4" id="to_t3"></td><td class="cc5" id="to_t4"></td></tr>
+            <tr><td class="c3lbl">Spor noapte <span class="u">(25%)</span></td><td id="to_n0"></td><td id="to_n1"></td><td id="to_n2"></td><td class="cc4" id="to_n3"></td><td class="cc5" id="to_n4"></td></tr>
+            <tr><td class="c3lbl">Tarif orar SDSL <span class="u" id="to_lblsdsl"></span></td><td id="to_d0"></td><td id="to_d1"></td><td id="to_d2"></td><td class="cc4" id="to_d3"></td><td class="cc5" id="to_d4"></td></tr>
+            <tr class="c3total"><td class="c3lbl">Tarif orar total <span class="u">(bază + spor condiții)</span></td><td id="to_x0"></td><td id="to_x1"></td><td id="to_x2"></td><td class="cc4" id="to_x3"></td><td class="cc5" id="to_x4"></td></tr>
+            <tr><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="to_df1"></td><td id="to_df2"></td><td class="cc4" id="to_df3"></td><td class="cc5" id="to_df4"></td></tr>
           </tbody>
         </table>
       </div>
@@ -1899,44 +1916,73 @@ function mxInit(){
 }
 
 // ===== Tarif orar =====
-let toSel=0, toUnit='clinic';
+let toSel=0, toUnits=['clinic','clinic','clinic','clinic','clinic'], toCount=3;
 function toUpdateGrad(){const v=+$('to_grad').value;$('to_grad_lbl').textContent=v;$('to_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('to_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function toSyncCols(){
+  const tab=document.querySelector('.totab');
+  tab.classList.toggle('on4',toCount>=4); tab.classList.toggle('on5',toCount>=5);
+  $('to_rm4').style.display=(toCount===4)?'':'none';
+  $('to_rm5').style.display=(toCount===5)?'':'none';
+  $('to_add').style.display=(toCount>=5)?'none':'';
+  document.querySelectorAll('.totab .c3sec td').forEach(td=>td.colSpan=toCount+1);
+}
+function toSyncUnitAll(){
+  const u=toUnits.every(x=>x===toUnits[0])?toUnits[0]:null;
+  document.querySelectorAll('#to_unitall button').forEach(b=>b.classList.toggle('active',b.dataset.u===u));
+}
+function toSyncSpor(){
+  $('to_sp0').value=$('to_svechi').value;
+  for(let i=1;i<5;i++) $('to_sp'+i).value=$('to_snou').value;
+}
 function toApplyDefaults(){
   $('to_ore').value=168; $('to_grad').value=5; toUpdateGrad();
-  $('to_adj').value=0; $('to_svechi').value=85; $('to_snou').value=20;
+  $('to_svechi').value=85; $('to_snou').value=20; toSyncSpor();
   $('to_tarifsdsl').value=30;
   c3SetSw('to_indemn',true); $('to_indemnv').value=800;
-  toUnit='clinic'; document.querySelectorAll('#to_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
+  $('to_adj1').value=0; $('to_adj2').value=10; $('to_adj3').value=0; $('to_adj4').value=0;
+  toUnits=['clinic','clinic','clinic','clinic','clinic'];
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#to_unit'+ci+' button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic')));
+  toSyncUnitAll();
+  toCount=3; toSyncCols();
 }
 function renderTo(){
   const ore=+$('to_ore').value||1, grad=+$('to_grad').value, coeff=GRAD[grad]??1;
-  const adj=(+$('to_adj').value||0)/100;
-  const sv=(+$('to_svechi').value||0)/100, sn=(+$('to_snou').value||0)/100;
   const tsd=(+$('to_tarifsdsl').value||0)/100;
   const ougOn=c3Sw('to_indemn')==='Da', ougv=+$('to_indemnv').value||0;
-  const r=DS[toUnit].rows[toSel], meta=DS.clinic.rows[toSel];
-  // prezent: J = salariu OUG 19; L = baza 2018; K = baza 2022 (sporul de condiții se ia după anul funcției)
-  const J=r.F*coeff, K=r.G*coeff, L=r.H*coeff, Mb=(r.an===2022?K:L);
-  const I=r.E*coeff*(1+adj);                       // salariul de bază nou (ajustat)
   const ougH=ougOn?ougv/ore:0;                     // indemnizația OUG 63 transformată în lei/oră
-  $('to_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[toUnit]} · gradația ${grad} · ${ore} ore/lună · ajustare ${(+$('to_adj').value||0).toLocaleString('ro-RO')}% · an spor condiții: ${r.an}`;
-  $('to_sub').textContent=`· ${meta.fn} · ${ore} ore/lună`;
-  $('to_lblsc').textContent=`(${Math.round(sv*100)}% → ${Math.round(sn*100)}%)`;
+  const meta=DS.clinic.rows[toSel];
+  $('to_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · gradația ${grad} · ${ore} ore lucrătoare/lună · an spor condiții: ${meta.an}`;
   $('to_lblsdsl').innerHTML=`(prezent 100% din tariful orar${ougOn?' + OUG 63':''} · nou ${Math.round(tsd*100)}%)`;
-  const set=(id0,id1,idd,v0,v1,sub0)=>{
-    $(id0).innerHTML=lord(v0)+(sub0?`<span class="c3d">${sub0}</span>`:'');
-    $(id1).textContent=lord(v1);
-    const d=v1-v0, el=$(idd);
-    el.classList.add('c3diff'); el.classList.remove('pos','neg'); el.classList.add(d>=0?'pos':'neg');
-    el.innerHTML=`${d>=0?'+':''}${lord(d)}<span class="dp">${v0?pct(v1/v0-1):''}</span>`;
-  };
-  set('to_b0','to_b1','to_bd', J/ore, I/ore);
-  set('to_s0','to_s1','to_sd', L/ore, I/ore);
-  set('to_c0','to_c1','to_cd', Mb*sv/ore, I*sn/ore);
-  set('to_t0','to_t1','to_td', L*0.15/ore, I*0.15/ore);
-  set('to_n0','to_n1','to_nd', L/ore*0.25, I/ore*0.25);
-  set('to_d0','to_d1','to_dd', L/ore+ougH, I/ore*tsd, ougOn?`din care OUG 63: ${lord(ougH)}`:'');
-  set('to_x0','to_x1','to_xd', (J+Mb*sv)/ore, (I+I*sn)/ore);
+  // Cazul 1 — prezent (J = salariu OUG 19, L = baza 2018, K = baza 2022 pentru sporul de condiții)
+  const r0=DS[toUnits[0]].rows[toSel];
+  const J=r0.F*coeff, K=r0.G*coeff, L=r0.H*coeff, Mb=(r0.an===2022?K:L);
+  const sv=(+$('to_sp0').value||0)/100;
+  const P={b:J/ore, s:L/ore, c:Mb*sv/ore, t:L*0.15/ore, n:L/ore*0.25, d:L/ore+ougH};
+  P.x=P.b+P.c;
+  $('to_b0').textContent=lord(P.b); $('to_s0').textContent=lord(P.s);
+  $('to_c0').textContent=lord(P.c); $('to_t0').textContent=lord(P.t); $('to_n0').textContent=lord(P.n);
+  $('to_d0').innerHTML=lord(P.d)+(ougOn?`<span class="c3d">din care OUG 63: ${lord(ougH)}</span>`:'');
+  $('to_x0').textContent=lord(P.x);
+  const cell=(id,v,base)=>{const d=v-base, cls=d>1e-9?'pos':(d<-1e-9?'neg':'');
+    let dl=`<span class="c3d ${cls}">${d>=0?'+':''}${lord(d)}</span>`;
+    if(base) dl+=`<span class="c3d ${cls}">${pct(v/base-1)}</span>`;
+    $(id).innerHTML=lord(v)+dl;};
+  for(let i=1;i<5;i++){
+    if(i>=toCount) continue;
+    const r=DS[toUnits[i]].rows[toSel];
+    const adj=(+$('to_adj'+i).value||0)/100, sn=(+$('to_sp'+i).value||0)/100;
+    const I=r.E*coeff*(1+adj);                     // salariul de bază nou (ajustat)
+    const N={b:I/ore, s:I/ore, c:I*sn/ore, t:I*0.15/ore, n:I/ore*0.25, d:I/ore*tsd};
+    N.x=N.b+N.c;
+    cell('to_b'+i,N.b,P.b); cell('to_s'+i,N.s,P.s); cell('to_c'+i,N.c,P.c);
+    cell('to_t'+i,N.t,P.t); cell('to_n'+i,N.n,P.n); cell('to_d'+i,N.d,P.d);
+    $('to_x'+i).textContent=lord(N.x);
+    const dx=N.x-P.x, el=$('to_df'+i);
+    el.classList.add('c3diff'); el.classList.remove('pos','neg'); el.classList.add(dx>=0?'pos':'neg');
+    el.innerHTML=`${dx>=0?'+':''}${lord(dx)}<span class="dp">${P.x?pct(N.x/P.x-1):''}</span>`;
+    const warn=N.x<P.x;
+    ['b','s','c','t','n','d','x','df'].forEach(k=>$('to_'+k+i).classList.toggle('c3warncell',warn));
+  }
 }
 function toInit(){
   $('to_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
@@ -1945,16 +1991,31 @@ function toInit(){
   toApplyDefaults();
   $('to_fnsel').addEventListener('change',e=>{toSel=+e.target.value;renderTo();});
   document.querySelectorAll('#to_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
-    const idx=DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match); if(idx<0)return;
-    toSel=idx; $('to_fnsel').value=idx; renderTo();
+    const pr=PRESETS[+b.dataset.p], idx=DS.clinic.rows.findIndex(pr.match); if(idx<0)return;
+    toSel=idx; $('to_fnsel').value=idx;
+    if(/^Medic (primar|specialist)$/.test(pr.label)){$('to_svechi').value=85;$('to_snou').value=20;toSyncSpor();}
+    renderTo();
   }));
-  document.querySelectorAll('#to_unit button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('#to_unit button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active'); toUnit=b.dataset.u; renderTo();
+  [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#to_unit'+ci+' button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#to_unit'+ci+' button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); toUnits[ci]=b.dataset.u; toSyncUnitAll(); renderTo();
+  })));
+  document.querySelectorAll('#to_unitall button').forEach(b=>b.addEventListener('click',()=>{
+    const u=b.dataset.u; toUnits=[u,u,u,u,u];
+    [0,1,2,3,4].forEach(ci=>document.querySelectorAll('#to_unit'+ci+' button').forEach(x=>x.classList.toggle('active',x.dataset.u===u)));
+    toSyncUnitAll(); renderTo();
   }));
+  $('to_add').addEventListener('click',()=>{if(toCount<5){toCount++;toSyncCols();renderTo();}});
+  $('to_rm4').addEventListener('click',()=>{toCount=3;toSyncCols();renderTo();});
+  $('to_rm5').addEventListener('click',()=>{toCount=4;toSyncCols();renderTo();});
+  $('to_toggleparams').addEventListener('click',()=>{
+    const v=$('toview'); v.classList.toggle('noparams');
+    $('to_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
+  });
   $('to_grad').addEventListener('input',()=>{toUpdateGrad();renderTo();});
   $('to_indemn').addEventListener('click',()=>{c3SetSw('to_indemn',!$('to_indemn').classList.contains('on'));renderTo();});
-  ['to_ore','to_adj','to_svechi','to_snou','to_tarifsdsl','to_indemnv'].forEach(id=>$(id).addEventListener('input',renderTo));
+  ['to_svechi','to_snou'].forEach(id=>$(id).addEventListener('input',()=>{toSyncSpor();renderTo();}));
+  ['to_ore','to_tarifsdsl','to_indemnv','to_adj1','to_adj2','to_adj3','to_adj4','to_sp0','to_sp1','to_sp2','to_sp3','to_sp4'].forEach(id=>$(id).addEventListener('input',renderTo));
   $('to_reset').addEventListener('click',()=>{toApplyDefaults();renderTo();});
   renderTo();
 }
