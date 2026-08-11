@@ -456,6 +456,7 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   <div class="tabs" id="tabs">
     <button class="tab active" data-ds="cmp3">Comparație cazuri</button>
     <button class="tab" data-ds="gcmp">Comparație gărzi</button>
+    <button class="tab" data-ds="to">Tarif orar</button>
     <button class="tab" data-ds="sal">Salarii de bază</button>
     <button class="tab" data-ds="mtx">Matrice ajustări</button>
     <button class="tab" data-ds="cx">Matrice complexă</button>
@@ -1059,6 +1060,72 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
   </section>
 </div>
 
+<div class="grid cmp3view" id="toview" style="display:none">
+  <section class="card c3params">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Parametri comuni</h2>
+    <div class="body">
+      <div class="pgroup"><div class="pgroup-title">Tip unitate</div>
+        <div class="seg" id="to_unit">
+          <button type="button" data-u="clinic" class="active">Clinic</button>
+          <button type="button" data-u="neclinic">Neclinic</button>
+          <button type="button" data-u="sju">SAJ · ATI</button>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Alege funcția</div><select id="to_fnsel"></select>
+        <div class="preselabel" style="margin:10px 0 8px">Selectează rapid o funcție</div>
+        <div class="presetbar" id="to_presetbar"></div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-title">Gradație de vechime</div>
+        <div class="sliderhead"><span>Gradația <b id="to_grad_lbl">5</b></span><span class="gradcoef" id="to_grad_coef">coef. 1×</span></div>
+        <input type="range" id="to_grad" min="0" max="5" step="1" value="5">
+        <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Ore lucrătoare / lună</div><input type="number" id="to_ore" step="1"></div>
+      <div class="pgroup"><div class="pgroup-title">Ajustare salariu nou <span class="u">(%)</span></div><input type="number" id="to_adj" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Spor condiții deosebite</div>
+        <div class="params two">
+          <div class="field"><label>Actual <span class="u">(%)</span></label><input type="number" id="to_svechi" step="1"></div>
+          <div class="field"><label>Nou <span class="u">(%)</span></label><input type="number" id="to_snou" step="1"></div>
+        </div>
+      </div>
+      <div class="pgroup"><div class="pgroup-title">Tarif SDSL nou <span class="u">(% din tariful orar nou)</span></div><input type="number" id="to_tarifsdsl" step="1"></div>
+      <div class="pgroup">
+        <div class="pgroup-title">Indemnizație OUG 63/2023 <span class="u">(se adaugă la tariful orar SDSL prezent)</span></div>
+        <div class="switchrow">
+          <button type="button" class="switch on" id="to_indemn"><span class="knob"></span><span class="stxt">Da</span></button>
+          <input type="number" id="to_indemnv" class="vinput" step="1"><span class="unit">lei</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:right"><button class="btn" id="to_reset">↺ Resetează parametrii</button></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Tarif orar — prezent vs. nou <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="to_sub"></span></h2>
+    <div class="body">
+      <p class="selfn" id="to_meta"></p>
+      <div class="fwrap">
+        <table class="c3tab totab">
+          <thead><tr><th class="c3lbl"></th><th>Prezent<span class="c3sub">lei / oră</span></th><th>Nou 2026<span class="c3sub">lei / oră</span></th><th>Diferență</th></tr></thead>
+          <tbody>
+            <tr class="c3sec"><td colspan="4">Tarife orare de bază</td></tr>
+            <tr><td class="c3lbl">Tarif orar — salariu de bază</td><td id="to_b0"></td><td id="to_b1"></td><td id="to_bd"></td></tr>
+            <tr><td class="c3lbl">Tarif orar — bază de calcul sporuri <span class="u">(2018 în prezent)</span></td><td id="to_s0"></td><td id="to_s1"></td><td id="to_sd"></td></tr>
+            <tr class="c3sec"><td colspan="4">Sporuri — lei / oră</td></tr>
+            <tr><td class="c3lbl">Spor condiții deosebite <span class="u" id="to_lblsc"></span></td><td id="to_c0"></td><td id="to_c1"></td><td id="to_cd"></td></tr>
+            <tr><td class="c3lbl">Spor tură <span class="u">(15%)</span></td><td id="to_t0"></td><td id="to_t1"></td><td id="to_td"></td></tr>
+            <tr><td class="c3lbl">Spor noapte <span class="u">(25%)</span></td><td id="to_n0"></td><td id="to_n1"></td><td id="to_nd"></td></tr>
+            <tr><td class="c3lbl">Tarif orar SDSL <span class="u" id="to_lblsdsl"></span></td><td id="to_d0"></td><td id="to_d1"></td><td id="to_dd"></td></tr>
+            <tr class="c3total"><td class="c3lbl">Tarif orar total <span class="u">(bază + spor condiții)</span></td><td id="to_x0"></td><td id="to_x1"></td><td id="to_xd"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Toate valorile sunt <b>lei / oră</b>, la gradația și ora lucrătoare alese. În <b>prezent</b>, sporurile se calculează pe baza <b>2018</b> (Legea 153), iar salariul de bază e cel din <b>OUG 19</b>; în <b>noua lege</b> totul se raportează la salariul de bază din proiect (ajustat). Tariful orar <b>SDSL prezent</b> include, dacă e activată, <b>indemnizația OUG 63/2023 ÷ ore lucrătoare</b>.</div>
+    </div>
+  </section>
+</div>
+
 <div id="salview" style="display:none">
   <section class="card">
     <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="5" width="3" height="12"/><rect x="17" y="13" width="3" height="4"/></svg>Salarii de bază — proiect <span class="u" id="salcount" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h2>
@@ -1502,12 +1569,14 @@ function renderCoef(){
   $('coefnotes').innerHTML=COEF.notes.map(n=>`<div class="nt${/^NOT/i.test(n)?' hd':''}">${n}</div>`).join('');
 }
 function showView(ds){
-  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp', isMtx=ds==='mtx', isCx=ds==='cx';
-  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp&&!isMtx&&!isCx;
+  const isCoef=ds==='coef', isGarzi=ds==='garzi', isCmp3=ds==='cmp3', isProg=ds==='prog', isSal=ds==='sal', isGcmp=ds==='gcmp', isMtx=ds==='mtx', isCx=ds==='cx', isTo=ds==='to';
+  const isCalc=!isCoef&&!isGarzi&&!isCmp3&&!isProg&&!isSal&&!isGcmp&&!isMtx&&!isCx&&!isTo;
   $('mtxview').style.display=isMtx?'':'none';
   if(isMtx) renderMx();
   $('cxview').style.display=isCx?'':'none';
   if(isCx){cxRenderVar();renderCx();}
+  $('toview').style.display=isTo?'':'none';
+  if(isTo) renderTo();
   $('salview').style.display=isSal?'':'none';
   if(isSal) renderSal();
   $('gcmpview').style.display=isGcmp?'':'none';
@@ -1827,6 +1896,67 @@ function mxInit(){
   });
   wrap.addEventListener('mouseleave',()=>{tip.style.display='none';});
   mxSetVariant('v0'); renderMtx(); renderMx();
+}
+
+// ===== Tarif orar =====
+let toSel=0, toUnit='clinic';
+function toUpdateGrad(){const v=+$('to_grad').value;$('to_grad_lbl').textContent=v;$('to_grad_coef').textContent='coef. '+(+(GRAD[v]??1).toFixed(2))+'×';const pc=v/5*100;$('to_grad').style.background=`linear-gradient(90deg,var(--brand) ${pc}%,var(--line) ${pc}%)`;}
+function toApplyDefaults(){
+  $('to_ore').value=168; $('to_grad').value=5; toUpdateGrad();
+  $('to_adj').value=0; $('to_svechi').value=85; $('to_snou').value=20;
+  $('to_tarifsdsl').value=30;
+  c3SetSw('to_indemn',true); $('to_indemnv').value=800;
+  toUnit='clinic'; document.querySelectorAll('#to_unit button').forEach(b=>b.classList.toggle('active',b.dataset.u==='clinic'));
+}
+function renderTo(){
+  const ore=+$('to_ore').value||1, grad=+$('to_grad').value, coeff=GRAD[grad]??1;
+  const adj=(+$('to_adj').value||0)/100;
+  const sv=(+$('to_svechi').value||0)/100, sn=(+$('to_snou').value||0)/100;
+  const tsd=(+$('to_tarifsdsl').value||0)/100;
+  const ougOn=c3Sw('to_indemn')==='Da', ougv=+$('to_indemnv').value||0;
+  const r=DS[toUnit].rows[toSel], meta=DS.clinic.rows[toSel];
+  // prezent: J = salariu OUG 19; L = baza 2018; K = baza 2022 (sporul de condiții se ia după anul funcției)
+  const J=r.F*coeff, K=r.G*coeff, L=r.H*coeff, Mb=(r.an===2022?K:L);
+  const I=r.E*coeff*(1+adj);                       // salariul de bază nou (ajustat)
+  const ougH=ougOn?ougv/ore:0;                     // indemnizația OUG 63 transformată în lei/oră
+  $('to_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · unitate: ${C3_UNITLBL[toUnit]} · gradația ${grad} · ${ore} ore/lună · ajustare ${(+$('to_adj').value||0).toLocaleString('ro-RO')}% · an spor condiții: ${r.an}`;
+  $('to_sub').textContent=`· ${meta.fn} · ${ore} ore/lună`;
+  $('to_lblsc').textContent=`(${Math.round(sv*100)}% → ${Math.round(sn*100)}%)`;
+  $('to_lblsdsl').innerHTML=`(prezent 100% din tariful orar${ougOn?' + OUG 63':''} · nou ${Math.round(tsd*100)}%)`;
+  const set=(id0,id1,idd,v0,v1,sub0)=>{
+    $(id0).innerHTML=lord(v0)+(sub0?`<span class="c3d">${sub0}</span>`:'');
+    $(id1).textContent=lord(v1);
+    const d=v1-v0, el=$(idd);
+    el.classList.add('c3diff'); el.classList.remove('pos','neg'); el.classList.add(d>=0?'pos':'neg');
+    el.innerHTML=`${d>=0?'+':''}${lord(d)}<span class="dp">${v0?pct(v1/v0-1):''}</span>`;
+  };
+  set('to_b0','to_b1','to_bd', J/ore, I/ore);
+  set('to_s0','to_s1','to_sd', L/ore, I/ore);
+  set('to_c0','to_c1','to_cd', Mb*sv/ore, I*sn/ore);
+  set('to_t0','to_t1','to_td', L*0.15/ore, I*0.15/ore);
+  set('to_n0','to_n1','to_nd', L/ore*0.25, I/ore*0.25);
+  set('to_d0','to_d1','to_dd', L/ore+ougH, I/ore*tsd, ougOn?`din care OUG 63: ${lord(ougH)}`:'');
+  set('to_x0','to_x1','to_xd', (J+Mb*sv)/ore, (I+I*sn)/ore);
+}
+function toInit(){
+  $('to_fnsel').innerHTML=DS.clinic.rows.map((r,i)=>`<option value="${i}">[${r.studii||'—'}] ${shortName(r.fn)}</option>`).join('');
+  $('to_fnsel').value=0;
+  $('to_presetbar').innerHTML=PRESETS.map((pr,i)=>`<button class="preset" data-p="${i}">${pr.label} <span class="ps">${pr.studii}</span></button>`).join('');
+  toApplyDefaults();
+  $('to_fnsel').addEventListener('change',e=>{toSel=+e.target.value;renderTo();});
+  document.querySelectorAll('#to_presetbar .preset').forEach(b=>b.addEventListener('click',()=>{
+    const idx=DS.clinic.rows.findIndex(PRESETS[+b.dataset.p].match); if(idx<0)return;
+    toSel=idx; $('to_fnsel').value=idx; renderTo();
+  }));
+  document.querySelectorAll('#to_unit button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#to_unit button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); toUnit=b.dataset.u; renderTo();
+  }));
+  $('to_grad').addEventListener('input',()=>{toUpdateGrad();renderTo();});
+  $('to_indemn').addEventListener('click',()=>{c3SetSw('to_indemn',!$('to_indemn').classList.contains('on'));renderTo();});
+  ['to_ore','to_adj','to_svechi','to_snou','to_tarifsdsl','to_indemnv'].forEach(id=>$(id).addEventListener('input',renderTo));
+  $('to_reset').addEventListener('click',()=>{toApplyDefaults();renderTo();});
+  renderTo();
 }
 
 // ===== Matrice complexă: spor nou × ajustările variantei =====
@@ -2615,6 +2745,7 @@ loadDS();
 $('sal_search').addEventListener('input',renderSal);
 mxInit();
 cxInit();
+toInit();
 document.querySelectorAll('#sal_unit button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#sal_unit button').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); salUnit=b.dataset.u; renderSal();
