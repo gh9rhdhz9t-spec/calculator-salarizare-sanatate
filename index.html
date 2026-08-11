@@ -378,6 +378,13 @@ table.mtxtab tbody td.mtxcell.sel{background:#fff7ed;box-shadow:inset 0 0 0 2px 
 #mx_var button.mxgold,#cx_var button.mxgold{border-color:#c9971b;background:linear-gradient(180deg,#fffaf0,#fdf0d0);color:#8a6a10}
 #mx_var button.mxgold:hover,#cx_var button.mxgold:hover{background:linear-gradient(180deg,#fff6e0,#fbe7ba);border-color:#b8860b;color:#7a5c0a}
 #mx_var button.mxgold.active,#cx_var button.mxgold.active{background:linear-gradient(180deg,#e6b422,#c9971b);border-color:#a9800f;color:#fff;box-shadow:0 2px 10px rgba(201,151,27,.4)}
+/* variantă evidențiată — albastru */
+#mx_var button.mxblue,#cx_var button.mxblue{border-color:#0072B2;background:linear-gradient(180deg,#f5faff,#e3f0fb);color:#075985}
+#mx_var button.mxblue:hover,#cx_var button.mxblue:hover{background:linear-gradient(180deg,#eaf4ff,#d3e6f8);border-color:#005b8f;color:#064c6f}
+#mx_var button.mxblue.active,#cx_var button.mxblue.active{background:linear-gradient(180deg,#2b93d4,#0072B2);border-color:#005b8f;color:#fff;box-shadow:0 2px 10px rgba(0,114,178,.4)}
+table.mtxtab.mtxblue thead th.mtxcorner,table.mtxtab.mtxblue th.mtxside{background:#f5faff}
+table.mtxtab.mtxblue thead th{background:#e8f2fb}
+table.mtxtab.mtxblue tbody td.mtxcell.sel{background:#eff6ff;box-shadow:inset 0 0 0 2px #0072B2}
 table.mtxtab.mtxgold thead th.mtxcorner,table.mtxtab.mtxgold th.mtxside{background:#fffaf0}
 table.mtxtab.mtxgold thead th{background:#fdf3dc}
 table.mtxtab.mtxgold tbody td.mtxcell.sel{background:#fffaf0;box-shadow:inset 0 0 0 2px #c9971b}
@@ -1607,7 +1614,8 @@ const MTXVAR={
   v3:{rows:[10,5,0,-3,-6,-10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:1.25},{l:'5 ani',p:2.5},{l:'Chirurgie',p:3.75},{l:'ATI UPU',p:5}]},
   v4:{rows:[-3,0,3,6,9,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]},
   v5:{rows:[10,7,4,0,-3,-5], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2},{l:'5 ani',p:4},{l:'Chirurgie',p:6},{l:'ATI UPU',p:15}]},
-  v6:{rows:[-5,-3,0,4,7,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:12}]}
+  v6:{rows:[-5,-3,0,4,7,10], cols:[{l:'3 ani',p:0},{l:'4 ani',p:2.5},{l:'5 ani',p:5},{l:'Chirurgie',p:7.5},{l:'ATI UPU',p:12}]},
+  v7:{blue:true, rows:[-5,-3,0,4,8,12], cols:[{l:'3 ani',p:0},{l:'4 ani',p:3},{l:'5 ani',p:5},{l:'Chirurgie',p:8},{l:'ATI UPU',p:12}]}
 };
 let MTXROWS=MTXVAR.v0.rows, MTXCOLS=MTXVAR.v0.cols, mxVar='v0';
 // culori pe specialitate (paletă Okabe–Ito, sigură pentru daltonism): 3 ani, 4 ani, 5 ani, Chirurgie, ATI UPU
@@ -1641,7 +1649,8 @@ function renderMtx(){
     }).join('')+'</tr>';
   });
   $('mtxtab').innerHTML=h+'</tbody>';
-  document.querySelector('#mtxview .mtxtab').classList.toggle('mtxgold',edit);
+  const t=document.querySelector('#mtxview .mtxtab');
+  t.classList.toggle('mtxgold',edit); t.classList.toggle('mtxblue',!!MTXVAR[mxVar].blue);
 }
 // actualizează doar coeficienții din celule (păstrează focusul pe input-uri)
 function mxRefreshCells(){
@@ -1786,8 +1795,8 @@ function mxInit(){
   });
   // butoanele de variantă, cu min–max pe verticală (tip spital) și orizontală (specialitate)
   $('mx_var').innerHTML=Object.keys(MTXVAR).map((k,i)=>{
-    const gold=!!MTXVAR[k].gold;
-    const cls=(gold?'mxgold':'')+(k===mxVar?' active':'');
+    const gold=!!MTXVAR[k].gold, blue=!!MTXVAR[k].blue;
+    const cls=(gold?'mxgold':blue?'mxblue':'')+(k===mxVar?' active':'');
     const name=gold?'★ Varianta personalizată':`Varianta ${i}`;
     return `<button type="button" data-v="${k}" class="${cls.trim()}" title="${gold?'Procente editabile direct în matrice':'Tip spital / specialitate'}">${name}<span class="mxvsub">${mxSubLabel(k)}</span></button>`;
   }).join('');
@@ -1853,7 +1862,8 @@ const cxRows=()=>MTXVAR[cxVar].rows, cxCols=()=>MTXVAR[cxVar].cols;
 const cxCoef=(ri,ci)=>1+(cxRows()[ri]+cxCols()[ci].p)/100;
 function cxRenderVar(){
   $('cx_var').innerHTML=Object.keys(MTXVAR).map((k,i)=>{
-    const gold=!!MTXVAR[k].gold, cls=(gold?'mxgold':'')+(k===cxVar?' active':'');
+    const gold=!!MTXVAR[k].gold, blue=!!MTXVAR[k].blue;
+    const cls=(gold?'mxgold':blue?'mxblue':'')+(k===cxVar?' active':'');
     return `<button type="button" data-v="${k}" class="${cls.trim()}">${gold?'★ Varianta personalizată':'Varianta '+i}<span class="mxvsub">${mxSubLabel(k)}</span></button>`;
   }).join('');
 }
@@ -1874,6 +1884,7 @@ function cxRenderMtx(){
   });
   $('cxmtx').innerHTML=h+'</tbody>';
   $('cxmtx').classList.toggle('mtxgold',edit);
+  $('cxmtx').classList.toggle('mtxblue',!!MTXVAR[cxVar].blue);
 }
 function renderCx(){
   cxRenderMtx();
