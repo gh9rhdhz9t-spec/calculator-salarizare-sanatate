@@ -1058,6 +1058,46 @@ table.bd td .gsubname{color:var(--muted);font-size:11.5px;font-weight:600;margin
       <div class="note">„Prezent” = tarif orar Legea 250 + sporul de gardă (zi / weekend); „Nou 2026” = tariful orar din proiect (salariul de bază nou ÷ ore lucrătoare), cu <b>+20%</b> în weekend. <b>Plata pe gardă</b> folosește tariful de gardă în urgență, zi lucrătoare. Funcțiile care nu există pentru un tip de unitate apar cu „—”. Poți adăuga până la <b>5 cazuri</b>.</div>
     </div>
   </section>
+  <section class="card">
+    <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Plată totală gărzi <span class="u" style="text-transform:none;letter-spacing:0;font-weight:500" id="g4_hsub"></span></h2>
+    <div class="body">
+      <div class="g4newrates">
+        <div class="pgroup-title">Ore de gardă și tipul gărzii</div>
+        <div class="g4nr">
+          <div class="field"><label>Ore în zile lucrătoare</label><input type="number" id="g4_hz" step="1" value="18"></div>
+          <div class="field"><label>Ore în weekend / sărbători</label><input type="number" id="g4_hw" step="1" value="12"></div>
+          <div class="field"><label>Tip gardă</label>
+            <div class="seg" id="g4_gtype" style="margin-top:auto">
+              <button type="button" data-t="u" class="active">Urgență</button>
+              <button type="button" data-t="m">Monitorizare</button>
+              <button type="button" data-t="d">Domiciliu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fwrap">
+        <table class="c3tab g4ttab">
+          <thead><tr><th class="c3lbl"></th>
+            <th>Cazul 1<span class="c3sub">Prezent</span></th>
+            <th>Cazul 2<span class="c3sub">Nou 2026</span></th>
+            <th>Cazul 3<span class="c3sub">Nou 2026</span></th>
+            <th class="cc4">Cazul 4<span class="c3sub">Nou 2026</span></th>
+            <th class="cc5">Cazul 5<span class="c3sub">Nou 2026</span></th></tr></thead>
+          <tbody>
+            <tr class="c3sec g4hsec"><td colspan="4">Tarife orare pentru tipul de gardă ales <span class="u">(lei/oră)</span></td></tr>
+            <tr><td class="c3lbl">Tarif orar — zi lucrătoare</td><td id="g4_hz0"></td><td id="g4_hz1"></td><td id="g4_hz2"></td><td class="cc4" id="g4_hz3"></td><td class="cc5" id="g4_hz4"></td></tr>
+            <tr><td class="c3lbl">Tarif orar — weekend / sărbători</td><td id="g4_hw0"></td><td id="g4_hw1"></td><td id="g4_hw2"></td><td class="cc4" id="g4_hw3"></td><td class="cc5" id="g4_hw4"></td></tr>
+            <tr class="c3sec g4hsec"><td colspan="4">Plata pentru orele alese <span class="u">(lei)</span></td></tr>
+            <tr><td class="c3lbl">Plată ore zi lucrătoare <span class="u" id="g4_lblz"></span></td><td id="g4_pz0"></td><td id="g4_pz1"></td><td id="g4_pz2"></td><td class="cc4" id="g4_pz3"></td><td class="cc5" id="g4_pz4"></td></tr>
+            <tr><td class="c3lbl">Plată ore weekend <span class="u" id="g4_lblw"></span></td><td id="g4_pw0"></td><td id="g4_pw1"></td><td id="g4_pw2"></td><td class="cc4" id="g4_pw3"></td><td class="cc5" id="g4_pw4"></td></tr>
+            <tr class="c3total"><td class="c3lbl">TOTAL plată gărzi <span class="u" id="g4_lblt"></span></td><td id="g4_pt0"></td><td id="g4_pt1"></td><td id="g4_pt2"></td><td class="cc4" id="g4_pt3"></td><td class="cc5" id="g4_pt4"></td></tr>
+            <tr><td class="c3lbl">Diferență <span class="u">față de prezent</span></td><td class="c3na">—</td><td id="g4_pd1"></td><td id="g4_pd2"></td><td class="cc4" id="g4_pd3"></td><td class="cc5" id="g4_pd4"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Alege câte ore de gardă faci în <b>zile lucrătoare</b> și câte în <b>weekend / sărbători</b>, plus <b>tipul gărzii</b>; tabelul dă plata totală în prezent și pentru fiecare caz nou, cu aceleași tipuri de unitate și ajustări ca în tabelul de mai sus.</div>
+    </div>
+  </section>
 </div>
 
 <div class="grid cmp3view" id="toview" style="display:none">
@@ -2390,6 +2430,9 @@ function c3Init(){
 let g4sel=0, g4units=['clinic','clinic','clinic','clinic','clinic'], g4count=3;
 const G4LBL={clinic:'Clinic',neclinic:'Neclinic',saj:'SAJ · ATI'};
 const G4CELLS=['uz','mz','dz','uw','mw','dw','pg'];
+const G4HCELLS=['hz','hw','pz','pw','pt'];
+const G4TLBL={u:'gardă în urgență',m:'gardă de monitorizare',d:'gardă la domiciliu'};
+function g4Type(){return document.querySelector('#g4_gtype button.active')?.dataset.t||'u';}
 function g4Row(unit){
   const fn=GARZI.units.clinic[g4sel]?.fn;
   return GARZI.units[unit].find(r=>r.fn===fn)||null;
@@ -2402,7 +2445,9 @@ function g4SyncCols(){
   $('g4_rm4').style.display=(g4count===4)?'':'none';
   $('g4_rm5').style.display=(g4count===5)?'':'none';
   $('g4_add').style.display=(g4count>=5)?'none':'';
-  document.querySelectorAll('#gcmpview .g4sec td').forEach(td=>td.colSpan=g4count+1);
+  document.querySelectorAll('#gcmpview .g4sec td, #gcmpview .g4hsec td').forEach(td=>td.colSpan=g4count+1);
+  const t2=document.querySelector('#gcmpview .g4ttab');
+  if(t2){t2.classList.toggle('on4',g4count>=4); t2.classList.toggle('on5',g4count>=5);}
 }
 function g4SyncUnitAll(){
   const u=g4units.every(x=>x===g4units[0])?g4units[0]:null;
@@ -2413,6 +2458,8 @@ function g4ApplyDefaults(){
   $('g4_ore').value=d.ore; $('g4_dur').value=18;
   $('g4_gz').value=Math.round(d.gz*100); $('g4_gw').value=Math.round(d.gw*100);
   $('g4_pu').value=100; $('g4_pm').value=75; $('g4_pd').value=40; $('g4_pwe').value=20;
+  $('g4_hz').value=18; $('g4_hw').value=12;
+  document.querySelectorAll('#g4_gtype button').forEach(b=>b.classList.toggle('active',b.dataset.t==='u'));
   c3SetSw('g4_oug',true); $('g4_ougv').value=1000;
   $('g4_grad').value=5; g4UpdateGrad();
   $('g4_adj1').value=0; $('g4_adj2').value=10; $('g4_adj3').value=0; $('g4_adj4').value=0;
@@ -2433,8 +2480,8 @@ function renderG4(){
   const meta=GARZI.units.clinic[g4sel];
   $('g4_meta').innerHTML=`<b>${meta.fn}</b><br>Studii: ${meta.studii||'—'} · gradația ${grad} · gardă de ${dur} ore`;
   $('g4_durlbl').textContent=`(${dur} ore · urgență, zi)`;
-  const na=i=>{G4CELLS.forEach(k=>{const el=$('g4_'+k+i); el.innerHTML='<span class="c3na">—</span>'; el.classList.remove('c3warncell');});
-    if(i>0){const dc=$('g4_df'+i); dc.innerHTML='—'; dc.className=dc.className.replace(/\b(pos|neg|c3diff|c3warncell)\b/g,'').trim();}};
+  const na=i=>{[...G4CELLS,...G4HCELLS].forEach(k=>{const el=$('g4_'+k+i); if(el){el.innerHTML='<span class="c3na">—</span>'; el.classList.remove('c3warncell');}});
+    if(i>0){['df','pd'].forEach(k=>{const dc=$('g4_'+k+i); if(dc){dc.innerHTML='—'; dc.className=dc.className.replace(/\b(pos|neg|c3diff|c3warncell)\b/g,'').trim();}});}};
   // Cazul 1 = PREZENT (tarif orar Legea 250 + spor gardă), pe unitatea Cazului 1
   const r0=g4Row(g4units[0]);
   let Q=null,R=null;
@@ -2446,6 +2493,20 @@ function renderG4(){
     $('g4_uw0').textContent=lord(R); $('g4_mw0').textContent=lord(R); $('g4_dw0').textContent=lord(R*0.4);
     $('g4_pg0').textContent=lei(Q*dur);
   } else na(0);
+  // ——— plata totală pe orele alese, pentru tipul de gardă selectat ———
+  const gt=g4Type(), hz=+$('g4_hz').value||0, hw=+$('g4_hw').value||0;
+  const pctOf={u:pu,m:pm,d:pd}[gt];                 // procentul nou al tipului de gardă
+  const prezMul={u:1,m:1,d:0.4}[gt];                // în prezent monitorizarea se plătește ca urgența
+  $('g4_hsub').textContent=`· ${G4TLBL[gt]} · ${hz} ore zi + ${hw} ore weekend`;
+  $('g4_lblz').textContent=`(${hz} ore)`; $('g4_lblw').textContent=`(${hw} ore)`;
+  $('g4_lblt').textContent=`(${hz+hw} ore · ${G4TLBL[gt]})`;
+  let TZ=null,TW=null,TT=null;
+  if(Q!=null){
+    TZ=Q*prezMul; TW=R*prezMul;
+    $('g4_hz0').textContent=lord(TZ); $('g4_hw0').textContent=lord(TW);
+    $('g4_pz0').textContent=lei(TZ*hz); $('g4_pw0').textContent=lei(TW*hw);
+    TT=TZ*hz+TW*hw; $('g4_pt0').textContent=lei(TT);
+  }
   const cell=(id,val,base)=>{const d=base==null?null:val-base, cls=d==null?'':(d>1e-9?'pos':(d<-1e-9?'neg':''));
     let dl='';
     if(d!=null){dl=`<span class="c3d ${cls}">${d>=0?'+':''}${lord(d)}</span>`; if(base) dl+=`<span class="c3d ${cls}">${pct(val/base-1)}</span>`;}
@@ -2467,6 +2528,18 @@ function renderG4(){
       dc.classList.add('c3diff'); dc.classList.remove('pos','neg'); dc.classList.add(d>=0?'pos':'neg');
       dc.innerHTML=`${d>=0?'+':''}${lei(d)}<span class="dp">${pgP?pct(pg/pgP-1):''}</span>`;
     }
+    // plata totală pe orele alese, pentru cazul i
+    const nz=M*pctOf, nw=M*pctOf*WE, nt=nz*hz+nw*hw;
+    cell('g4_hz'+i,nz,TZ); cell('g4_hw'+i,nw,TW);
+    $('g4_pz'+i).textContent=lei(nz*hz); $('g4_pw'+i).textContent=lei(nw*hw);
+    $('g4_pt'+i).textContent=lei(nt);
+    const pdc=$('g4_pd'+i);
+    if(TT==null){pdc.innerHTML='—'; pdc.classList.remove('pos','neg');}
+    else{const d2=nt-TT;
+      pdc.classList.add('c3diff'); pdc.classList.remove('pos','neg'); pdc.classList.add(d2>=0?'pos':'neg');
+      pdc.innerHTML=`${d2>=0?'+':''}${lei(d2)}<span class="dp">${TT?pct(nt/TT-1):''}</span>`;}
+    const warnH=TT!=null&&nt<TT;
+    [...G4HCELLS,'pd'].forEach(k=>$('g4_'+k+i).classList.toggle('c3warncell',warnH));
     const warn=pgP!=null&&pg<pgP;
     [...G4CELLS,'df'].forEach(k=>$('g4_'+k+i).classList.toggle('c3warncell',warn));
   }
@@ -2493,7 +2566,11 @@ function g4Init(){
     $('g4_toggleparams').textContent=v.classList.contains('noparams')?'⚙ Arată parametrii':'⚙ Ascunde parametrii';
   });
   $('g4_grad').addEventListener('input',()=>{g4UpdateGrad();renderG4();});
-  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_pu','g4_pm','g4_pd','g4_pwe','g4_ougv','g4_adj1','g4_adj2','g4_adj3','g4_adj4'].forEach(id=>$(id).addEventListener('input',renderG4));
+  ['g4_ore','g4_dur','g4_gz','g4_gw','g4_pu','g4_pm','g4_pd','g4_pwe','g4_ougv','g4_adj1','g4_adj2','g4_adj3','g4_adj4','g4_hz','g4_hw'].forEach(id=>$(id).addEventListener('input',renderG4));
+  document.querySelectorAll('#g4_gtype button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#g4_gtype button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); renderG4();
+  }));
   $('g4_oug').addEventListener('click',()=>{c3SetSw('g4_oug',!$('g4_oug').classList.contains('on'));renderG4();});
   $('g4_reset').addEventListener('click',()=>{g4ApplyDefaults();renderG4();});
   renderG4();
